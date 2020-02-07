@@ -13,8 +13,14 @@ description: A rock climbing training app.
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
 
+# Caret syntax provides a more compact way of expressing the most common sort of version constraint.
+# ^version means “the range of all versions guaranteed to be backwards compatible with the specified version”,
+# and follows pub’s convention for semantic versioning. For example, ^1.2.3 is equivalent to '>=1.2.3 <2.0.0',
+# and ^0.1.2 is equivalent to '>=0.1.2 <0.2.0'.
+# i.e. up to the next breaking version
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.4.0 <3.0.0"
+  flutter: ^1.14.6
 
 dependencies:
   flutter:
@@ -25,7 +31,11 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  test: ^1.9.0
+  test_api: ^0.2.11
   flutter_test:
+    sdk: flutter
+  flutter_driver:
     sdk: flutter
 
 
