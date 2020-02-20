@@ -1,7 +1,8 @@
-import 'package:crux/services/base_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'base_auth.dart';
 
 class GoogleSignInFirebaseAuth implements BaseAuth {
   final GoogleSignIn googleSignIn;
@@ -16,7 +17,6 @@ class GoogleSignInFirebaseAuth implements BaseAuth {
 
   @override
   Future<FirebaseUser> signInWithGoogle() async {
-    //
     try {
       final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
 
@@ -41,7 +41,7 @@ class GoogleSignInFirebaseAuth implements BaseAuth {
     try {
       await firebaseAuth.signOut();
       return await googleSignIn.signOut();
-    } catch(error) {
+    } catch (error) {
       print(error.toString());
       return null;
     }

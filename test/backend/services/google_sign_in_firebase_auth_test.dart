@@ -1,5 +1,5 @@
-import 'package:crux/services/base_auth.dart';
-import 'package:crux/services/google_sign_in_firebase_auth.dart';
+import 'package:crux/backend/services/base_auth.dart';
+import 'package:crux/backend/services/google_sign_in_firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';
@@ -124,30 +124,37 @@ void main() {
           .thenAnswer((_) => Future<GoogleSignInAccount>.value(googleSignInAccountMock));
 
       var actual = await googleSignInFirebaseAuth.signOutOfGoogle();
+
       expect(actual, googleSignInAccountMock);
+      verify(firebaseAuthMock.signOut()).called(1);
+      verify(googleSignInMock.signOut()).called(1);
     });
 
     test(
         'Given user is currently signed in to Google and Firebase and Firebase sign out fails, '
-            'should not sign user out of either and should return null Google account info.',
-        () async {
+        'should not sign user out of either and should return null Google account info.', () async {
       when(firebaseAuthMock.signOut()).thenAnswer((_) => Future.error(Error()));
 
       var actual = await googleSignInFirebaseAuth.signOutOfGoogle();
+
       expect(actual, null);
+      verify(firebaseAuthMock.signOut()).called(1);
+      verifyNever(googleSignInMock.signOut());
     });
 
     test(
         'Given user is currently signed in to Google and Firebase and Google sign out fails, '
-            'should not sign user out of Google and should return null Google account info.',
-        () async {
-          when(firebaseAuthMock.signOut()).thenAnswer((_) => Future<void>.value(null));
+        'should not sign user out of Google and should return null Google account info.', () async {
+      when(firebaseAuthMock.signOut()).thenAnswer((_) => Future<void>.value(null));
 
       when(googleSignInMock.signOut())
           .thenAnswer((_) => Future<GoogleSignInAccount>.error(Error()));
 
       var actual = await googleSignInFirebaseAuth.signOutOfGoogle();
+
       expect(actual, null);
+      verify(firebaseAuthMock.signOut()).called(1);
+      verify(googleSignInMock.signOut()).called(1);
     });
   });
 }

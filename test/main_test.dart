@@ -1,29 +1,26 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:crux/frontend/screens/sign_in_screen.dart';
 import 'package:crux/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-    testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-      // Build our app and trigger a frame.
-      await tester.pumpWidget(MyApp());
+  group('Main app smoke test', () {
+    testWidgets('High level Main App elements test', (WidgetTester tester) async {
+      await tester.pumpWidget(Crux());
 
-      // Verify that our counter starts at 0.
-      expect(find.text('0'), findsOneWidget);
-      expect(find.text('1'), findsNothing);
-
-      // Tap the '+' icon and trigger a frame.
-      await tester.tap(find.byIcon(Icons.add));
-      await tester.pump();
-
-      // Verify that our counter has incremented.
-      expect(find.text('0'), findsNothing);
-      expect(find.text('1'), findsOneWidget);
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.byType(SignInScreen), findsOneWidget);
+      expect(find.byType(Theme), findsOneWidget);
     });
+
+    testWidgets('Test Theme Data properties', (WidgetTester tester) async {
+      await tester.pumpWidget(Crux());
+
+      var theme = tester.widget(find.byType(Theme)) as Theme;
+
+      expect(theme.data, isNotNull);
+      expect(theme.data.primaryColorLight, Crux.themeData.primaryColorLight);
+      expect(theme.data.accentColor, Crux.themeData.accentColor);
+    });
+  });
 }
