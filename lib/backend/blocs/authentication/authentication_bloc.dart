@@ -1,12 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
-import 'package:crux/backend/services/base_auth.dart';
+import 'package:crux/backend/services/base_authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
 class AuthenticationBloc extends Bloc {
-  BaseAuth authenticationService;
+  BaseAuthenticationService authenticationService;
 
   AuthenticationBloc({@required this.authenticationService});
 

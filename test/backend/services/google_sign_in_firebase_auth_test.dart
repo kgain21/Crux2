@@ -1,4 +1,4 @@
-import 'package:crux/backend/services/base_auth.dart';
+import 'package:crux/backend/services/base_authentication_service.dart';
 import 'package:crux/backend/services/google_sign_in_firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -35,7 +35,7 @@ void main() {
   final AuthCredentialMock authCredentialMock = AuthCredentialMock();
 
   // Subject
-  final BaseAuth googleSignInFirebaseAuth = GoogleSignInFirebaseAuth(
+  final BaseAuthenticationService googleSignInFirebaseAuth = GoogleSignInFirebaseAuth(
     googleSignIn: googleSignInMock,
     firebaseAuth: firebaseAuthMock,
     credentialManager: credentialManagerMock,

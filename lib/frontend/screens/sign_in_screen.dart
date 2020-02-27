@@ -2,8 +2,11 @@ import 'dart:ui';
 
 import 'package:crux/backend/blocs/authentication/authentication_bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_event.dart';
+import 'package:crux/backend/blocs/authentication/authentication_state.dart';
+import 'package:crux/frontend/screens/dashboard_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignInScreen extends StatelessWidget {
   final AuthenticationBloc authenticationBloc;
@@ -11,18 +14,32 @@ class SignInScreen extends StatelessWidget {
   SignInScreen({Key key, @required this.authenticationBloc}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: Key('signInScaffold'),
-      body: Center(
-        child: Stack(
-          key: Key('signInStack'),
-          children: <Widget>[
-            buildBackgroundImage(context),
-            buildContentOutlineOverlay(context),
-            buildTitleButtonOverlay(context),
-          ],
-        ),
+  Widget build(context) {
+    return BlocListener(
+      bloc: authenticationBloc,
+      listener: (context, state) {
+        if(state is AuthenticationSuccess) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
+        }
+      },
+      child: BlocBuilder(
+        key: Key('authenticationBlocBuilder'),
+        bloc: authenticationBloc,
+        builder: (context, state) {
+          return Scaffold(
+            key: Key('signInScaffold'),
+            body: Center(
+              child: Stack(
+                key: Key('signInStack'),
+                children: <Widget>[
+                  buildBackgroundImage(context),
+                  buildContentOutlineOverlay(context),
+                  buildTitleButtonOverlay(context),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -102,8 +119,7 @@ class SignInScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        constraints:
-            BoxConstraints(maxHeight: 45.0, minWidth: MediaQuery.of(context).size.width * .75),
+        constraints: BoxConstraints(maxHeight: 45.0, minWidth: 275.0,),
         child: RaisedButton(
           key: Key('signInGoogleButton'),
           onPressed: () => authenticationBloc.add(GoogleSignInButtonTapped()),
@@ -142,7 +158,7 @@ class SignInScreen extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints(
           minHeight: 45.0,
-          minWidth: MediaQuery.of(context).size.width * 0.75,
+          minWidth: 275.0,
         ),
         child: RaisedButton(
           key: Key('signInGuestButton'),

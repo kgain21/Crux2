@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class LoadingIndicator extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Center(
+  Widget build(context) => Center(
     child: CircularProgressIndicator(),
   );
 }

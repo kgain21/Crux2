@@ -1,4 +1,4 @@
-package com.gain.crux.crux
+package com.gain.crux
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

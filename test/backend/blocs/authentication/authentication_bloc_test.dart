@@ -1,12 +1,13 @@
 import 'package:crux/backend/blocs/authentication/authentication_bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
-import 'package:crux/backend/services/base_auth.dart';
+import 'package:crux/backend/services/base_authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class BaseAuthMock extends Mock implements BaseAuth {}
+class BaseAuthMock extends Mock implements BaseAuthenticationService {}
+
 class FirebaseUserMock extends Mock implements FirebaseUser {}
 
 void main() {
@@ -47,10 +48,7 @@ void main() {
 
       when(baseAuthMock.signInWithGoogle()).thenAnswer((_) => Future.value(firebaseUserMock));
 
-      expectLater(
-        authenticationBloc,
-        emitsInOrder(expectedResponse)
-      );
+      expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
       authenticationBloc.add(GoogleSignInButtonTapped());
     });
@@ -64,10 +62,7 @@ void main() {
 
       when(baseAuthMock.signInWithGoogle()).thenAnswer((_) => Future.value(null));
 
-      expectLater(
-        authenticationBloc,
-        emitsInOrder(expectedResponse)
-      );
+      expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
       authenticationBloc.add(GoogleSignInButtonTapped());
     });
@@ -79,12 +74,10 @@ void main() {
         AuthenticationError()
       ];
 
-      when(baseAuthMock.signInWithGoogle()).thenAnswer((_) => Future.error(Exception('Google sign in test')));
+      when(baseAuthMock.signInWithGoogle())
+          .thenAnswer((_) => Future.error(Exception('Google sign in test')));
 
-      expectLater(
-        authenticationBloc,
-        emitsInOrder(expectedResponse)
-      );
+      expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
       authenticationBloc.add(GoogleSignInButtonTapped());
     });
