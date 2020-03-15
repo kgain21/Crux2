@@ -5,7 +5,7 @@ import 'package:crux/backend/services/base_authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
-class AuthenticationBloc extends Bloc {
+class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   BaseAuthenticationService authenticationService;
 
   AuthenticationBloc({@required this.authenticationService});
@@ -14,7 +14,7 @@ class AuthenticationBloc extends Bloc {
   get initialState => AuthenticationUninitialized();
 
   @override
-  Stream mapEventToState(event) {
+  Stream<AuthenticationState> mapEventToState(event) {
     if (event is GoogleSignInButtonTapped) {
       return _mapGoogleSignInButtonTappedEventToState(event);
     }

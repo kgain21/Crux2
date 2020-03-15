@@ -24,7 +24,7 @@ class GoogleSignInFirebaseAuth implements BaseAuthenticationService {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
 
-        final AuthCredential authCredential = credentialManager.getCredential(
+        final AuthCredential authCredential = credentialManager.getCredentials(
             googleSignInAuthentication.accessToken, googleSignInAuthentication.idToken);
 
         AuthResult authResult = await firebaseAuth.signInWithCredential(authCredential);
@@ -49,7 +49,7 @@ class GoogleSignInFirebaseAuth implements BaseAuthenticationService {
 }
 
 class CredentialManager {
-  AuthCredential getCredential(String accessToken, String idToken) {
+  AuthCredential getCredentials(String accessToken, String idToken) {
     return GoogleAuthProvider.getCredential(idToken: idToken, accessToken: accessToken);
   }
 }

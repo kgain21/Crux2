@@ -59,7 +59,7 @@ void main() {
       when(googleSignInAuthenticationMock.idToken).thenReturn(idToken);
 
       // Get credentials from credential manager to bypass static method call
-      when(credentialManagerMock.getCredential(accessToken, idToken))
+      when(credentialManagerMock.getCredentials(accessToken, idToken))
           .thenReturn(authCredentialMock);
 
       // Use those authentication credentials to sign in to firebase
@@ -74,7 +74,7 @@ void main() {
       expect(actual, firebaseUserMock);
       verify(googleSignInMock.signIn()).called(1);
       verify(googleSignInAccountMock.authentication).called(1);
-      verify(credentialManagerMock.getCredential(accessToken, idToken)).called(1);
+      verify(credentialManagerMock.getCredentials(accessToken, idToken)).called(1);
       verify(firebaseAuthMock.signInWithCredential(authCredentialMock)).called(1);
     });
 
@@ -85,7 +85,7 @@ void main() {
       expect(actual, null);
       verify(googleSignInMock.signIn()).called(1);
       verifyNever(googleSignInAccountMock.authentication);
-      verifyNever(credentialManagerMock.getCredential(any, any));
+      verifyNever(credentialManagerMock.getCredentials(any, any));
       verifyNever(firebaseAuthMock.signInWithCredential(any));
     });
 
@@ -99,7 +99,7 @@ void main() {
       when(googleSignInAuthenticationMock.accessToken).thenReturn(accessToken);
       when(googleSignInAuthenticationMock.idToken).thenReturn(idToken);
 
-      when(credentialManagerMock.getCredential(accessToken, idToken))
+      when(credentialManagerMock.getCredentials(accessToken, idToken))
           .thenReturn(authCredentialMock);
 
       when(firebaseAuthMock.signInWithCredential(authCredentialMock))
@@ -109,7 +109,7 @@ void main() {
       expect(actual, null);
       verify(googleSignInMock.signIn()).called(1);
       verify(googleSignInAccountMock.authentication).called(1);
-      verify(credentialManagerMock.getCredential(accessToken, idToken)).called(1);
+      verify(credentialManagerMock.getCredentials(accessToken, idToken)).called(1);
       verify(firebaseAuthMock.signInWithCredential(authCredentialMock)).called(1);
     });
   });

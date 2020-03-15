@@ -10,6 +10,7 @@ Widget buildTestableWidget(Widget widget, {MockNavigatorObserver mockNavigatorOb
   return MaterialApp(
     /// Test theme properties on widgets
     theme: Crux.themeData,
+    routes: Crux.routes,
     home: Builder(
       builder: (context) {
         return widget;

@@ -9,26 +9,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignInScreen extends StatelessWidget {
+  static const routeName = '/';
+
   final AuthenticationBloc authenticationBloc;
 
   SignInScreen({Key key, @required this.authenticationBloc}) : super(key: key);
 
   @override
   Widget build(context) {
-    return BlocListener(
-      bloc: authenticationBloc,
-      listener: (context, state) {
-        if(state is AuthenticationSuccess) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
-        }
-      },
-      child: BlocBuilder(
-        key: Key('authenticationBlocBuilder'),
+    return Scaffold(
+      key: Key('signInScaffold'),
+      body: BlocListener<AuthenticationBloc, AuthenticationState>(
+        key: Key('SignInBlocListener'),
         bloc: authenticationBloc,
-        builder: (context, state) {
-          return Scaffold(
-            key: Key('signInScaffold'),
-            body: Center(
+        listener: (context, state) {
+          if (state is AuthenticationSuccess) {
+            Navigator.pushNamed(
+              context,
+              DashboardScreen.routeName,
+              arguments: state.firebaseUser,
+            );
+          }
+          if (state is AuthenticationFailure) {
+            Scaffold.of(context).showSnackBar(SnackBar(
+              key: Key('failureSnackBar'),
+              content:
+                  Text('Sign In authentication failed. Please try again or continue as a guest.'),
+              duration: Duration(seconds: 5),
+              backgroundColor: Theme.of(context).errorColor,
+            ));
+          }
+          if (state is AuthenticationError) {
+            Scaffold.of(context).showSnackBar(SnackBar(
+              key: Key('errorSnackBar'),
+              content: Text('Error occurred signing in. Please try again or continue as a guest.'),
+              duration: Duration(seconds: 5),
+              backgroundColor: Theme.of(context).errorColor,
+            ));
+          }
+        },
+        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          key: Key('authenticationBlocBuilder'),
+          bloc: authenticationBloc,
+          builder: (context, state) {
+            return Center(
               child: Stack(
                 key: Key('signInStack'),
                 children: <Widget>[
@@ -37,9 +61,9 @@ class SignInScreen extends StatelessWidget {
                   buildTitleButtonOverlay(context),
                 ],
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -119,7 +143,10 @@ class SignInScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        constraints: BoxConstraints(maxHeight: 45.0, minWidth: 275.0,),
+        constraints: BoxConstraints(
+          maxHeight: 45.0,
+          minWidth: 275.0,
+        ),
         child: RaisedButton(
           key: Key('signInGoogleButton'),
           onPressed: () => authenticationBloc.add(GoogleSignInButtonTapped()),
