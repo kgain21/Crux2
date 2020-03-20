@@ -22,32 +22,7 @@ class SignInScreen extends StatelessWidget {
       body: BlocListener<AuthenticationBloc, AuthenticationState>(
         key: Key('SignInBlocListener'),
         bloc: authenticationBloc,
-        listener: (context, state) {
-          if (state is AuthenticationSuccess) {
-            Navigator.pushNamed(
-              context,
-              DashboardScreen.routeName,
-              arguments: state.firebaseUser,
-            );
-          }
-          if (state is AuthenticationFailure) {
-            Scaffold.of(context).showSnackBar(SnackBar(
-              key: Key('failureSnackBar'),
-              content:
-                  Text('Sign In authentication failed. Please try again or continue as a guest.'),
-              duration: Duration(seconds: 5),
-              backgroundColor: Theme.of(context).errorColor,
-            ));
-          }
-          if (state is AuthenticationError) {
-            Scaffold.of(context).showSnackBar(SnackBar(
-              key: Key('errorSnackBar'),
-              content: Text('Error occurred signing in. Please try again or continue as a guest.'),
-              duration: Duration(seconds: 5),
-              backgroundColor: Theme.of(context).errorColor,
-            ));
-          }
-        },
+        listener: _listenForAuthenticationBlocState,
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           key: Key('authenticationBlocBuilder'),
           bloc: authenticationBloc,
@@ -67,6 +42,34 @@ class SignInScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _listenForAuthenticationBlocState(context, state) {
+        if (state is AuthenticationSuccess) {
+          Navigator.pushNamed(
+            context,
+            DashboardScreen.routeName,
+            arguments: state.cruxUser,
+          );
+        }
+        if (state is AuthenticationFailure) {
+          Scaffold.of(context).showSnackBar(SnackBar(
+            key: Key('failureSnackBar'),
+            content: Text(
+                'Sign in authentication failed. Please check your credentials and try again or continue as a guest.'),
+            duration: Duration(seconds: 5),
+            backgroundColor: Theme.of(context).errorColor,
+          ));
+        }
+        if (state is AuthenticationError) {
+          Scaffold.of(context).showSnackBar(SnackBar(
+            key: Key('errorSnackBar'),
+            content: Text(
+                'Network error occurred signing in. Please try again or continue as a guest.'),
+            duration: Duration(seconds: 5),
+            backgroundColor: Theme.of(context).errorColor,
+          ));
+        }
+      }
 
   Widget buildBackgroundImage(BuildContext context) {
     return Container(

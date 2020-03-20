@@ -1,3 +1,4 @@
+import 'package:crux/model/crux_user.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
@@ -11,3 +12,11 @@ class GoogleSignInButtonTapped implements AuthenticationEvent {
   List<Object> get props => [];
 }
 
+class AppBarSignOutButtonTapped implements AuthenticationEvent {
+  final CruxUser cruxUser;
+
+  const AppBarSignOutButtonTapped({this.cruxUser});
+
+  @override
+  List<Object> get props => [cruxUser];
+}

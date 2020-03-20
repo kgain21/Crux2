@@ -1,3 +1,4 @@
+import 'package:crux/model/crux_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,12 +8,13 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseUser firebaseUser = ModalRoute.of(context).settings.arguments;
+    final CruxUser cruxUser = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       key: Key('dashboardScaffold'),
+//      drawer: dashboardDrawer(),
       body: Container(
-        child: Center(child: Text('Welcome, ${firebaseUser.displayName.split(' ').first}')),
+        child: Center(child: Text('Welcome, ${cruxUser.displayName.split(' ').first}')),
       ),
     );
   }

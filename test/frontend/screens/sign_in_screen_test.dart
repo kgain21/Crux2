@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart' as dartTest;
 
+import '../../backend/blocs/authentication/authentication_bloc_test.dart';
 import '../../test_utils/widget_test_utils.dart';
 
 class AuthenticationBlocMock extends MockBloc<AuthenticationEvent, AuthenticationState>
@@ -19,13 +20,13 @@ class FirebaseUserMock extends Mock implements FirebaseUser {}
 
 void main() {
   AuthenticationBlocMock authenticationBlocMock;
-  FirebaseUserMock firebaseUserMock;
+  CruxUserMock cruxUserMock;
   MockNavigatorObserver mockNavigatorObserver;
 
   var subject;
 
   dartTest.setUp(() {
-    firebaseUserMock = FirebaseUserMock();
+    cruxUserMock = CruxUserMock();
     authenticationBlocMock = AuthenticationBlocMock();
     mockNavigatorObserver = MockNavigatorObserver();
 
@@ -80,13 +81,13 @@ void main() {
     testWidgets(
       'Test build with AuthenticationSuccess state should push /dashboard route with firebaseUser',
       (WidgetTester tester) async {
-        when(firebaseUserMock.displayName).thenReturn('Display Name');
+        when(cruxUserMock.displayName).thenReturn('Display Name');
 
         whenListen(
           authenticationBlocMock,
           Stream.fromIterable([
             AuthenticationInProgress(),
-            AuthenticationSuccess(firebaseUser: firebaseUserMock),
+            AuthenticationSuccess(cruxUser: cruxUserMock),
           ]),
         );
 
@@ -97,7 +98,7 @@ void main() {
         final Route pushedRoute =
             verify(mockNavigatorObserver.didPush(captureAny, any)).captured[1];
         expect(pushedRoute.settings.name, DashboardScreen.routeName);
-        expect(pushedRoute.settings.arguments, firebaseUserMock);
+        expect(pushedRoute.settings.arguments, cruxUserMock);
 
         expect(find.byType(DashboardScreen), findsOneWidget);
       },

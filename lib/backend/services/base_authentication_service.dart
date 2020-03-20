@@ -1,10 +1,7 @@
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:crux/model/crux_user.dart';
 
 abstract class BaseAuthenticationService {
+  Future<CruxUser> signIn();
 
-  Future<FirebaseUser> signInWithGoogle();
-
-  Future<GoogleSignInAccount> signOutOfGoogle();
+  Future<CruxUser> signOut();
 }

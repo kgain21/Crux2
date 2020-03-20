@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
 import 'package:crux/backend/services/base_authentication_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
@@ -18,22 +17,39 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     if (event is GoogleSignInButtonTapped) {
       return _mapGoogleSignInButtonTappedEventToState(event);
     }
+    if (event is AppBarSignOutButtonTapped) {
+      return _mapAppBarSignOutButtonTapped(event);
+    }
     return null;
   }
 
   Stream<AuthenticationState> _mapGoogleSignInButtonTappedEventToState(
       GoogleSignInButtonTapped event) async* {
     yield AuthenticationInProgress();
-    try {
-      FirebaseUser firebaseUser = await authenticationService.signInWithGoogle();
-      if(null != firebaseUser) {
-        yield AuthenticationSuccess(firebaseUser: firebaseUser);
+    yield await authenticationService.signIn().then((cruxUser) {
+      if (null != cruxUser) {
+        return AuthenticationSuccess(cruxUser: cruxUser);
       } else {
-        yield AuthenticationFailure();
+        return AuthenticationFailure();
       }
-    } catch (error) {
+    }).catchError((error) {
       print(error);
-      yield AuthenticationError();
-    }
+      return AuthenticationError();
+    });
+  }
+
+  Stream<AuthenticationState> _mapAppBarSignOutButtonTapped(
+      AppBarSignOutButtonTapped event) async* {
+    yield AuthenticationInProgress();
+    yield await authenticationService.signOut().then((cruxUser) {
+      if (null != cruxUser) {
+        return AuthenticationUninitialized();
+      } else {
+        return AuthenticationFailure();
+      }
+    }).catchError((error) {
+      print(error);
+      return AuthenticationError();
+    });
   }
 }

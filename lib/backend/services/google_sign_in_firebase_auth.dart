@@ -1,3 +1,5 @@
+import 'package:crux/backend/services/exceptions/sign_in_exceptions.dart';
+import 'package:crux/model/crux_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -15,35 +17,45 @@ class GoogleSignInFirebaseAuth implements BaseAuthenticationService {
     @required this.credentialManager,
   });
 
+  /// Opens Google sign in overlay and signs user in with Google email. Using those credentials,
+  /// connects that user to the Firebase instance for access to their Crux data.
   @override
-  Future<FirebaseUser> signInWithGoogle() async {
+  Future<CruxUser> signIn() async {
     try {
-      final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-
+      GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
       if (null != googleSignInAccount) {
-        final GoogleSignInAuthentication googleSignInAuthentication =
+        GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
-
         final AuthCredential authCredential = credentialManager.getCredentials(
             googleSignInAuthentication.accessToken, googleSignInAuthentication.idToken);
 
         AuthResult authResult = await firebaseAuth.signInWithCredential(authCredential);
-        return authResult.user;
+        return CruxUser(
+          displayName: authResult.user.displayName,
+          email: authResult.user.email,
+        );
       }
+      print('Google sign in process aborted.');
+      return null;
     } catch (error) {
-      print(error.toString());
+      print('Error occurred signing in to Crux: ${error.toString()}');
+      return Future.error(GoogleSignInException());
     }
-    return null;
   }
 
+  /// Signs out the current user (anonymous or not) from the Firebase instance and clears disk cache
   @override
-  Future<GoogleSignInAccount> signOutOfGoogle() async {
+  Future<CruxUser> signOut() async {
     try {
       await firebaseAuth.signOut();
-      return await googleSignIn.signOut();
+      GoogleSignInAccount googleSignInAccount = await googleSignIn.signOut();
+      return CruxUser(
+        displayName: googleSignInAccount.displayName,
+        email: googleSignInAccount.email,
+      );
     } catch (error) {
-      print(error.toString());
-      return null;
+      print('Error occurred signing out of Crux: ${error.toString()}');
+      return Future.error(GoogleSignOutException());
     }
   }
 }
