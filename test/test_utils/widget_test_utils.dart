@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mockito/mockito.dart';
 
-class MockNavigatorObserver extends Mock implements NavigatorObserver {}
+class NavigatorObserverMock extends Mock implements NavigatorObserver {}
 
 /// Test method that wraps given widget in MaterialApp for testing more representative of real use
-Widget buildTestableWidget(Widget widget, {MockNavigatorObserver mockNavigatorObserver}) {
+Widget buildTestableWidget(Widget widget, {NavigatorObserverMock navigatorObserverMock}) {
   return MaterialApp(
     /// Test theme properties on widgets
     theme: Crux.themeData,
@@ -16,6 +16,7 @@ Widget buildTestableWidget(Widget widget, {MockNavigatorObserver mockNavigatorOb
         return widget;
       },
     ),
-    navigatorObservers: [mockNavigatorObserver],
+    navigatorObservers: [navigatorObserverMock],
+
   );
 }

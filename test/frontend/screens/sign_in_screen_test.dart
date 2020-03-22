@@ -21,17 +21,17 @@ class FirebaseUserMock extends Mock implements FirebaseUser {}
 void main() {
   AuthenticationBlocMock authenticationBlocMock;
   CruxUserMock cruxUserMock;
-  MockNavigatorObserver mockNavigatorObserver;
+  NavigatorObserverMock mockNavigatorObserver;
 
   var subject;
 
   dartTest.setUp(() {
     cruxUserMock = CruxUserMock();
     authenticationBlocMock = AuthenticationBlocMock();
-    mockNavigatorObserver = MockNavigatorObserver();
+    mockNavigatorObserver = NavigatorObserverMock();
 
     subject = buildTestableWidget(SignInScreen(authenticationBloc: authenticationBlocMock),
-        mockNavigatorObserver: mockNavigatorObserver);
+        navigatorObserverMock: mockNavigatorObserver);
   });
 
   dartTest.tearDown(() {
