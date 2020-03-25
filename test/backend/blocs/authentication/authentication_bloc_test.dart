@@ -3,28 +3,22 @@ import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
 import 'package:crux/backend/services/base_authentication_service.dart';
 import 'package:crux/model/crux_user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';
 
 class BaseAuthMock extends Mock implements BaseAuthenticationService {}
 
-class CruxUserMock extends Mock implements CruxUser {}
-
 class GoogleSignInAccountMock extends Mock implements GoogleSignInAccount {}
 
 void main() {
   BaseAuthMock baseAuthMock;
-  CruxUserMock cruxUserMock;
-  GoogleSignInAccountMock googleSignInAccountMock;
+  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
 
   AuthenticationBloc authenticationBloc;
 
   setUp(() {
     baseAuthMock = BaseAuthMock();
-    cruxUserMock = CruxUserMock();
-    googleSignInAccountMock = GoogleSignInAccountMock();
     authenticationBloc = AuthenticationBloc(authenticationService: baseAuthMock);
   });
 
@@ -49,10 +43,10 @@ void main() {
       final expectedResponse = [
         AuthenticationUninitialized(),
         AuthenticationInProgress(),
-        AuthenticationSuccess(cruxUser: cruxUserMock)
+        AuthenticationSuccess(cruxUser: cruxUser)
       ];
 
-      when(baseAuthMock.signIn()).thenAnswer((_) => Future.value(cruxUserMock));
+      when(baseAuthMock.signIn()).thenAnswer((_) => Future.value(cruxUser));
 
       expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
@@ -80,8 +74,7 @@ void main() {
         AuthenticationError()
       ];
 
-      when(baseAuthMock.signIn())
-          .thenAnswer((_) => Future.error(Exception('Google sign in test')));
+      when(baseAuthMock.signIn()).thenAnswer((_) => Future.error(Exception('Google sign in test')));
 
       expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
@@ -97,11 +90,11 @@ void main() {
         AuthenticationUninitialized(),
       ];
 
-      when(baseAuthMock.signOut()).thenAnswer((_) => Future.value(cruxUserMock));
+      when(baseAuthMock.signOut()).thenAnswer((_) => Future.value(cruxUser));
 
       expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
-      authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUserMock));
+      authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUser));
     });
 
     test('emits [uninitialized, inProgress, failure] when sign out fails', () {
@@ -115,7 +108,7 @@ void main() {
 
       expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
-      authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUserMock));
+      authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUser));
     });
 
     test('emits [uninitialized, inProgress, error] when sign out errors', () {
@@ -129,7 +122,7 @@ void main() {
 
       expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
-      authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUserMock));
+      authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUser));
     });
   });
 

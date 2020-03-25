@@ -1,4 +1,5 @@
 import 'package:crux/frontend/screens/dashboard_screen.dart';
+import 'package:crux/model/crux_user.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -10,21 +11,14 @@ import '../../test_utils/widget_test_utils.dart';
 class ModalRouteMock extends Mock implements ModalRoute {}
 
 void main() {
-  DashboardScreen subject;
+  var subject;
 
-  CruxUserMock cruxUserMock;
-  ModalRouteMock modalRouteMock;
   var navigatorObserverMock = NavigatorObserverMock();
+  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
 
   dartTest.setUp(() {
-    subject = buildTestableWidget(DashboardScreen(), navigatorObserverMock: navigatorObserverMock);
-    cruxUserMock = CruxUserMock();
-    modalRouteMock = ModalRouteMock();
-//    when(navigatorObserverMock.navigator)
+    subject = buildTestableWidget(DashboardScreen(cruxUser: cruxUser), navigatorObserverMock: navigatorObserverMock);
   });
-
-//  when(modalRouteMock.settings).
-//  when(cruxUserMock.displayName).thenReturn('Display Name');
 
   group('Dashboard screen structural tests', () {
     final findScaffold = find.byKey(Key('dashboardScaffold'));

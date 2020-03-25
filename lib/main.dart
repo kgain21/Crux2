@@ -29,23 +29,42 @@ class Crux extends StatefulWidget {
     fontFamily: 'Metropolis',
   );
 
-  static final routes = <String, WidgetBuilder>{
-    DashboardScreen.routeName: (context) => DashboardScreen(),
-  };
+  static Route onGenerateRoute(RouteSettings settings) {
+//    if (settings.name == SignInScreen.routeName) {
+//      return MaterialPageRoute(builder: (context) {
+//        return SignInScreen(
+//          authenticationBloc: authenticationBloc,
+//        );
+//      });
+//    }
+    if (settings.name == DashboardScreen.routeName) {
+      final DashboardScreenArguments args = settings.arguments;
+      return MaterialPageRoute(builder: (context) {
+        return DashboardScreen(
+          cruxUser: args.cruxUser,
+        );
+      });
+    } else {
+      return null;
+    }
+  }
 
   @override
-  State<StatefulWidget> createState() => CruxState(themeData: themeData, routes: routes);
+  State<StatefulWidget> createState() => CruxState(themeData: themeData , onGenerateRoute: onGenerateRoute);
 }
 
 class CruxState extends State<Crux> {
   ThemeData themeData;
-  Map<String, WidgetBuilder> routes;
+
+//  Map<String, WidgetBuilder> routes;
+  Function onGenerateRoute;
   AuthenticationBloc authenticationBloc;
   CredentialManager credentialManager;
   FirebaseAuth firebaseAuth;
   GoogleSignIn googleSignIn;
 
-  CruxState({@required this.themeData, @required this.routes});
+  CruxState({@required this.themeData , @required this.onGenerateRoute
+      });
 
   @override
   void initState() {
@@ -67,7 +86,8 @@ class CruxState extends State<Crux> {
       title: 'Flutter Demo',
       theme: themeData,
       home: SignInScreen(authenticationBloc: authenticationBloc),
-      routes: routes,
+//      routes: routes,
+      onGenerateRoute: onGenerateRoute,
     );
   }
 

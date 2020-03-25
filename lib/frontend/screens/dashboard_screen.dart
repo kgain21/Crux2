@@ -4,11 +4,12 @@ import 'package:flutter/widgets.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const routeName = '/dashboard';
+  final CruxUser cruxUser;
+
+  DashboardScreen({@required this.cruxUser});
 
   @override
   Widget build(BuildContext context) {
-    final CruxUser cruxUser = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
       key: Key('dashboardScaffold'),
 //      drawer: dashboardDrawer(),
@@ -17,4 +18,10 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class DashboardScreenArguments {
+  final CruxUser cruxUser;
+
+  DashboardScreenArguments(this.cruxUser);
 }

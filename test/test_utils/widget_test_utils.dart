@@ -10,13 +10,13 @@ Widget buildTestableWidget(Widget widget, {NavigatorObserverMock navigatorObserv
   return MaterialApp(
     /// Test theme properties on widgets
     theme: Crux.themeData,
-    routes: Crux.routes,
+//    routes: Crux.routes,
     home: Builder(
       builder: (context) {
         return widget;
       },
     ),
     navigatorObservers: [navigatorObserverMock],
-
+    onGenerateRoute: Crux.onGenerateRoute,
   );
 }

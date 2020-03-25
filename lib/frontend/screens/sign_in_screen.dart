@@ -48,7 +48,7 @@ class SignInScreen extends StatelessWidget {
       Navigator.pushNamed(
         context,
         DashboardScreen.routeName,
-        arguments: state.cruxUser,
+        arguments: DashboardScreenArguments(state.cruxUser),
       );
     }
     if (state is AuthenticationFailure) {

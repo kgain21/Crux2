@@ -4,13 +4,13 @@ import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
 import 'package:crux/frontend/screens/dashboard_screen.dart';
 import 'package:crux/frontend/screens/sign_in_screen.dart';
+import 'package:crux/model/crux_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart' as dartTest;
 
-import '../../backend/blocs/authentication/authentication_bloc_test.dart';
 import '../../test_utils/widget_test_utils.dart';
 
 class AuthenticationBlocMock extends MockBloc<AuthenticationEvent, AuthenticationState>
@@ -20,13 +20,14 @@ class FirebaseUserMock extends Mock implements FirebaseUser {}
 
 void main() {
   AuthenticationBlocMock authenticationBlocMock;
-  CruxUserMock cruxUserMock;
+
+  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
+
   NavigatorObserverMock mockNavigatorObserver;
 
   var subject;
 
   dartTest.setUp(() {
-    cruxUserMock = CruxUserMock();
     authenticationBlocMock = AuthenticationBlocMock();
     mockNavigatorObserver = NavigatorObserverMock();
 
@@ -81,13 +82,11 @@ void main() {
     testWidgets(
       'Test build with AuthenticationSuccess state should push /dashboard route with firebaseUser',
       (WidgetTester tester) async {
-        when(cruxUserMock.displayName).thenReturn('Display Name');
-
         whenListen(
           authenticationBlocMock,
           Stream.fromIterable([
             AuthenticationInProgress(),
-            AuthenticationSuccess(cruxUser: cruxUserMock),
+            AuthenticationSuccess(cruxUser: cruxUser),
           ]),
         );
 
@@ -98,7 +97,7 @@ void main() {
         final Route pushedRoute =
             verify(mockNavigatorObserver.didPush(captureAny, any)).captured[1];
         expect(pushedRoute.settings.name, DashboardScreen.routeName);
-        expect(pushedRoute.settings.arguments, cruxUserMock);
+        expect(pushedRoute.settings.arguments, cruxUser);
 
         expect(find.byType(DashboardScreen), findsOneWidget);
       },

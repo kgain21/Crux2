@@ -24,7 +24,7 @@ class AuthenticationSuccess extends AuthenticationState {
   List<Object> get props => [cruxUser];
 
   @override
-  String toString() => '''AuthenticationSuccess: { firebaseUser: $cruxUser }''';
+  String toString() => '''AuthenticationSuccess: { cruxUser: $cruxUser }''';
 }
 
 class AuthenticationFailure extends AuthenticationState {}
