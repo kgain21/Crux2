@@ -1,3 +1,3 @@
-class GoogleSignInException implements Exception {}
+class CruxSignInException implements Exception {}
 
-class GoogleSignOutException implements Exception {}
+class CruxSignOutException implements Exception {}

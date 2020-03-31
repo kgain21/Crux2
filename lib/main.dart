@@ -30,27 +30,25 @@ class Crux extends StatefulWidget {
   );
 
   static Route onGenerateRoute(RouteSettings settings) {
-//    if (settings.name == SignInScreen.routeName) {
-//      return MaterialPageRoute(builder: (context) {
-//        return SignInScreen(
-//          authenticationBloc: authenticationBloc,
-//        );
-//      });
-//    }
-    if (settings.name == DashboardScreen.routeName) {
-      final DashboardScreenArguments args = settings.arguments;
-      return MaterialPageRoute(builder: (context) {
-        return DashboardScreen(
-          cruxUser: args.cruxUser,
+    switch (settings.name) {
+      case DashboardScreen.routeName:
+        final DashboardScreenArguments args = settings.arguments;
+        return MaterialPageRoute(
+          builder: (context) {
+            return DashboardScreen(
+              cruxUser: args.cruxUser,
+            );
+          },
+          settings: settings,
         );
-      });
-    } else {
-      return null;
+      default:
+        return null;
     }
   }
 
   @override
-  State<StatefulWidget> createState() => CruxState(themeData: themeData , onGenerateRoute: onGenerateRoute);
+  State<StatefulWidget> createState() =>
+      CruxState(themeData: themeData, onGenerateRoute: onGenerateRoute);
 }
 
 class CruxState extends State<Crux> {
@@ -63,8 +61,7 @@ class CruxState extends State<Crux> {
   FirebaseAuth firebaseAuth;
   GoogleSignIn googleSignIn;
 
-  CruxState({@required this.themeData , @required this.onGenerateRoute
-      });
+  CruxState({@required this.themeData, @required this.onGenerateRoute});
 
   @override
   void initState() {

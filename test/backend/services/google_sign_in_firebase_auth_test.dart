@@ -123,7 +123,7 @@ void main() {
           .thenAnswer((_) => Future.error(Error()));
 
       await expectLater(() => googleSignInFirebaseAuth.signIn(),
-          throwsA(const TypeMatcher<GoogleSignInException>()));
+          throwsA(const TypeMatcher<CruxSignInException>()));
       verify(googleSignInMock.signIn()).called(1);
       verify(googleSignInAccountMock.authentication).called(1);
       verify(credentialManagerMock.getCredentials(accessToken, idToken)).called(1);
@@ -156,7 +156,7 @@ void main() {
         'should not sign user out of either and should return null Google account info.', () async {
       when(firebaseAuthMock.signOut()).thenAnswer((_) => Future.error(Error()));
 
-      await expectLater(() => googleSignInFirebaseAuth.signOut(), throwsA(const TypeMatcher<GoogleSignOutException>()));
+      await expectLater(() => googleSignInFirebaseAuth.signOut(), throwsA(const TypeMatcher<CruxSignOutException>()));
       verify(firebaseAuthMock.signOut()).called(1);
       verifyNever(googleSignInMock.signOut());
     });
@@ -169,7 +169,7 @@ void main() {
       when(googleSignInMock.signOut())
           .thenAnswer((_) => Future<GoogleSignInAccount>.error(Error()));
 
-      await expectLater(() =>  googleSignInFirebaseAuth.signOut(), throwsA(const TypeMatcher<GoogleSignOutException>()));
+      await expectLater(() =>  googleSignInFirebaseAuth.signOut(), throwsA(const TypeMatcher<CruxSignOutException>()));
       verify(firebaseAuthMock.signOut()).called(1);
       verify(googleSignInMock.signOut()).called(1);
     });

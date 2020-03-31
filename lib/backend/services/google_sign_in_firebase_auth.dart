@@ -39,7 +39,7 @@ class GoogleSignInFirebaseAuth implements BaseAuthenticationService {
       return null;
     } catch (error) {
       print('Error occurred signing in to Crux: ${error.toString()}');
-      return Future.error(GoogleSignInException());
+      return Future.error(CruxSignInException());
     }
   }
 
@@ -55,7 +55,7 @@ class GoogleSignInFirebaseAuth implements BaseAuthenticationService {
       );
     } catch (error) {
       print('Error occurred signing out of Crux: ${error.toString()}');
-      return Future.error(GoogleSignOutException());
+      return Future.error(CruxSignOutException());
     }
   }
 }

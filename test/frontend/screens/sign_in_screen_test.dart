@@ -80,7 +80,7 @@ void main() {
     });
 
     testWidgets(
-      'Test build with AuthenticationSuccess state should push /dashboard route with firebaseUser',
+      'Test build with AuthenticationSuccess state should push /dashboard route with cruxUser',
       (WidgetTester tester) async {
         whenListen(
           authenticationBlocMock,
@@ -97,7 +97,7 @@ void main() {
         final Route pushedRoute =
             verify(mockNavigatorObserver.didPush(captureAny, any)).captured[1];
         expect(pushedRoute.settings.name, DashboardScreen.routeName);
-        expect(pushedRoute.settings.arguments, cruxUser);
+        expect(pushedRoute.settings.arguments, isA<DashboardScreenArguments>());
 
         expect(find.byType(DashboardScreen), findsOneWidget);
       },
