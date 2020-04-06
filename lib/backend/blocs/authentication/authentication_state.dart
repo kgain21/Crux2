@@ -1,6 +1,5 @@
-import 'package:crux/model/crux_user.dart';
+import 'package:crux/backend/blocs/user/models/crux_user.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
 @immutable

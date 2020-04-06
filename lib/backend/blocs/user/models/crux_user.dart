@@ -7,7 +7,7 @@ class CruxUser extends Equatable {
   final String displayName;
   final String email;
 
-  CruxUser({@required this.displayName, @required this.email});
+  const CruxUser({@required this.displayName, @required this.email});
 
   @override
   List<Object> get props => [displayName, email];

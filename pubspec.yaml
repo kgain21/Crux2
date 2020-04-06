@@ -25,6 +25,7 @@ dependencies:
   equatable: ^0.6.0
 
   table_calendar: ^2.2.3
+  intl: ^0.16.1
 
 dev_dependencies:
   test: ^1.9.0

@@ -2,7 +2,7 @@ import 'package:crux/backend/blocs/authentication/authentication_bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
 import 'package:crux/backend/services/base_authentication_service.dart';
-import 'package:crux/model/crux_user.dart';
+import 'package:crux/backend/blocs/user/models/crux_user.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';

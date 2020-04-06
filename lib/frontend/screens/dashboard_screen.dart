@@ -1,6 +1,7 @@
-import 'package:crux/model/crux_user.dart';
+import 'package:crux/backend/blocs/user/models/crux_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -18,20 +19,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   ScrollController _scrollController;
   CalendarController _calendarController;
 
-  int _tabIndex = 0;
+  int _tabIndex = 1;
+
+  DateTime _selectedDay;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
       length: 3,
+      initialIndex: 1,
       vsync: this,
     );
     _calendarController = CalendarController();
-    _scrollController = ScrollController()
-      ..addListener(() {
-        _scrollController.position;
-      });
+    _scrollController = ScrollController();
   }
 
   @override
@@ -53,9 +54,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             slivers: <Widget>[
               buildAppBar(context),
               buildTabBar(),
-              if (_tabIndex == 0) _buildListView(),
+              if (_tabIndex == 0) SliverToBoxAdapter(child: Placeholder()),
               if (_tabIndex == 1) _buildTableCalendar(),
               if (_tabIndex == 2) _buildListView(),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              new BottomNavigationBarItem(
+                icon: new Icon(Icons.home),
+                title: new Text('Home'),
+              ),
+              new BottomNavigationBarItem(
+                icon: new Icon(Icons.menu),
+                title: new Text('Menu'),
+              ),
             ],
           ),
         ),
@@ -65,12 +78,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   SliverAppBar buildAppBar(BuildContext context) {
     return SliverAppBar(
+//      floating: true, // allows appbar to expand from anywhere in the list - don't need this unless the list gets long enough
+      centerTitle: true,
+      title: Text(
+          'Workout for ${DateFormat('MMMMEEEEd').format(_calendarController.selectedDay ?? DateTime.now())}'),
       automaticallyImplyLeading: false,
       backgroundColor: Theme.of(context).accentColor,
       stretch: true,
       pinned: true,
       expandedHeight: 300.0,
       flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.pin,
         stretchModes: <StretchMode>[
           StretchMode.zoomBackground,
           StretchMode.blurBackground,
@@ -79,9 +97,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         background: DecoratedBox(
           child: Column(
             children: <Widget>[
+              Text('Current Exercise: '),
               Text('Get Started'),
+              Icon(Icons.play_arrow),
+              Icon(Icons.pause),
+              Text('Total Time: 1:34:56'),
             ],
-            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
           ),
           decoration: BoxDecoration(
@@ -131,11 +152,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          return ListTile(
-            title: Text('Tile $index'),
+          return ExpansionTile(
+            key: PageStorageKey<int>(index),
+            title: Text('Exercise Type $index'),
+            initiallyExpanded: true,
+            children: <Widget>[
+              Text('Child 1'),
+              Text('Child 2'),
+              Text('Child 3'),
+              Text('Child 4'),
+            ],
           );
         },
-        childCount: 15,
+        childCount: 150,
       ),
     );
   }
@@ -145,6 +174,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   Widget _buildTableCalendar() {
     return SliverToBoxAdapter(
       child: TableCalendar(
+        initialSelectedDay: _selectedDay ?? DateTime.now(),
         availableGestures: AvailableGestures.horizontalSwipe,
         headerStyle: HeaderStyle(
           centerHeaderTitle: true,
@@ -158,6 +188,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           outsideWeekendStyle: const TextStyle(),
         ),
         calendarController: _calendarController,
+        onDaySelected: (dateTime, events) {
+          //todo: events = workout data from firebase?
+          //todo: go to bloc to retrieve?
+          setState(() {
+            _selectedDay = dateTime;
+          });
+        },
       ),
     );
   }

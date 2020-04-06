@@ -1,5 +1,5 @@
 import 'package:crux/backend/services/exceptions/sign_in_exceptions.dart';
-import 'package:crux/model/crux_user.dart';
+import 'package:crux/backend/blocs/user/models/crux_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';

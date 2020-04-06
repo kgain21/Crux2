@@ -4,7 +4,7 @@ import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
 import 'package:crux/frontend/screens/dashboard_screen.dart';
 import 'package:crux/frontend/screens/sign_in_screen.dart';
-import 'package:crux/model/crux_user.dart';
+import 'package:crux/backend/blocs/user/models/crux_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
