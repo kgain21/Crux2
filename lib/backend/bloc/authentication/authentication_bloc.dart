@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_event.dart';
 import 'package:crux/backend/blocs/authentication/authentication_state.dart';
-import 'package:crux/backend/services/base_authentication_service.dart';
+import 'package:crux/backend/services/authentication/base_authentication_service.dart';
 import 'package:flutter/widgets.dart';
 
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {

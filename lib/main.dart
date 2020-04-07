@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/blocs/authentication/authentication_bloc.dart';
 import 'package:crux/backend/blocs/simple_bloc_delegate.dart';
-import 'package:crux/backend/services/base_authentication_service.dart';
-import 'package:crux/backend/services/google_sign_in_firebase_auth.dart';
+import 'package:crux/backend/services/authentication/base_authentication_service.dart';
+import 'package:crux/backend/services/authentication/google_sign_in_firebase_auth.dart';
 import 'package:crux/frontend/screens/dashboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

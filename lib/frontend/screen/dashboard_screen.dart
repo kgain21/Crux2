@@ -59,7 +59,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               if (_tabIndex == 2) _buildListView(),
             ],
           ),
-          bottomNavigationBar: BottomNavigationBar(
+          /*bottomNavigationBar: BottomNavigationBar(
             items: <BottomNavigationBarItem>[
               new BottomNavigationBarItem(
                 icon: new Icon(Icons.home),
@@ -70,7 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 title: new Text('Menu'),
               ),
             ],
-          ),
+          ),*/
         ),
       ),
     );
