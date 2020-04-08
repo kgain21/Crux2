@@ -1,17 +1,17 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:crux/backend/blocs/authentication/authentication_bloc.dart';
-import 'package:crux/backend/blocs/authentication/authentication_event.dart';
-import 'package:crux/backend/blocs/authentication/authentication_state.dart';
-import 'package:crux/frontend/screens/dashboard_screen.dart';
-import 'package:crux/frontend/screens/sign_in_screen.dart';
-import 'package:crux/backend/blocs/user/models/crux_user.dart';
+import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
+import 'package:crux/backend/bloc/authentication/authentication_event.dart';
+import 'package:crux/backend/bloc/authentication/authentication_state.dart';
+import 'package:crux/frontend/screen/dashboard_screen.dart';
+import 'package:crux/frontend/screen/sign_in_screen.dart';
+import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart' as dartTest;
 
-import '../../test_utils/widget_test_utils.dart';
+import '../../test_util/widget_test_utils.dart';
 
 class AuthenticationBlocMock extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}

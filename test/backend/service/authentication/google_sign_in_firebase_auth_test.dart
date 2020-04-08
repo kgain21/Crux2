@@ -1,7 +1,7 @@
-import 'package:crux/backend/blocs/user/models/crux_user.dart';
-import 'package:crux/backend/services/authentication/base_authentication_service.dart';
-import 'package:crux/backend/services/authentication/exceptions/sign_in_exceptions.dart';
-import 'package:crux/backend/services/authentication/google_sign_in_firebase_auth.dart';
+import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/service/authentication/base_authentication_service.dart';
+import 'package:crux/backend/service/authentication/exception/sign_in_exceptions.dart';
+import 'package:crux/backend/service/authentication/google_sign_in_firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';

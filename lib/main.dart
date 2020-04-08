@@ -1,14 +1,14 @@
 import 'package:bloc/bloc.dart';
-import 'package:crux/backend/blocs/authentication/authentication_bloc.dart';
-import 'package:crux/backend/blocs/simple_bloc_delegate.dart';
-import 'package:crux/backend/services/authentication/base_authentication_service.dart';
-import 'package:crux/backend/services/authentication/google_sign_in_firebase_auth.dart';
-import 'package:crux/frontend/screens/dashboard_screen.dart';
+import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
+import 'package:crux/backend/bloc/simple_bloc_delegate.dart';
+import 'package:crux/backend/service/authentication/base_authentication_service.dart';
+import 'package:crux/backend/service/authentication/google_sign_in_firebase_auth.dart';
+import 'package:crux/frontend/screen/dashboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'frontend/screens/sign_in_screen.dart';
+import 'frontend/screen/sign_in_screen.dart';
 
 Future<void> main() async {
   /// Needed to add this since there's an await in main()

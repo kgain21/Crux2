@@ -1,4 +1,4 @@
-import 'package:crux/backend/blocs/user/models/crux_user.dart';
+import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 

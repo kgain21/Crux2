@@ -1,4 +1,4 @@
-import 'package:crux/backend/blocs/user/models/crux_user.dart';
+import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';

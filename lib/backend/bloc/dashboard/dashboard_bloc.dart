@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:crux/backend/blocs/dashboard/dashboard_event.dart';
-import 'package:crux/backend/blocs/dashboard/dashboard_state.dart';
+import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
+import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 
 class DashboardBloc extends Bloc {
 

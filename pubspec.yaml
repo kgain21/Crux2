@@ -1,4 +1,4 @@
-name: Crux
+name: crux
 description: A rock climbing training app.
 
 version: 1.0.0+1
@@ -9,8 +9,8 @@ version: 1.0.0+1
 # and ^0.1.2 is equivalent to '>=0.1.2 <0.2.0'.
 # i.e. up to the next breaking version
 environment:
-  sdk: ">=2.4.0 <3.0.0"
-  flutter: ^1.14.6
+  sdk: ^2.7.0
+  flutter: ^1.17.0
 
 dependencies:
   flutter:
