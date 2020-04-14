@@ -14,6 +14,9 @@ class DashboardUninitialized extends DashboardState {
 }
 
 class DashboardInitialized extends DashboardState {
-
   const DashboardInitialized();
+}
+
+class DashboardDateChangeInProgress extends DashboardState {
+  const DashboardDateChangeInProgress();
 }
