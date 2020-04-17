@@ -1,7 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
+import 'package:flutter/widgets.dart';
 
 class FirebaseWorkoutRepository extends BaseWorkoutRepository {
+  final Firestore firestore;
+
+  FirebaseWorkoutRepository({@required this.firestore});
+
   @override
   CruxWorkout createWorkout(DateTime dateTime) {
     // TODO: implement createWorkout
@@ -25,5 +31,4 @@ class FirebaseWorkoutRepository extends BaseWorkoutRepository {
     // TODO: implement updateWorkoutByDate
     throw UnimplementedError();
   }
-
 }

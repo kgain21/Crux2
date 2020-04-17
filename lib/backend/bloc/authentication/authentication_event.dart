@@ -7,12 +7,12 @@ abstract class AuthenticationEvent extends Equatable {
   const AuthenticationEvent();
 }
 
-class GoogleSignInButtonTapped implements AuthenticationEvent {
+class GoogleSignInButtonTapped extends AuthenticationEvent {
   @override
   List<Object> get props => [];
 }
 
-class AppBarSignOutButtonTapped implements AuthenticationEvent {
+class AppBarSignOutButtonTapped extends AuthenticationEvent {
   final CruxUser cruxUser;
 
   const AppBarSignOutButtonTapped({this.cruxUser});
