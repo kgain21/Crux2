@@ -10,7 +10,7 @@ version: 1.0.0+1
 # i.e. up to the next breaking version
 environment:
   sdk: ^2.7.0
-  flutter: ^1.17.0
+  flutter: ^1.16.9
 
 dependencies:
   flutter:
@@ -18,29 +18,40 @@ dependencies:
   firebase_auth: ^0.16.0
   google_sign_in: ^4.1.1
   firebase_core: ^0.4.0+9
-  cloud_firestore: ^0.12.9+5
+  cloud_firestore: ^0.13.5
 
   cupertino_icons: ^0.1.2
 
-  bloc: ^3.0.0
-  flutter_bloc: ^3.2.0
-  rxdart: ^0.23.0
+  bloc: ^4.0.0
+  flutter_bloc: ^4.0.0
+  rxdart: ^0.24.0
   equatable: ^1.1.1
 
   table_calendar: ^2.2.3
   intl: ^0.16.1
 
   built_value: ^7.0.9
+  built_collection: ^4.3.2
+  resource: ^2.1.6
+#  analyzer: ^0.39.7
 
 dev_dependencies:
   test: ^1.9.0
   test_api: ^0.2.11
-  bloc_test: ^4.0.0
+  bloc_test: ^5.0.0
   mockito: ^4.1.1
   flutter_test:
     sdk: flutter
   flutter_driver:
     sdk: flutter
+
+  build_runner: ^1.0.0
+#  source_gen: ^0.9.5
+#  json_serializable: ^3.3.0
+#  build_config: ^0.4.2
+  built_value_generator: ^7.1.0
+
+  build_test: ^1.0.0
 
 flutter:
   uses-material-design: true
