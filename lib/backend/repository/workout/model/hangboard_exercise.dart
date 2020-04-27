@@ -1,34 +1,38 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 
-@JsonSerializable()
-class HangboardExercise {
-  final String exerciseTitle;
-  final String depthMeasurementSystem;
-  final String resistanceMeasurementSystem;
-  final int numberOfHands;
-  final String holdType;
-  final String fingerConfiguration;
-  final double holdDepth;
-  final int hangsPerSet;
-  final int numberOfSets;
-  final int resistance;
-  final int breakDuration;
-  final int repDuration;
-  final int restDuration;
+part 'hangboard_exercise.g.dart';
 
-  HangboardExercise(
-    this.exerciseTitle,
-    this.depthMeasurementSystem,
-    this.resistanceMeasurementSystem,
-    this.numberOfHands,
-    this.holdType,
-    this.fingerConfiguration,
-    this.holdDepth,
-    this.hangsPerSet,
-    this.numberOfSets,
-    this.resistance,
-    this.breakDuration,
-    this.repDuration,
-    this.restDuration,
-  );
+abstract class HangboardExercise implements Built<HangboardExercise, HangboardExerciseBuilder> {
+  HangboardExercise._();
+
+  factory HangboardExercise([updates(HangboardExerciseBuilder b)]) = _$HangboardExercise;
+
+  static Serializer<HangboardExercise> get serializer => _$hangboardExerciseSerializer;
+
+  String get exerciseTitle;
+
+  String get depthMeasurementSystem;
+
+  String get resistanceMeasurementSystem;
+
+  int get numberOfHands;
+
+  String get holdType;
+
+  String get fingerConfiguration;
+
+  double get holdDepth;
+
+  int get hangsPerSet;
+
+  int get numberOfSets;
+
+  int get resistance;
+
+  int get breakDuration;
+
+  int get repDuration;
+
+  int get restDuration;
 }

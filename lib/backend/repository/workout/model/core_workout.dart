@@ -1,6 +1,12 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 
-@JsonSerializable()
-class CoreWorkout {
+part 'core_workout.g.dart';
 
+abstract class CoreWorkout implements Built<CoreWorkout, CoreWorkoutBuilder> {
+  CoreWorkout._();
+
+  factory CoreWorkout([updates(CoreWorkoutBuilder b)]) = _$CoreWorkout;
+
+  static Serializer<CoreWorkout> get serializer => _$coreWorkoutSerializer;
 }
