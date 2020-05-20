@@ -1,7 +1,7 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
-import 'package:crux/backend/service/authentication/base_authentication_service.dart';
+import 'package:crux/backend/service/authentication/authentication_service.dart';
 import 'package:crux/backend/service/authentication/exception/sign_in_exceptions.dart';
-import 'package:crux/backend/service/authentication/google_sign_in_firebase_auth.dart';
+import 'package:crux/backend/service/authentication/google_sign_in_authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';
@@ -36,7 +36,7 @@ void main() {
   AuthCredentialMock authCredentialMock;
 
   // Subject
-  BaseAuthenticationService googleSignInFirebaseAuth;
+  BaseAuthenticationService googleSignInAuthenticationService;
 
   setUp(() {
     firebaseAuthMock = FirebaseAuthMock();
@@ -48,7 +48,7 @@ void main() {
     credentialManagerMock = CredentialManagerMock();
     authCredentialMock = AuthCredentialMock();
 
-    googleSignInFirebaseAuth = GoogleSignInFirebaseAuth(
+    googleSignInAuthenticationService = GoogleSignInAuthenticationService(
       googleSignIn: googleSignInMock,
       firebaseAuth: firebaseAuthMock,
       credentialManager: credentialManagerMock,
@@ -85,7 +85,7 @@ void main() {
       when(firebaseUserMock.displayName).thenReturn('display name');
       when(firebaseUserMock.email).thenReturn('email');
 
-      var actual = await googleSignInFirebaseAuth.signIn();
+      var actual = await googleSignInAuthenticationService.signIn();
       var expected = CruxUser(displayName: 'display name', email: 'email');
 
       expect(actual, equals(expected));
@@ -95,10 +95,10 @@ void main() {
       verify(firebaseAuthMock.signInWithCredential(authCredentialMock)).called(1);
     });
 
-    test('Given invalid usern signs in through Google, should not return firebase user.', () async {
+    test('Given invalid user signs in through Google, should not return firebase user.', () async {
       when(googleSignInMock.signIn()).thenAnswer((_) => Future.value(null));
 
-      var actual = await googleSignInFirebaseAuth.signIn();
+      var actual = await googleSignInAuthenticationService.signIn();
       expect(actual, null);
       verify(googleSignInMock.signIn()).called(1);
       verifyNever(googleSignInAccountMock.authentication);
@@ -122,7 +122,7 @@ void main() {
       when(firebaseAuthMock.signInWithCredential(authCredentialMock))
           .thenAnswer((_) => Future.error(Error()));
 
-      await expectLater(() => googleSignInFirebaseAuth.signIn(),
+      await expectLater(() => googleSignInAuthenticationService.signIn(),
           throwsA(const TypeMatcher<CruxSignInException>()));
       verify(googleSignInMock.signIn()).called(1);
       verify(googleSignInAccountMock.authentication).called(1);
@@ -143,7 +143,7 @@ void main() {
       when(googleSignInAccountMock.displayName).thenReturn('display name');
       when(googleSignInAccountMock.email).thenReturn('email');
 
-      var actual = await googleSignInFirebaseAuth.signOut();
+      var actual = await googleSignInAuthenticationService.signOut();
       var expected = CruxUser(displayName: 'display name', email: 'email');
 
       expect(actual, equals(expected));
@@ -156,7 +156,7 @@ void main() {
         'should not sign user out of either and should return null Google account info.', () async {
       when(firebaseAuthMock.signOut()).thenAnswer((_) => Future.error(Error()));
 
-      await expectLater(() => googleSignInFirebaseAuth.signOut(), throwsA(const TypeMatcher<CruxSignOutException>()));
+      await expectLater(() => googleSignInAuthenticationService.signOut(), throwsA(const TypeMatcher<CruxSignOutException>()));
       verify(firebaseAuthMock.signOut()).called(1);
       verifyNever(googleSignInMock.signOut());
     });
@@ -169,7 +169,7 @@ void main() {
       when(googleSignInMock.signOut())
           .thenAnswer((_) => Future<GoogleSignInAccount>.error(Error()));
 
-      await expectLater(() =>  googleSignInFirebaseAuth.signOut(), throwsA(const TypeMatcher<CruxSignOutException>()));
+      await expectLater(() =>  googleSignInAuthenticationService.signOut(), throwsA(const TypeMatcher<CruxSignOutException>()));
       verify(firebaseAuthMock.signOut()).called(1);
       verify(googleSignInMock.signOut()).called(1);
     });

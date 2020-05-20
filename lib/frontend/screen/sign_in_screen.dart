@@ -8,12 +8,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
+  final AuthenticationBloc authenticationBloc;
+
+  SignInScreen({@required this.authenticationBloc});
+
+  @override
+  State<StatefulWidget> createState() =>
+      SignInScreenState(authenticationBloc: this.authenticationBloc);
+}
+
+class SignInScreenState extends State<SignInScreen> {
   static const routeName = '/';
 
   final AuthenticationBloc authenticationBloc;
 
-  const SignInScreen({Key key, @required this.authenticationBloc}) : super(key: key);
+  SignInScreenState({@required this.authenticationBloc});
 
   @override
   Widget build(context) {
@@ -213,5 +223,11 @@ class SignInScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    authenticationBloc.close();
+    super.dispose();
   }
 }

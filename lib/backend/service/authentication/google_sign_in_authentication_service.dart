@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'base_authentication_service.dart';
+import 'authentication_service.dart';
 
-class GoogleSignInFirebaseAuth implements BaseAuthenticationService {
+class GoogleSignInAuthenticationService implements BaseAuthenticationService {
   final GoogleSignIn googleSignIn;
   final FirebaseAuth firebaseAuth;
   final CredentialManager credentialManager;
 
-  GoogleSignInFirebaseAuth({
+  GoogleSignInAuthenticationService({
     @required this.googleSignIn,
     @required this.firebaseAuth,
     @required this.credentialManager,

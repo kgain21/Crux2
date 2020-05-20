@@ -1,29 +1,27 @@
 {
-  "cruxWorkout": {
-    "hangboardWorkout": {
-      "workoutTitle": "Fake hangboard workout title",
-      "hangboardExercises": [
-        {
-          "exerciseTitle": "Fake exercise title 1",
-          "depthMeasurementSystem": "Fake depth measurement system",
-          "resistanceMeasurementSystem": "Fake resistance measurement system",
-          "numberOfHands": "Fake number of hands",
-          "holdType": "Fake hold type",
-          "fingerConfiguration": "Fake finger configuration",
-          "holdDepth": "Fake hold depth",
-          "hangsPerSet": "Fake hangs per set",
-          "numberOfSets": "Fake number of sets",
-          "resistance": "Fake resistance",
-          "breakDuration": "Fake break duration",
-          "repDuration": "Fake rep duration",
-          "restDuration": "Fake rest duration"
-        }
-      ]
-    },
-    "campusBoardWorkout": {},
-    "strengthWorkout": {},
-    "coreWorkout": {},
-    "stretchingWorkout": {},
-    "climbingWorkout": {}
-  }
+  "hangboardWorkout": {
+    "workoutTitle": "Fake hangboard workout title",
+    "hangboardExercises": [
+      {
+        "exerciseTitle": "Fake exercise title 1",
+        "depthMeasurementSystem": "Fake depth measurement system",
+        "resistanceMeasurementSystem": "Fake resistance measurement system",
+        "numberOfHands": "Fake number of hands",
+        "holdType": "Fake hold type",
+        "fingerConfiguration": "Fake finger configuration",
+        "holdDepth": "Fake hold depth",
+        "hangsPerSet": "Fake hangs per set",
+        "numberOfSets": "Fake number of sets",
+        "resistance": "Fake resistance",
+        "breakDuration": "Fake break duration",
+        "repDuration": "Fake rep duration",
+        "restDuration": "Fake rest duration"
+      }
+    ]
+  },
+  "campusBoardWorkout": {},
+  "strengthWorkout": {},
+  "coreWorkout": {},
+  "stretchingWorkout": {},
+  "climbingWorkout": {}
 }

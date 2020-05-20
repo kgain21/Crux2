@@ -28,4 +28,4 @@ part 'serializers.g.dart';
   StrengthWorkout,
   StretchingWorkout,
 ])
-Serializers serializers = (_$serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();
+final Serializers serializers = (_$serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();
