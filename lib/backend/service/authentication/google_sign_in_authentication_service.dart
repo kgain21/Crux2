@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/service/authentication/exception/sign_in_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,11 +38,11 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
           email: authResult.user.email,
         );
       }
-      print('Google sign in process aborted.');
+      log('Google sign in process aborted.');
       return null;
     } catch (error) {
-      print('Error occurred signing in to Crux: ${error.toString()}');
-      return Future.error(CruxSignInException());
+      log('Error occurred signing in to Crux', error: error);
+      throw CruxSignInException();
     }
   }
 
@@ -54,8 +57,8 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
         email: googleSignInAccount.email,
       );
     } catch (error) {
-      print('Error occurred signing out of Crux: ${error.toString()}');
-      return Future.error(CruxSignOutException());
+      log('Error occurred signing out of Crux', error: error);
+      throw CruxSignOutException();
     }
   }
 }

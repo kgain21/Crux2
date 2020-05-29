@@ -1,21 +1,21 @@
 {
   "hangboardWorkout": {
-    "workoutTitle": "Fake hangboard workout title",
+    "workoutTitle": "Tuesday, May 26, 2020",
     "hangboardExercises": [
       {
-        "exerciseTitle": "Fake exercise title 1",
-        "depthMeasurementSystem": "Fake depth measurement system",
-        "resistanceMeasurementSystem": "Fake resistance measurement system",
-        "numberOfHands": "Fake number of hands",
-        "holdType": "Fake hold type",
-        "fingerConfiguration": "Fake finger configuration",
-        "holdDepth": "Fake hold depth",
-        "hangsPerSet": "Fake hangs per set",
-        "numberOfSets": "Fake number of sets",
-        "resistance": "Fake resistance",
-        "breakDuration": "Fake break duration",
-        "repDuration": "Fake rep duration",
-        "restDuration": "Fake rest duration"
+        "exerciseTitle": "Repeaters",
+        "depthMeasurementSystem": "mm",
+        "resistanceMeasurementSystem": "lbs",
+        "numberOfHands": 2,
+        "holdType": "Half Crimp",
+        "fingerConfiguration": "4 Finger",
+        "holdDepth": 12,
+        "hangsPerSet": 6,
+        "numberOfSets": 4,
+        "resistance": 25,
+        "breakDuration": 180,
+        "repDuration": 7,
+        "restDuration": 3
       }
     ]
   },

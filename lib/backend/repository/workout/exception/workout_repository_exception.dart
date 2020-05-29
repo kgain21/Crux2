@@ -1,0 +1,2 @@
+
+class CruxWorkoutRepositoryException implements Exception {}

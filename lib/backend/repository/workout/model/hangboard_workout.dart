@@ -14,5 +14,5 @@ abstract class HangboardWorkout implements Built<HangboardWorkout, HangboardWork
 
   String get workoutTitle;
 
-  BuiltList<HangboardExercise> get hangboardExerciseList;
+  BuiltList<HangboardExercise> get hangboardExercises;
 }
