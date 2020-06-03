@@ -29,7 +29,7 @@ Future<void> main() async {
   FirestoreWorkoutRepository firestoreWorkoutRepository;
 
   var testDate = DateTime(2020); // Jan 1, 2020
-  var testUser = CruxUser(displayName: 'Kyle Gain', email: 'abc123@gmail.com');
+  var testUser = TestModelFactory.getTypicalCruxUser();
 
   setUp(() {
     firestoreMock = FirestoreMock();

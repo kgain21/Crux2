@@ -1,4 +1,5 @@
 import 'package:built_collection/built_collection.dart';
+import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/campus_board_workout.dart';
 import 'package:crux/backend/repository/workout/model/climbing_workout.dart';
 import 'package:crux/backend/repository/workout/model/core_workout.dart';
@@ -39,5 +40,9 @@ class TestModelFactory {
       ..coreWorkout = (CoreWorkoutBuilder()..build())
       ..campusBoardWorkout = (CampusBoardWorkoutBuilder()..build())
       ..build());
+  }
+
+  static CruxUser getTypicalCruxUser() {
+    return CruxUser(displayName: 'Kyle Gain', email: 'abc123@gmail.com');
   }
 }

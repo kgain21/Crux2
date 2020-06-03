@@ -118,7 +118,7 @@ void main() {
         AuthenticationError(),
       ];
 
-      when(baseAuthMock.signOut()).thenAnswer((_) => Future.error('Unit test'));
+      when(baseAuthMock.signOut()).thenAnswer((_) => Future.error('Google sign out test'));
 
       expectLater(authenticationBloc, emitsInOrder(expectedResponse));
 
