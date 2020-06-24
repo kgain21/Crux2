@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/application_context.dart';
 import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
+import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/simple_bloc_delegate.dart';
 import 'package:crux/backend/util/injector/injector.dart';
 import 'package:crux/frontend/screen/dashboard_screen.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'frontend/screen/sign_in_screen.dart';
 
 Future<void> main() async {
-  /// Needed to add this since there's an await in main()
+  /// Needed to add this since there's an await in main() - update: not anymore but I'm leaving it JIC
   WidgetsFlutterBinding.ensureInitialized();
 
   BlocSupervisor.delegate = SimpleBlocDelegate();
@@ -29,7 +30,7 @@ class Crux extends StatelessWidget {
     fontFamily: 'Metropolis',
   );
 
-  final Injector injector = ApplicationContext().initialize(Injector.injector);
+  static final Injector injector = ApplicationContext().initialize(Injector.injector);
 
   static Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -39,6 +40,7 @@ class Crux extends StatelessWidget {
           builder: (context) {
             return DashboardScreen(
               cruxUser: args.cruxUser,
+              dashboardBloc: injector.get<DashboardBloc>(),
             );
           },
           settings: settings,

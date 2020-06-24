@@ -53,7 +53,7 @@ void main() {
     final findFailureSnackBar = find.byKey(Key('failureSnackBar'));
     final findErrorSnackBar = find.byKey(Key('errorSnackBar'));
 
-    testWidgets('Test Sign In Screen basic structure with AuthenticationUnitialized state',
+    testWidgets('Test Sign In Screen basic structure with AuthenticationUninitialized state',
         (WidgetTester tester) async {
       whenListen(authenticationBlocMock, Stream.value(AuthenticationUninitialized()));
 

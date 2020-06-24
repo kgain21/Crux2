@@ -1,3 +1,5 @@
+import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
+import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -6,15 +8,20 @@ import 'package:table_calendar/table_calendar.dart';
 
 class DashboardScreen extends StatefulWidget {
   static const routeName = '/dashboard';
-  final CruxUser cruxUser;
 
-  DashboardScreen({@required this.cruxUser});
+  final CruxUser cruxUser;
+  final DashboardBloc dashboardBloc;
+
+  const DashboardScreen({@required this.cruxUser, @required this.dashboardBloc});
 
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
+  _DashboardScreenState createState() => _DashboardScreenState(dashboardBloc, cruxUser);
 }
 
 class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+  final DashboardBloc dashboardBloc;
+  final CruxUser cruxUser;
+
   TabController _tabController;
   ScrollController _scrollController;
   CalendarController _calendarController;
@@ -22,6 +29,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   int _tabIndex = 1;
 
   DateTime _selectedDay;
+
+  _DashboardScreenState(this.dashboardBloc, this.cruxUser);
 
   @override
   void initState() {
@@ -86,7 +95,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       backgroundColor: Theme.of(context).accentColor,
       stretch: true,
       pinned: true,
-      expandedHeight: 300.0,
+      expandedHeight: MediaQuery.of(context).size.height / 3.0,
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.pin,
         stretchModes: <StretchMode>[
@@ -188,9 +197,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           outsideWeekendStyle: const TextStyle(),
         ),
         calendarController: _calendarController,
+        dayHitTestBehavior: HitTestBehavior.opaque,
         onDaySelected: (dateTime, events) {
-          //todo: events = workout data from firebase?
-          //todo: go to bloc to retrieve?
+          dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: dateTime));
           setState(() {
             _selectedDay = dateTime;
           });

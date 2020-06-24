@@ -1,6 +1,5 @@
 import 'package:built_value/serializer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/exception/workout_repository_exception.dart';
 import 'package:crux/backend/repository/workout/firestore_workout_repository.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';

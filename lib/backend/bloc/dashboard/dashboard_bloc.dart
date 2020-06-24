@@ -38,6 +38,7 @@ class DashboardBloc extends Bloc {
             selectedDate: date, cruxWorkout: cruxWorkout);
       } else {
         yield DashboardDateChangeNotFound(selectedDate: date);
+        //todo: UI alert and option to create new / copy existing
       }
     } catch (error) {
       log('Failed to retrieve CruxWorkout.', error: error);

@@ -11,19 +11,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class SignInScreen extends StatefulWidget {
   final AuthenticationBloc authenticationBloc;
 
-  SignInScreen({@required this.authenticationBloc});
+  const SignInScreen({@required this.authenticationBloc});
 
   @override
   State<StatefulWidget> createState() =>
-      SignInScreenState(authenticationBloc: this.authenticationBloc);
+      _SignInScreenState(authenticationBloc);
 }
 
-class SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends State<SignInScreen> {
   static const routeName = '/';
 
   final AuthenticationBloc authenticationBloc;
 
-  SignInScreenState({@required this.authenticationBloc});
+  _SignInScreenState(this.authenticationBloc);
 
   @override
   Widget build(context) {

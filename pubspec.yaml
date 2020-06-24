@@ -46,9 +46,6 @@ dev_dependencies:
     sdk: flutter
 
   build_runner: ^1.0.0
-#  source_gen: ^0.9.5
-#  json_serializable: ^3.3.0
-#  build_config: ^0.4.2
   built_value_generator: ^7.1.0
 
   build_test: ^1.0.0

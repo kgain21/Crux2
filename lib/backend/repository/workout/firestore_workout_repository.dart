@@ -33,7 +33,7 @@ class FirestoreWorkoutRepository implements BaseWorkoutRepository {
         .document(dateTime.toIso8601String())
         .get()
         .then((workout) {
-      if (null != workout) {
+      if (null != workout?.data) {
         return serializers.deserializeWith(CruxWorkout.serializer, workout.data);
       } else {
         return null;

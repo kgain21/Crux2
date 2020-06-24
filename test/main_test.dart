@@ -11,10 +11,6 @@ void main() {
       cruxApp = Crux();
     });
 
-    tearDown(() {
-      cruxApp.injector.dispose();
-    });
-
     testWidgets('High level Main App elements test', (WidgetTester tester) async {
       await tester.pumpWidget(cruxApp);
 
