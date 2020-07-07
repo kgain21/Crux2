@@ -1,8 +1,10 @@
 import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
+import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -58,28 +60,26 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: SafeArea(
         child: Scaffold(
           key: Key('dashboardScaffold'),
-          body: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: <Widget>[
-              buildAppBar(context),
-              buildTabBar(),
-              if (_tabIndex == 0) SliverToBoxAdapter(child: Placeholder()),
-              if (_tabIndex == 1) _buildTableCalendar(),
-              if (_tabIndex == 2) _buildListView(),
-            ],
+          body: BlocListener<DashboardBloc, DashboardState>(
+            key: Key('dashboardBlocListener'),
+            bloc: dashboardBloc,
+            listener: _listenForDashboardBlocState,
+            child: BlocBuilder<DashboardBloc, DashboardState>(
+                key: Key('dashboardBlocBuilder'),
+                bloc: dashboardBloc,
+                builder: (context, state) {
+                  return CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: <Widget>[
+                      buildAppBar(context),
+                      buildTabBar(),
+                      if (_tabIndex == 0) SliverToBoxAdapter(child: Placeholder()),
+                      if (_tabIndex == 1) _buildTableCalendar(),
+                      if (_tabIndex == 2) _buildListView(),
+                    ],
+                  );
+                }),
           ),
-          /*bottomNavigationBar: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
-              new BottomNavigationBarItem(
-                icon: new Icon(Icons.home),
-                title: new Text('Home'),
-              ),
-              new BottomNavigationBarItem(
-                icon: new Icon(Icons.menu),
-                title: new Text('Menu'),
-              ),
-            ],
-          ),*/
         ),
       ),
     );
@@ -90,7 +90,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 //      floating: true, // allows appbar to expand from anywhere in the list - don't need this unless the list gets long enough
       centerTitle: true,
       title: Text(
-          'Workout for ${DateFormat('MMMMEEEEd').format(_calendarController.selectedDay ?? DateTime.now())}'),
+        'Workout for ${DateFormat('MMMMEEEEd').format(_calendarController.selectedDay ?? DateTime.now())}',
+      ),
       automaticallyImplyLeading: false,
       backgroundColor: Theme.of(context).accentColor,
       stretch: true,
@@ -197,7 +198,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           outsideWeekendStyle: const TextStyle(),
         ),
         calendarController: _calendarController,
-        dayHitTestBehavior: HitTestBehavior.opaque,
         onDaySelected: (dateTime, events) {
           dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: dateTime));
           setState(() {
@@ -206,6 +206,84 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         },
       ),
     );
+  }
+
+  void _listenForDashboardBlocState(BuildContext context, DashboardState state) {
+    if (state is DashboardDateChangeNotFound) {
+      if (state.selectedDate.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
+        _noWorkoutFoundDialog(context, state);
+      } else {
+        _noWorkoutFoundDialogCreateNew(context, state);
+      }
+    }
+  }
+
+  void _noWorkoutFoundDialogCreateNew(BuildContext context, DashboardDateChangeNotFound state) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            key: Key('noWorkoutFoundDialogCreateNew'),
+            title:
+                Text('No Workout found for ${DateFormat('MMMMEEEEd').format(state.selectedDate)}.'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[Text('Would you like to create a new workout for this date?')],
+            ),
+            actions: <Widget>[
+              Row(
+                children: <Widget>[
+                  FlatButton(
+                    child: Text(
+                      'Create New Workout',
+                      style: TextStyle(color: Theme.of(context).accentColor),
+                    ),
+                    onPressed: () {
+                      dashboardBloc.add(CreateNewWorkoutButtonTapped(
+                          selectedDate: state.selectedDate, cruxUser: cruxUser));
+                    },
+                  ),
+                  FlatButton(
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              )
+            ],
+          );
+        });
+  }
+
+  void _noWorkoutFoundDialog(BuildContext context, DashboardDateChangeNotFound state) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            key: Key('noWorkoutFoundDialog'),
+            title:
+                Text('No Workout found for ${DateFormat('MMMMEEEEd').format(state.selectedDate)}.'),
+            actions: <Widget>[
+              Row(
+                children: <Widget>[
+                  FlatButton(
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              )
+            ],
+          );
+        });
   }
 }
 

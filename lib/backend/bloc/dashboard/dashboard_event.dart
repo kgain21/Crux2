@@ -15,7 +15,7 @@ class CalendarDateChanged extends DashboardEvent {
   const CalendarDateChanged({@required this.cruxUser, @required this.selectedDate});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [selectedDate, cruxUser];
 
   @override
   String toString() => '''CalendarDateChanged: { cruxUser: $cruxUser, selectedDate: $selectedDate } ''';
@@ -34,5 +34,19 @@ class TabChanged extends DashboardEvent {
   const TabChanged({@required this.tabIndex});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [tabIndex];
+}
+
+
+class CreateNewWorkoutButtonTapped extends DashboardEvent {
+  final DateTime selectedDate;
+  final CruxUser cruxUser;
+
+  const CreateNewWorkoutButtonTapped({@required this.cruxUser, @required this.selectedDate});
+
+  @override
+  List<Object> get props => [selectedDate, cruxUser];
+
+  @override
+  String toString() => '''CreateNewWorkoutButtonTapped: { cruxUser: $cruxUser, selectedDate: $selectedDate } ''';
 }

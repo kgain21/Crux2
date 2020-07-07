@@ -1,6 +1,9 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
+import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -38,18 +41,31 @@ void main() {
     final findScaffold = find.byKey(Key('dashboardScaffold'));
 
     testWidgets('test Dashboard screen builds correctly', (WidgetTester tester) async {
+      whenListen(
+        dashboardBlockMock,
+        Stream.fromIterable([
+          DashboardUninitialized(),
+        ]),
+      );
       await tester.pumpWidget(subject);
 
       dartTest.expect(findScaffold, findsOneWidget);
     });
   });
 
-  group('Calendar Tests', () {
+  group('Calendar interaction tests', () {
     var selectedDate = DateTime.now();
     var currentDay = selectedDate.day;
 
-    testWidgets('Test new calendar date tapped interaction with DashboardDateChangedSuccess state',
+    testWidgets('Test calendar date tapped interaction adds a CalendarDateChanged event',
         (WidgetTester tester) async {
+      whenListen(
+        dashboardBlockMock,
+        Stream.fromIterable([
+          DashboardUninitialized(),
+        ]),
+      );
+
       await tester.pumpWidget(subject);
 
       // Scroll down 200px in case date is cut off by smaller screen
@@ -69,4 +85,80 @@ void main() {
       expect((result.captured.first as CalendarDateChanged).selectedDate.day, selectedDate.day);
     });
   });
+
+  group('State update interaction tests', () {
+    var selectedDate = DateTime.now();
+
+    testWidgets('Test build with DashboardDateChangedSuccess state', (WidgetTester tester) async {
+      whenListen(
+        dashboardBlockMock,
+        Stream.fromIterable([
+          DashboardUninitialized(),
+          DashboardDateChangeInProgress(),
+          DashboardDateChangeSuccess(selectedDate: selectedDate, cruxWorkout: CruxWorkout()),
+        ]),
+      );
+
+      await tester.pumpWidget(subject);
+
+      expect(find.byType(DashboardScreen), findsOneWidget);
+    });
+
+    testWidgets(
+        'Test build with DashboardDateChangeNotFound state given past date should show '
+        'noWorkoutFoundDialog with working Cancel button', (WidgetTester tester) async {
+      whenListen(
+        dashboardBlockMock,
+        Stream.fromIterable([
+          DashboardUninitialized(),
+          DashboardDateChangeInProgress(),
+          DashboardDateChangeNotFound(selectedDate: selectedDate.subtract(Duration(days: 2))),
+        ]),
+      );
+
+      await tester.pumpWidget(subject);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DashboardScreen), findsOneWidget);
+      expect(find.byKey(Key('noWorkoutFoundDialog')), findsOneWidget);
+      expect(find.widgetWithText(FlatButton, 'Create New Workout'), findsNothing);
+
+      var cancelButton = find.widgetWithText(FlatButton, 'Cancel');
+      expect(cancelButton, findsOneWidget);
+
+      await tester.tap(cancelButton);
+      expect(find.byKey(Key('noWorkoutFoundDialogCreateNew')), findsNothing);
+    });
+
+    testWidgets(
+        'Test build with DashboardDateChangeNotFound state given future date should show '
+        'noWorkoutFoundDialogCreateNew', (WidgetTester tester) async {
+      var futureSelectedDate = selectedDate.add(Duration(days: 2));
+
+      whenListen(
+        dashboardBlockMock,
+        Stream.fromIterable([
+          DashboardUninitialized(),
+          DashboardDateChangeInProgress(),
+          DashboardDateChangeNotFound(selectedDate: futureSelectedDate),
+        ]),
+      );
+
+      await tester.pumpWidget(subject);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DashboardScreen), findsOneWidget);
+      expect(find.byKey(Key('noWorkoutFoundDialogCreateNew')), findsOneWidget);
+      var newWorkoutButton = find.widgetWithText(FlatButton, 'Create New Workout');
+      expect(newWorkoutButton, findsOneWidget);
+
+      await tester.tap(newWorkoutButton);
+
+      var result = verify(dashboardBlockMock.add(captureThat(isA<CreateNewWorkoutButtonTapped>())));
+      result.called(1);
+      expect((result.captured.first as CreateNewWorkoutButtonTapped).cruxUser, cruxUser);
+      expect((result.captured.first as CreateNewWorkoutButtonTapped).selectedDate.day, futureSelectedDate.day);
+    });
+  });
 }
+

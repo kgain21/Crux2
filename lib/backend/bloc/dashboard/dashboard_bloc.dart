@@ -7,7 +7,7 @@ import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/backend/repository/workout/workout_repository.dart';
 import 'package:flutter/cupertino.dart';
 
-class DashboardBloc extends Bloc {
+class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   BaseWorkoutRepository workoutRepository;
 
   DashboardBloc({@required this.workoutRepository});
@@ -16,14 +16,14 @@ class DashboardBloc extends Bloc {
   get initialState => DashboardUninitialized();
 
   @override
-  Stream mapEventToState(event) {
+  Stream<DashboardState> mapEventToState(event) {
     if (event is CalendarDateChanged) {
       return _mapCalendarDateChangedToState(event);
     }
     return null;
   }
 
-  Stream _mapCalendarDateChangedToState(CalendarDateChanged event) async* {
+  Stream<DashboardState> _mapCalendarDateChangedToState(CalendarDateChanged event) async* {
     yield DashboardDateChangeInProgress();
 
     var date = event.selectedDate;

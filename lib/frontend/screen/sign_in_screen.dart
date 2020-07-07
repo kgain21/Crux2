@@ -30,7 +30,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       key: Key('signInScaffold'),
       body: BlocListener<AuthenticationBloc, AuthenticationState>(
-        key: Key('SignInBlocListener'),
+        key: Key('authenticationBlocListener'),
         bloc: authenticationBloc,
         listener: _listenForAuthenticationBlocState,
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
@@ -61,7 +61,7 @@ class _SignInScreenState extends State<SignInScreen> {
         arguments: DashboardScreenArguments(state.cruxUser),
       );
     }
-    if (state is AuthenticationFailure) {
+    else if (state is AuthenticationFailure) {
       Scaffold.of(context).showSnackBar(SnackBar(
         key: Key('failureSnackBar'),
         content: Text(
@@ -70,7 +70,7 @@ class _SignInScreenState extends State<SignInScreen> {
         backgroundColor: Theme.of(context).errorColor,
       ));
     }
-    if (state is AuthenticationError) {
+    else if (state is AuthenticationError) {
       Scaffold.of(context).showSnackBar(SnackBar(
         key: Key('errorSnackBar'),
         content:
@@ -106,8 +106,8 @@ class _SignInScreenState extends State<SignInScreen> {
       key: Key('contentOutlineOverlay'),
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * .45,
-          maxWidth: MediaQuery.of(context).size.width * .9,
+          maxHeight: MediaQuery.of(context).size.height * .5,
+          maxWidth: MediaQuery.of(context).size.width * .91,
         ),
         child: ClipRect(
           child: BackdropFilter(
