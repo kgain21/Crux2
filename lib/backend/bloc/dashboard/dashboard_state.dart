@@ -4,27 +4,29 @@ import 'package:flutter/widgets.dart';
 
 @immutable
 abstract class DashboardState extends Equatable {
-  const DashboardState();
+  final DateTime selectedDate;
+
+  const DashboardState(this.selectedDate);
 
   @override
   List<Object> get props => [];
 }
 
 class DashboardUninitialized extends DashboardState {
-  const DashboardUninitialized();
+  const DashboardUninitialized() : super(null);
 }
 
 class DashboardInitialized extends DashboardState {
-  const DashboardInitialized();
+  const DashboardInitialized() : super(null);
 }
 
 class DashboardDateChangeInProgress extends DashboardState {
-  const DashboardDateChangeInProgress();
+  const DashboardDateChangeInProgress() : super(null);
 }
 
 class DashboardDateChangeSuccess extends DashboardState {
   final CruxWorkout cruxWorkout;
-  final DateTime selectedDate;
+  final selectedDate;
 
   @override
   List<Object> get props => [selectedDate, cruxWorkout];
@@ -33,7 +35,8 @@ class DashboardDateChangeSuccess extends DashboardState {
   String toString() =>
       '''DashboardDateChangeComplete: { selectedDate: $selectedDate, cruxWorkout: $cruxWorkout }''';
 
-  const DashboardDateChangeSuccess({@required this.selectedDate, @required this.cruxWorkout});
+  const DashboardDateChangeSuccess({@required this.selectedDate, @required this.cruxWorkout})
+      : super(selectedDate);
 }
 
 class DashboardDateChangeError extends DashboardState {
@@ -45,7 +48,7 @@ class DashboardDateChangeError extends DashboardState {
   @override
   String toString() => '''DashboardDateChangeError: { selectedDate: $selectedDate }''';
 
-  const DashboardDateChangeError({@required this.selectedDate});
+  const DashboardDateChangeError({@required this.selectedDate}) : super(selectedDate);
 }
 
 class DashboardDateChangeNotFound extends DashboardState {
@@ -57,5 +60,5 @@ class DashboardDateChangeNotFound extends DashboardState {
   @override
   String toString() => '''DashboardDateChangeNotFound: { selectedDate: $selectedDate }''';
 
-  const DashboardDateChangeNotFound({@required this.selectedDate});
+  const DashboardDateChangeNotFound({@required this.selectedDate}) : super(selectedDate);
 }

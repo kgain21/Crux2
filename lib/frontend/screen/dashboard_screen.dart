@@ -2,6 +2,8 @@ import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/frontend/screen/workout_form_screen.dart';
+import 'package:crux/frontend/util_widget/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,8 +31,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   CalendarController _calendarController;
 
   int _tabIndex = 1;
-
-  DateTime _selectedDay;
 
   _DashboardScreenState(this.dashboardBloc, this.cruxUser);
 
@@ -71,10 +71,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   return CustomScrollView(
                     physics: const BouncingScrollPhysics(),
                     slivers: <Widget>[
-                      buildAppBar(context),
-                      buildTabBar(),
+                      _buildAppBar(context, state),
+                      _buildTabBar(),
                       if (_tabIndex == 0) SliverToBoxAdapter(child: Placeholder()),
-                      if (_tabIndex == 1) _buildTableCalendar(),
+                      if (_tabIndex == 1) _buildTableCalendar(state),
                       if (_tabIndex == 2) _buildListView(),
                     ],
                   );
@@ -85,9 +85,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  SliverAppBar buildAppBar(BuildContext context) {
+  void _listenForDashboardBlocState(BuildContext context, DashboardState state) {
+    if (state is DashboardDateChangeError) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        key: Key('workoutLookupError'),
+        content: Text('Workout lookup failed. Please check your connection and try again.'),
+        duration: Duration(seconds: 5),
+        backgroundColor: Theme.of(context).errorColor,
+      ));
+    }
+  }
+
+  SliverAppBar _buildAppBar(BuildContext context, DashboardState dashboardState) {
     return SliverAppBar(
-//      floating: true, // allows appbar to expand from anywhere in the list - don't need this unless the list gets long enough
       centerTitle: true,
       title: Text(
         'Workout for ${DateFormat('MMMMEEEEd').format(_calendarController.selectedDay ?? DateTime.now())}',
@@ -105,16 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           StretchMode.fadeTitle,
         ],
         background: DecoratedBox(
-          child: Column(
-            children: <Widget>[
-              Text('Current Exercise: '),
-              Text('Get Started'),
-              Icon(Icons.play_arrow),
-              Icon(Icons.pause),
-              Text('Total Time: 1:34:56'),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
+          child: _buildAppBarContent(dashboardState, context),
           decoration: BoxDecoration(
             //todo: make this common?
             gradient: LinearGradient(
@@ -131,7 +132,67 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  SliverPersistentHeader buildTabBar() {
+  Widget _buildAppBarContent(DashboardState state, BuildContext context) {
+    if (state is DashboardUninitialized) {
+      dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: DateTime.now()));
+    }
+    if (state is DashboardDateChangeInProgress) {
+      return LoadingIndicator(
+        color: Theme.of(context).primaryColor,
+      );
+    } else if (state is DashboardDateChangeSuccess) {
+      return Column(
+        children: <Widget>[
+          Text('Current Exercise: '),
+          Text('Get Started'),
+          Icon(Icons.play_arrow),
+          Icon(Icons.pause),
+          Text('Total Time: 1:34:56'),
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
+      );
+    } else if (state is DashboardDateChangeNotFound) {
+      if (state.selectedDate.subtract(Duration(hours: 12)).difference(DateTime.now().subtract(Duration(days: 1))).isNegative) {
+        return Column(
+          key: Key('noWorkoutFoundAppBar'),
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('No Workout found for ${DateFormat('MMMMEEEEd').format(state.selectedDate)}.'),
+          ],
+        );
+      } else {
+        return Column(
+          key: Key('noWorkoutFoundAppBarCreateNew'),
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('No Workout found for ${DateFormat('MMMMEEEEd').format(state.selectedDate)}.'),
+            Text('Would you like to create a new workout for this date?'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RaisedButton(
+                child: Text(
+                  'CREATE NEW WORKOUT',
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    WorkoutFormScreen.routeName,
+                    arguments: WorkoutFormScreenArguments(cruxUser, state.selectedDate),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      }
+    } else {
+      return Container();
+    }
+  }
+
+  SliverPersistentHeader _buildTabBar() {
     return SliverPersistentHeader(
       pinned: true,
       delegate: _SliverAppBarDelegate(
@@ -181,10 +242,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   bool notNull(Object o) => o != null;
 
-  Widget _buildTableCalendar() {
+  Widget _buildTableCalendar(DashboardState state) {
     return SliverToBoxAdapter(
       child: TableCalendar(
-        initialSelectedDay: _selectedDay ?? DateTime.now(),
+        initialSelectedDay: state.selectedDate ?? DateTime.now(),
         availableGestures: AvailableGestures.horizontalSwipe,
         headerStyle: HeaderStyle(
           centerHeaderTitle: true,
@@ -200,63 +261,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         calendarController: _calendarController,
         onDaySelected: (dateTime, events) {
           dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: dateTime));
-          setState(() {
-            _selectedDay = dateTime;
-          });
         },
       ),
     );
-  }
-
-  void _listenForDashboardBlocState(BuildContext context, DashboardState state) {
-    if (state is DashboardDateChangeNotFound) {
-      if (state.selectedDate.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
-        _noWorkoutFoundDialog(context, state);
-      } else {
-        _noWorkoutFoundDialogCreateNew(context, state);
-      }
-    }
-  }
-
-  void _noWorkoutFoundDialogCreateNew(BuildContext context, DashboardDateChangeNotFound state) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            key: Key('noWorkoutFoundDialogCreateNew'),
-            title:
-                Text('No Workout found for ${DateFormat('MMMMEEEEd').format(state.selectedDate)}.'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[Text('Would you like to create a new workout for this date?')],
-            ),
-            actions: <Widget>[
-              Row(
-                children: <Widget>[
-                  FlatButton(
-                    child: Text(
-                      'Create New Workout',
-                      style: TextStyle(color: Theme.of(context).accentColor),
-                    ),
-                    onPressed: () {
-                      dashboardBloc.add(CreateNewWorkoutButtonTapped(
-                          selectedDate: state.selectedDate, cruxUser: cruxUser));
-                    },
-                  ),
-                  FlatButton(
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              )
-            ],
-          );
-        });
   }
 
   void _noWorkoutFoundDialog(BuildContext context, DashboardDateChangeNotFound state) {

@@ -2,10 +2,9 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
 import 'package:crux/backend/bloc/authentication/authentication_event.dart';
 import 'package:crux/backend/bloc/authentication/authentication_state.dart';
+import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/frontend/screen/dashboard_screen.dart';
 import 'package:crux/frontend/screen/sign_in_screen.dart';
-import 'package:crux/backend/repository/user/model/crux_user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -16,23 +15,20 @@ import '../../test_util/widget_test_utils.dart';
 class AuthenticationBlocMock extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
-class FirebaseUserMock extends Mock implements FirebaseUser {}
-
 void main() {
   AuthenticationBlocMock authenticationBlocMock;
+  NavigatorObserverMock navigatorObserverMock;
 
   final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
-
-  NavigatorObserverMock mockNavigatorObserver;
 
   var subject;
 
   dartTest.setUp(() {
     authenticationBlocMock = AuthenticationBlocMock();
-    mockNavigatorObserver = NavigatorObserverMock();
+    navigatorObserverMock = NavigatorObserverMock();
 
     subject = buildTestableWidget(SignInScreen(authenticationBloc: authenticationBlocMock),
-        navigatorObserverMock: mockNavigatorObserver);
+        navigatorObserverMock: navigatorObserverMock);
   });
 
   dartTest.tearDown(() {
@@ -92,14 +88,10 @@ void main() {
 
         await tester.pumpWidget(subject);
 
-        await tester.pumpAndSettle();
-
         final Route pushedRoute =
-            verify(mockNavigatorObserver.didPush(captureAny, any)).captured[1];
+            verify(navigatorObserverMock.didPush(captureAny, any)).captured[1];
         expect(pushedRoute.settings.name, DashboardScreen.routeName);
         expect(pushedRoute.settings.arguments, isA<DashboardScreenArguments>());
-
-        expect(find.byType(DashboardScreen), findsOneWidget);
       },
     );
 

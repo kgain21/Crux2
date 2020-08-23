@@ -28,17 +28,12 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
     var date = event.selectedDate;
     try {
-      CruxWorkout cruxWorkout =
-          await workoutRepository.findWorkoutByDate(date, event.cruxUser);
-      //todo: how do i want to get user here? DI? just pass it in? seems like it should be globally available somehow and I shouldn't have to pass it everywhere
-      //todo update: decided to just pass it in the event. If it ends up becoming too clunky I can refactor to a more global approach but for right now this will keep things moving.
+      CruxWorkout cruxWorkout = await workoutRepository.findWorkoutByDate(date, event.cruxUser);
 
-      if(null != cruxWorkout) {
-        yield DashboardDateChangeSuccess(
-            selectedDate: date, cruxWorkout: cruxWorkout);
+      if (null != cruxWorkout) {
+        yield DashboardDateChangeSuccess(selectedDate: date, cruxWorkout: cruxWorkout);
       } else {
         yield DashboardDateChangeNotFound(selectedDate: date);
-        //todo: UI alert and option to create new / copy existing
       }
     } catch (error) {
       log('Failed to retrieve CruxWorkout.', error: error);
