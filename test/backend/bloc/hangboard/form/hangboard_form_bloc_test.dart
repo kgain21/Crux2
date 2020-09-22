@@ -1,43 +1,34 @@
-import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
-import 'package:crux/backend/repository/workout/workout_repository.dart';
-import 'package:mockito/mockito.dart';
+import 'package:crux/backend/bloc/hangboard/form/hangboard_form_bloc.dart';
+import 'package:crux/backend/bloc/hangboard/form/hangboard_form_state.dart';
 import 'package:test/test.dart';
 
-import '../../test_model_factory.dart';
-
-class BaseWorkoutRepositoryMock extends Mock implements BaseWorkoutRepository {}
-
 void main() {
-  BaseWorkoutRepositoryMock baseWorkoutRepositoryMock;
-  DashboardBloc dashboardBloc;
+  HangboardFormBloc hangboardFormBloc;
 
   setUp(() {
-    baseWorkoutRepositoryMock = BaseWorkoutRepositoryMock();
-    dashboardBloc = DashboardBloc(workoutRepository: baseWorkoutRepositoryMock);
+    hangboardFormBloc = HangboardFormBloc();
   });
 
   tearDown(() {
-    dashboardBloc?.close();
+    hangboardFormBloc?.close();
   });
 
   group('basic checks', () {
     test('initial state is correct', () {
-      expect(dashboardBloc.initialState, DashboardUninitialized());
+      expect(hangboardFormBloc.initialState, HangboardFormUninitialized());
     });
 
     test('close does not emit new states', () {
       expectLater(
-        dashboardBloc,
-        emitsInOrder([DashboardUninitialized(), emitsDone]),
+        hangboardFormBloc,
+        emitsInOrder([HangboardFormUninitialized(), emitsDone]),
       );
-      dashboardBloc.close();
+      hangboardFormBloc.close();
     });
   });
 
   group('event handling', () {
-    group('CalendarDateChanged', () {
+    /*group('CalendarDateChanged', () {
       var selectedDate = DateTime(2020);
       var testUser = TestModelFactory.getTypicalCruxUser();
       var testWorkout = TestModelFactory.getTypicalCruxWorkout();
@@ -48,6 +39,7 @@ void main() {
             dashboardBloc,
             emitsInOrder([
               DashboardUninitialized(),
+//              DashboardInitialized(), todo: may still want this, not sure yet
               DashboardDateChangeInProgress(),
               DashboardDateChangeSuccess(selectedDate: selectedDate, cruxWorkout: testWorkout),
             ]));
@@ -63,6 +55,7 @@ void main() {
             dashboardBloc,
             emitsInOrder([
               DashboardUninitialized(),
+//              DashboardInitialized(), todo: may still want this, not sure yet
               DashboardDateChangeInProgress(),
               DashboardDateChangeError(selectedDate: selectedDate),
             ]));
@@ -78,6 +71,7 @@ void main() {
             dashboardBloc,
             emitsInOrder([
               DashboardUninitialized(),
+//              DashboardInitialized(), todo: may still want this, not sure yet
               DashboardDateChangeInProgress(),
               DashboardDateChangeNotFound(selectedDate: selectedDate),
             ]));
@@ -86,6 +80,6 @@ void main() {
             .thenAnswer((_) => Future.value(null));
         dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
       });
-    });
+    });*/
   });
 }

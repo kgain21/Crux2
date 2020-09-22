@@ -16,17 +16,13 @@ class DashboardUninitialized extends DashboardState {
   const DashboardUninitialized() : super(null);
 }
 
-class DashboardInitialized extends DashboardState {
-  const DashboardInitialized() : super(null);
-}
-
 class DashboardDateChangeInProgress extends DashboardState {
   const DashboardDateChangeInProgress() : super(null);
 }
 
 class DashboardDateChangeSuccess extends DashboardState {
   final CruxWorkout cruxWorkout;
-  final selectedDate;
+  final DateTime selectedDate;
 
   @override
   List<Object> get props => [selectedDate, cruxWorkout];

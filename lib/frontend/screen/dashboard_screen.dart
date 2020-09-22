@@ -2,7 +2,7 @@ import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
-import 'package:crux/frontend/screen/workout_form_screen.dart';
+import 'package:crux/frontend/screen/form/workout_form_screen.dart';
 import 'package:crux/frontend/util_widget/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -253,6 +253,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         ),
         daysOfWeekStyle: DaysOfWeekStyle(weekendStyle: TextStyle(color: const Color(0xFF616161))),
         calendarStyle: CalendarStyle(
+          todayColor: Theme.of(context).buttonColor,
+          selectedColor: Theme.of(context).accentColor,
           weekendStyle: const TextStyle(),
           outsideDaysVisible: false,
           outsideStyle: const TextStyle(),
@@ -264,33 +266,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         },
       ),
     );
-  }
-
-  void _noWorkoutFoundDialog(BuildContext context, DashboardDateChangeNotFound state) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            key: Key('noWorkoutFoundDialog'),
-            title:
-                Text('No Workout found for ${DateFormat('MMMMEEEEd').format(state.selectedDate)}.'),
-            actions: <Widget>[
-              Row(
-                children: <Widget>[
-                  FlatButton(
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              )
-            ],
-          );
-        });
   }
 }
 

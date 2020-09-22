@@ -5,7 +5,8 @@ import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/simple_bloc_delegate.dart';
 import 'package:crux/backend/util/injector/injector.dart';
 import 'package:crux/frontend/screen/dashboard_screen.dart';
-import 'package:crux/frontend/screen/workout_form_screen.dart';
+import 'package:crux/frontend/screen/form/hangboard_form_screen.dart';
+import 'package:crux/frontend/screen/form/workout_form_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'frontend/screen/sign_in_screen.dart';
@@ -55,6 +56,13 @@ class Crux extends StatelessWidget {
               args.selectedDate,
 //              dashboardBloc: injector.get<DashboardBloc>(),
             );
+          },
+          settings: settings,
+        );
+        case HangboardFormScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return HangboardFormScreen();
           },
           settings: settings,
         );

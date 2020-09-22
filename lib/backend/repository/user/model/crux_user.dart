@@ -13,6 +13,6 @@ class CruxUser extends Equatable {
 
   @override
   String toString() {
-    return '''CruxUser: { displayName: $displayName email: $email }''';
+    return '''CruxUser: { displayName: $displayName, email: $email }''';
   }
 }
