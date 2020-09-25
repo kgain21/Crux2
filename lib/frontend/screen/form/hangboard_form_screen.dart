@@ -1,21 +1,25 @@
+import 'package:crux/backend/bloc/hangboard/form/hangboard_form_bloc.dart';
+import 'package:crux/backend/bloc/hangboard/form/hangboard_form_event.dart';
+import 'package:crux/backend/bloc/hangboard/form/hangboard_form_state.dart';
 import 'package:crux/frontend/util_widget/unit_selector.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
-import 'package:flutter/widgets.dart';
+import 'package:crux/util/string_format_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 class HangboardFormScreen extends StatefulWidget {
   static const routeName = '/hangboardForm';
 
   final String workoutTitle;
+
 //  final FirestoreHangboardWorkoutsRepository
 //  firestoreHangboardWorkoutsRepository;
 
-  HangboardFormScreen({/*this.firestoreHangboardWorkoutsRepository, */this.workoutTitle});
+  HangboardFormScreen({/*this.firestoreHangboardWorkoutsRepository, */ this.workoutTitle});
 
   @override
   State createState() => new _HangboardFormScreenState();
@@ -28,8 +32,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   final TextEditingController _timeOnController = TextEditingController();
   final TextEditingController _timeOffController = TextEditingController();
   final TextEditingController _hangsPerSetController = TextEditingController();
-  final TextEditingController _timeBetweenSetsController =
-  TextEditingController();
+  final TextEditingController _timeBetweenSetsController = TextEditingController();
   final TextEditingController _numberOfSetsController = TextEditingController();
   final TextEditingController _resistanceController = TextEditingController();
 
@@ -39,16 +42,13 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   Hold _hold;
   FingerConfiguration _fingerConfiguration;
 
-  ExerciseFormBloc _exerciseFormBloc;
+  HangboardFormBloc _hangboardFormBloc;
 
   @override
   void initState() {
     super.initState();
-    _exerciseFormBloc = /* BlocProvider.of<ExerciseFormBloc>(context);*/
-    ExerciseFormBloc(
-        workoutTitle: widget.workoutTitle,
-        firestoreHangboardWorkoutsRepository:
-        widget.firestoreHangboardWorkoutsRepository);
+    _hangboardFormBloc = /* BlocProvider.of<HangboardFormBloc>(context);*/
+        HangboardFormBloc();
   }
 
   @override
@@ -65,54 +65,51 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         ],
       ),
       body: BlocListener(
-        bloc: _exerciseFormBloc,
-        listener: (BuildContext context, ExerciseFormState exerciseFormState) {
-          if (exerciseFormState.isSuccess) {
+        bloc: _hangboardFormBloc,
+        listener: (BuildContext context, HangboardFormState hangboardFormState) {
+          if (hangboardFormState.isSuccess) {
             exerciseSavedSnackbar(context);
-            _exerciseFormBloc.add(ExerciseFormFlagsReset());
+            _hangboardFormBloc.add(HangboardFormFlagsReset());
 //            BlocProvider.of<HangboardParentBloc>(context).add(HangboardParentUpdated());
-          } else if (exerciseFormState.isDuplicate) {
-            _exerciseExistsAlert(exerciseFormState);
-            _exerciseFormBloc.add(ExerciseFormFlagsReset());
+          } else if (hangboardFormState.isDuplicate) {
+            _exerciseExistsAlert(hangboardFormState);
+            _hangboardFormBloc.add(HangboardFormFlagsReset());
           }
-          if (exerciseFormState is ExerciseFormSaveInvalid) {
+          if (hangboardFormState is HangboardFormSaveInvalid) {
 //            exerciseNotSavedSnackbar(context);
           }
         },
         child: BlocBuilder(
-          bloc: _exerciseFormBloc,
-          builder: (context, exerciseFormState) {
+          bloc: _hangboardFormBloc,
+          builder: (context, hangboardFormState) {
             return Builder(
-              builder: (scaffoldContext) =>
-                  Form(
-                    key: formKey,
-                    /*https://medium.com/saugo360/https-medium-com-saugo360-flutter-using-overlay-to-display-floating-widgets-2e6d0e8decb9
+              builder: (scaffoldContext) => Form(
+                key: formKey,
+                /*https://medium.com/saugo360/https-medium-com-saugo360-flutter-using-overlay-to-display-floating-widgets-2e6d0e8decb9
                 TODO: See if I can get the keyboard to jump to the text form field in focus (nice to have)
                 https://stackoverflow.com/questions/46841637/show-a-text-field-dialog-without-being-covered-by-keyboard/46849239#46849239
                 TODO: ^ this was the original solution to the keyboard covering text fields, might want to refer to it in the future
                  */
-                    child: ListView(
-                      children: <Widget>[
-                        UnitSelector(
-                          depthMeasurementSystem: 'mm',
-                          resistanceMeasurementSystem: 'kg',
-                        ),
-                        _numberOfHandsTile(exerciseFormState, scaffoldContext),
-                        _holdDropdownTile(exerciseFormState, scaffoldContext),
-                        _fingerConfigurationDropdownTile(
-                            exerciseFormState, scaffoldContext),
-                        _depthTile(exerciseFormState, scaffoldContext),
-                        _timeOnTile(exerciseFormState, scaffoldContext),
-                        // hangProtocolTile(),
-                        _hangsPerSetTile(exerciseFormState, scaffoldContext),
-                        _timeBetweenSetsTile(
-                            exerciseFormState, scaffoldContext),
-                        _numberOfSetsTile(exerciseFormState, scaffoldContext),
-                        _resistanceTile(exerciseFormState, scaffoldContext),
-                        _saveButton(exerciseFormState, scaffoldContext)
-                      ].where(notNull).toList(),
+                child: ListView(
+                  children: <Widget>[
+                    UnitSelector(
+                      depthMeasurementSystem: 'mm',
+                      resistanceMeasurementSystem: 'kg',
                     ),
-                  ),
+                    _handsRadioTile(hangboardFormState, scaffoldContext),
+                    _holdDropdownTile(hangboardFormState, scaffoldContext),
+                    _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
+                    _depthTile(hangboardFormState, scaffoldContext),
+                    _timeOnTile(hangboardFormState, scaffoldContext),
+                    // hangProtocolTile(),
+                    _hangsPerSetTile(hangboardFormState, scaffoldContext),
+                    _timeBetweenSetsTile(hangboardFormState, scaffoldContext),
+                    _numberOfSetsTile(hangboardFormState, scaffoldContext),
+                    _resistanceTile(hangboardFormState, scaffoldContext),
+                    _saveButton(hangboardFormState, scaffoldContext)
+                  ].where(notNull).toList(),
+                ),
+              ),
             );
           },
         ),
@@ -125,22 +122,20 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   /// turned back into a list without the null entries.
   bool notNull(Object o) => o != null;
 
-  Widget _numberOfHandsTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _handsRadioTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return new Card(
       child: ListTile(
-        key: PageStorageKey('numberOfHandsTile'),
+        key: PageStorageKey('handsTile'),
         title: Row(
           children: <Widget>[
             Flexible(
               child: RadioListTile(
                 title: Text('One hand'),
                 value: 1,
-                groupValue: exerciseFormState.numberOfHandsSelected,
+                groupValue: hangboardFormState.hands,
                 onChanged: (value) {
                   Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  _exerciseFormBloc.add(
-                      ExerciseFormNumberOfHandsChanged(value));
+                  _hangboardFormBloc.add(HangboardFormNumberOfHandsChanged(value));
                 },
               ),
             ),
@@ -148,11 +143,10 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               child: RadioListTile(
                 title: Text('Two hands'),
                 value: 2,
-                groupValue: exerciseFormState.numberOfHandsSelected,
+                groupValue: hangboardFormState.hands,
                 onChanged: (value) {
                   Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  _exerciseFormBloc.add(
-                      ExerciseFormNumberOfHandsChanged(value));
+                  _hangboardFormBloc.add(HangboardFormNumberOfHandsChanged(value));
                 },
               ),
             ),
@@ -162,8 +156,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _holdDropdownTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _holdDropdownTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return new Card(
       child: new ListTile(
         leading: Icon(
@@ -175,15 +168,15 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             hint: Text(
               'Choose a hold',
             ),
-            value: exerciseFormState.hold,
+            value: hangboardFormState.hold,
             onChanged: (value) {
               Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-              _exerciseFormBloc.add(ExerciseFormHoldChanged(value));
+              _hangboardFormBloc.add(HangboardFormHoldChanged(value));
             },
             items: Hold.values.map((Hold hold) {
               return new DropdownMenuItem<Hold>(
                 child: new Text(
-                  StringFormatUtils.formatHold(hold),
+                  StringFormatUtil.formatHold(hold),
                 ),
                 value: hold,
               );
@@ -194,9 +187,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _fingerConfigurationDropdownTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
-    if(exerciseFormState.isFingerConfigurationVisible) {
+  Widget _fingerConfigurationDropdownTile(
+      HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
+    if (hangboardFormState.showFingerConfiguration) {
       return new Card(
         child: new ListTile(
           leading: Icon(
@@ -209,18 +202,15 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               hint: Text(
                 'Choose a finger configuration',
               ),
-              value: exerciseFormState.fingerConfiguration,
+              value: hangboardFormState.fingerConfiguration,
               onChanged: (value) {
                 Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                _exerciseFormBloc.add(
-                    ExerciseFormFingerConfigurationChanged(value));
+                _hangboardFormBloc.add(HangboardFormFingerConfigurationChanged(value));
               },
-              items: exerciseFormState.availableFingerConfigurations
-                  .map((fingerConfiguration) {
+              items: hangboardFormState.availableFingerConfigurations.map((fingerConfiguration) {
                 return DropdownMenuItem(
                   child: new Text(
-                    StringFormatUtils.formatFingerConfiguration(
-                        fingerConfiguration),
+                    StringFormatUtil.formatFingerConfiguration(fingerConfiguration),
                   ),
                   value: fingerConfiguration,
                 );
@@ -234,9 +224,8 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     }
   }
 
-  Widget _depthTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
-    if(!exerciseFormState.isDepthVisible) {
+  Widget _depthTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
+    if (!hangboardFormState.showDepth) {
       return null;
     }
     return new Card(
@@ -245,19 +234,18 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: new TextFormField(
             controller: _depthController,
-            autovalidate: exerciseFormState.autoValidate,
+            autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
-              return exerciseFormState.isDepthValid ? null : 'Invalid Depth';
+              return hangboardFormState.validDepth ? null : 'Invalid Depth';
             },
             onChanged: (value) {
-              _exerciseFormBloc.add(ExerciseFormDepthChanged(value));
+              _hangboardFormBloc.add(HangboardFormDepthChanged(value));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.keyboard_tab),
-              labelText: 'Depth (${exerciseFormState.depthMeasurementSystem})',
+              labelText: 'Depth (${hangboardFormState.depthUnit})',
             ),
-            keyboardType:
-            TextInputType.numberWithOptions(signed: true, decimal: true),
+            keyboardType: TextInputType.numberWithOptions(signed: true, decimal: true),
             onTap: () {
               Scaffold.of(scaffoldContext).hideCurrentSnackBar();
             },
@@ -267,8 +255,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _timeOnTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _timeOnTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
@@ -276,18 +263,15 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           children: <Widget>[
             Flexible(
               child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 8.0, top: 0.0, right: 8.0, bottom: 8.0),
+                padding: const EdgeInsets.only(left: 8.0, top: 0.0, right: 8.0, bottom: 8.0),
                 child: TextFormField(
                   controller: _timeOnController,
-                  autovalidate: exerciseFormState.autoValidate,
+                  autovalidate: hangboardFormState.autoValidate,
                   validator: (_) {
-                    return exerciseFormState.isTimeOnValid
-                        ? null
-                        : 'Invalid Time On';
+                    return hangboardFormState.validTimeOn ? null : 'Invalid Time On';
                   },
                   onChanged: (value) {
-                    _exerciseFormBloc.add(ExerciseFormTimeOnChanged(value));
+                    _hangboardFormBloc.add(HangboardFormTimeOnChanged(value));
                   },
                   decoration: InputDecoration(
                     labelText: 'Time On (sec)',
@@ -301,18 +285,15 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             Flexible(
               child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 8.0, top: 0.0, right: 8.0, bottom: 8.0),
+                padding: const EdgeInsets.only(left: 8.0, top: 0.0, right: 8.0, bottom: 8.0),
                 child: TextFormField(
                   controller: _timeOffController,
-                  autovalidate: exerciseFormState.autoValidate,
+                  autovalidate: hangboardFormState.autoValidate,
                   validator: (_) {
-                    return exerciseFormState.isTimeOffValid
-                        ? null
-                        : 'Invalid Time Off';
+                    return hangboardFormState.validTimeOff ? null : 'Invalid Time Off';
                   },
                   onChanged: (value) {
-                    _exerciseFormBloc.add(ExerciseFormTimeOffChanged(value));
+                    _hangboardFormBloc.add(HangboardFormTimeOffChanged(value));
                   },
                   decoration: InputDecoration(
                     labelText: 'Time Off (sec)',
@@ -330,7 +311,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-//  Widget hangProtocolTile(ExerciseFormState exerciseFormState) {
+//  Widget hangProtocolTile(HangboardFormState hangboardFormState) {
 //    return Card(
 //      child: new CheckboxListTile(
 //        key: PageStorageKey('hangProtocolTile'),
@@ -345,23 +326,19 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 //    );
 //  }
 
-  Widget _hangsPerSetTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _hangsPerSetTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
       child: ListTile(
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: new TextFormField(
             controller: _hangsPerSetController,
-            autovalidate: exerciseFormState.autoValidate,
+            autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
-              return exerciseFormState.isHangsPerSetValid
-                  ? null
-                  : 'Invalid Hangs Per Set';
+              return hangboardFormState.validHangsPerSet ? null : 'Invalid Hangs Per Set';
             },
             onChanged: (value) {
-              _exerciseFormBloc
-                  .add(ExerciseFormHangsPerSetChanged(value));
+              _hangboardFormBloc.add(HangboardFormHangsPerSetChanged(value));
             },
             decoration: InputDecoration(
               labelText: 'Hangs per set',
@@ -377,23 +354,19 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _timeBetweenSetsTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _timeBetweenSetsTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
       child: ListTile(
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: new TextFormField(
             controller: _timeBetweenSetsController,
-            autovalidate: exerciseFormState.autoValidate,
+            autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
-              return exerciseFormState.isTimeBetweenSetsValid
-                  ? null
-                  : 'Invalid Time Between Sets';
+              return hangboardFormState.validTimeBetweenSets ? null : 'Invalid Time Between Sets';
             },
             onChanged: (value) {
-              _exerciseFormBloc
-                  .add(ExerciseFormTimeBetweenSetsChanged(value));
+              _hangboardFormBloc.add(HangboardFormTimeBetweenSetsChanged(value));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.watch_later),
@@ -409,8 +382,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _numberOfSetsTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _numberOfSetsTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
       child: ListTile(
         key: PageStorageKey<String>('numberOfSetsTile'),
@@ -418,15 +390,12 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: new TextFormField(
             controller: _numberOfSetsController,
-            autovalidate: exerciseFormState.autoValidate,
+            autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
-              return exerciseFormState.isNumberOfSetsValid
-                  ? null
-                  : 'Invalid Number of Sets';
+              return hangboardFormState.validNumberOfSets ? null : 'Invalid Number of Sets';
             },
             onChanged: (value) {
-              _exerciseFormBloc
-                  .add(ExerciseFormNumberOfSetsChanged(value));
+              _hangboardFormBloc.add(HangboardFormNumberOfSetsChanged(value));
             },
             decoration: InputDecoration(
               labelText: 'Number of sets',
@@ -442,8 +411,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _resistanceTile(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _resistanceTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
       child: ListTile(
         key: PageStorageKey<String>('resistanceTile'),
@@ -451,19 +419,16 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: new TextFormField(
             controller: _resistanceController,
-            autovalidate: exerciseFormState.autoValidate,
+            autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
-              return exerciseFormState.isResistanceValid
-                  ? null
-                  : 'Invalid Resistance';
+              return hangboardFormState.validResistance ? null : 'Invalid Resistance';
             },
             onChanged: (value) {
-              _exerciseFormBloc.add(ExerciseFormResistanceChanged(value));
+              _hangboardFormBloc.add(HangboardFormResistanceChanged(value));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.fitness_center),
-              labelText:
-              'Resistance (${exerciseFormState.resistanceMeasurementSystem})',
+              labelText: 'Resistance (${hangboardFormState.resistanceUnit})',
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
@@ -475,13 +440,12 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _saveButton(ExerciseFormState exerciseFormState,
-      BuildContext scaffoldContext) {
+  Widget _saveButton(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: RaisedButton(
         onPressed: () {
-          _saveTileFields(scaffoldContext, exerciseFormState);
+          _saveTileFields(scaffoldContext, hangboardFormState);
         },
         child: Text('Save Exercise'),
       ),
@@ -493,16 +457,15 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   /// describing invalid fields.
   ///
   /// If validation passes, the state is sent to the BLoC to be saved to the DB.
-  void _saveTileFields(BuildContext scaffoldContext,
-      ExerciseFormState exerciseFormState) {
-    if(formKey.currentState.validate()) {
+  void _saveTileFields(BuildContext scaffoldContext, HangboardFormState hangboardFormState) {
+    if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _exerciseFormBloc.add(ValidExerciseFormSaved(
-        exerciseFormState.resistanceMeasurementSystem,
-        exerciseFormState.depthMeasurementSystem,
-        exerciseFormState.numberOfHandsSelected,
-        exerciseFormState.hold,
-        exerciseFormState.fingerConfiguration,
+      _hangboardFormBloc.add(ValidHangboardFormSaved(
+        hangboardFormState.resistanceUnit,
+        hangboardFormState.depthUnit,
+        hangboardFormState.hands,
+        hangboardFormState.hold,
+        hangboardFormState.fingerConfiguration,
         _depthController.text,
         _timeOffController.text,
         _timeOnController.text,
@@ -512,39 +475,36 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         _resistanceController.text,
       ));
     } else {
-      _exerciseFormBloc.add(ExerciseFormSaveInvalid());
+      _hangboardFormBloc.add(HangboardFormSaveInvalid());
     }
   }
 
   List<Widget> mapFingerConfigurations(Hold hold) {
-    if(hold == Hold.POCKET) {
+    if (hold == Hold.POCKET) {
       return FingerConfiguration.values
           .sublist(0, 6)
           .map((FingerConfiguration fingerConfiguration) {
         return new DropdownMenuItem<FingerConfiguration>(
           child: new Text(
-            StringFormatUtils.formatFingerConfiguration(fingerConfiguration),
+            StringFormatUtil.formatFingerConfiguration(fingerConfiguration),
           ),
           value: fingerConfiguration,
         );
       }).toList();
-    } else if(hold == Hold.OPEN_HAND) {
-      return FingerConfiguration.values
-          .sublist(4)
-          .map((FingerConfiguration fingerConfiguration) {
+    } else if (hold == Hold.OPEN_HAND) {
+      return FingerConfiguration.values.sublist(4).map((FingerConfiguration fingerConfiguration) {
         return new DropdownMenuItem<FingerConfiguration>(
           child: new Text(
-            StringFormatUtils.formatFingerConfiguration(fingerConfiguration),
+            StringFormatUtil.formatFingerConfiguration(fingerConfiguration),
           ),
           value: fingerConfiguration,
         );
       }).toList();
     } else {
-      return FingerConfiguration.values
-          .map((FingerConfiguration fingerConfiguration) {
+      return FingerConfiguration.values.map((FingerConfiguration fingerConfiguration) {
         return new DropdownMenuItem<FingerConfiguration>(
           child: new Text(
-            StringFormatUtils.formatFingerConfiguration(fingerConfiguration),
+            StringFormatUtil.formatFingerConfiguration(fingerConfiguration),
           ),
           value: fingerConfiguration,
         );
@@ -552,7 +512,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     }
   }
 
-  Future<void> _exerciseExistsAlert(ExerciseFormState exerciseFormState) async {
+  Future<void> _exerciseExistsAlert(HangboardFormState hangboardFormState) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -566,14 +526,12 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   text: TextSpan(
                     style: TextStyle(color: Colors.black, fontSize: 16.0),
                     children: [
+                      TextSpan(text: 'You already have an exercise created for '),
                       TextSpan(
-                          text: 'You already have an exercise created for '),
-                      TextSpan(
-                        text: '${exerciseFormState.exerciseTitle}.\n\n',
+                        text: '${hangboardFormState.exerciseTitle}.\n\n',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      TextSpan(
-                          text: 'Would you like to replace it with this one?'),
+                      TextSpan(text: 'Would you like to replace it with this one?'),
                     ],
                   ),
                 )
@@ -623,8 +581,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   children: <Widget>[
                     Text(
                       'Exercise Saved!',
-                      style: TextStyle(
-                          color: Theme.of(scaffoldContext).accentColor),
+                      style: TextStyle(color: Theme.of(scaffoldContext).accentColor),
                     ),
                   ],
                 ),
@@ -673,7 +630,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 
   void clearFields() {
     //todo: add this for resetting form
-//    _exerciseFormBloc.add(ExerciseFormCleared());
+//    _exerciseFormBloc.add(HangboardFormCleared());
   }
 
 //TODO: Figure out how to use date w/ firestore -- crashes app with this shit:
@@ -681,3 +638,4 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 /*data.putIfAbsent("created_date", () {
       return DateTime.now();
     });*/
+}

@@ -1,6 +1,10 @@
 import 'package:crux/backend/bloc/hangboard/form/hangboard_form_bloc.dart';
+import 'package:crux/backend/bloc/hangboard/form/hangboard_form_event.dart';
 import 'package:crux/backend/bloc/hangboard/form/hangboard_form_state.dart';
+import 'package:crux/model/unit.dart';
 import 'package:test/test.dart';
+
+import '../../../test_model_factory.dart';
 
 void main() {
   HangboardFormBloc hangboardFormBloc;
@@ -15,41 +19,33 @@ void main() {
 
   group('basic checks', () {
     test('initial state is correct', () {
-      expect(hangboardFormBloc.initialState, HangboardFormUninitialized());
+      expect(hangboardFormBloc.initialState, HangboardFormState.initial());
     });
 
     test('close does not emit new states', () {
       expectLater(
         hangboardFormBloc,
-        emitsInOrder([HangboardFormUninitialized(), emitsDone]),
+        emitsInOrder([HangboardFormState.initial(), emitsDone]),
       );
       hangboardFormBloc.close();
     });
   });
 
   group('event handling', () {
-    /*group('CalendarDateChanged', () {
-      var selectedDate = DateTime(2020);
-      var testUser = TestModelFactory.getTypicalCruxUser();
-      var testWorkout = TestModelFactory.getTypicalCruxWorkout();
+    group('ResistanceUnitChanged', () {
 
-      test('emits [uninitialized, dateChangeInProgress, dateChangeSuccess] given valid cruxUser and'
-          ' selectedDate', () {
+      test('emits [initialized, ResistanceUnitChanged] when user changes resistanceUnit', () {
         expectLater(
-            dashboardBloc,
-            emitsInOrder([
-              DashboardUninitialized(),
-//              DashboardInitialized(), todo: may still want this, not sure yet
-              DashboardDateChangeInProgress(),
-              DashboardDateChangeSuccess(selectedDate: selectedDate, cruxWorkout: testWorkout),
+            hangboardFormBloc,
+            emitsInOrder([HangboardFormState.initial(), ResistanceUnitChanged(ResistanceUnit.POUNDS)
             ]));
 
-        when(baseWorkoutRepositoryMock.findWorkoutByDate(selectedDate, testUser))
-            .thenAnswer((_) => Future.value(testWorkout));
-        dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
+//        when(baseWorkoutRepositoryMock.findWorkoutByDate(selectedDate, testUser))
+//            .thenAnswer((_) => Future.value(testWorkout));
+//        dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
       });
 
-      test('emits [uninitialized, dateChangeInProgress, dateChangeError] given valid cruxUser and'
+      /*test('emits [uninitialized, dateChangeInProgress, dateChangeError] given valid cruxUser and'
           ' selectedDate when error occurs querying db', () {
         expectLater(
             dashboardBloc,
@@ -79,7 +75,7 @@ void main() {
         when(baseWorkoutRepositoryMock.findWorkoutByDate(selectedDate, testUser))
             .thenAnswer((_) => Future.value(null));
         dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
-      });
-    });*/
+      });*/
+    });
   });
 }

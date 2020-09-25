@@ -9,7 +9,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   HangboardFormBloc();
 
   @override
-  get initialState => HangboardFormUninitialized();
+  get initialState => HangboardFormState.initial();
 
   @override
   Stream<HangboardFormState> mapEventToState(event) {

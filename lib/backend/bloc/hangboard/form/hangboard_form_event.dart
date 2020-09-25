@@ -1,5 +1,6 @@
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/unit.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,18 +10,18 @@ abstract class HangboardFormEvent extends Equatable {
   const HangboardFormEvent();
 }
 
-class HangboardFormResistanceMeasurementSystemChanged extends HangboardFormEvent {
-  final String resistanceMeasurementSystem;
+class ResistanceUnitChanged extends HangboardFormEvent {
+  final ResistanceUnit resistanceUnit;
 
-  HangboardFormResistanceMeasurementSystemChanged(
-      this.resistanceMeasurementSystem);
+  ResistanceUnitChanged(
+      this.resistanceUnit);
 
   @override
   String toString() =>
-      'HangboardFormResistanceMeasurementSystemChanged { resistanceMeasurementSystem: $resistanceMeasurementSystem }';
+      'ResistanceUnitChanged { resistanceUnit: $resistanceUnit }';
 
   @override
-  List<Object> get props => [resistanceMeasurementSystem];
+  List<Object> get props => [resistanceUnit];
 }
 
 class HangboardFormDepthMeasurementSystemChanged extends HangboardFormEvent {
@@ -184,8 +185,8 @@ class HangboardFormSaveInvalid extends HangboardFormEvent {
 }
 
 class ValidHangboardFormSaved extends HangboardFormEvent {
-  final String resistanceMeasurementSystem;
-  final String depthMeasurementSystem;
+  final ResistanceUnit resistanceMeasurementSystem;
+  final DepthUnit depthMeasurementSystem;
   final int numberOfHandsSelected;
   final Hold hold;
   final FingerConfiguration fingerConfiguration;
