@@ -13,125 +13,118 @@ abstract class HangboardFormEvent extends Equatable {
 class ResistanceUnitChanged extends HangboardFormEvent {
   final ResistanceUnit resistanceUnit;
 
-  ResistanceUnitChanged(
-      this.resistanceUnit);
+  ResistanceUnitChanged(this.resistanceUnit);
 
   @override
-  String toString() =>
-      'ResistanceUnitChanged { resistanceUnit: $resistanceUnit }';
+  String toString() => 'ResistanceUnitChanged { resistanceUnit: $resistanceUnit }';
 
   @override
   List<Object> get props => [resistanceUnit];
 }
 
-class HangboardFormDepthMeasurementSystemChanged extends HangboardFormEvent {
-  final String depthMeasurementSystem;
+class DepthUnitChanged extends HangboardFormEvent {
+  final DepthUnit depthUnit;
 
-  HangboardFormDepthMeasurementSystemChanged(this.depthMeasurementSystem);
-
-  @override
-  String toString() =>
-      'HangboardFormDepthMeasurementSystemChanged { depthMeasurementSystem: $depthMeasurementSystem }';
+  DepthUnitChanged(this.depthUnit);
 
   @override
-  List<Object> get props => [depthMeasurementSystem];
+  String toString() => 'DepthUnitChanged { depthUnit: $depthUnit }';
+
+  @override
+  List<Object> get props => [depthUnit];
 }
 
-class HangboardFormNumberOfHandsChanged extends HangboardFormEvent {
-  final int numberOfHandsSelected;
+class HandsChanged extends HangboardFormEvent {
+  final int hands;
 
-  HangboardFormNumberOfHandsChanged(this.numberOfHandsSelected);
-
-  @override
-  String toString() =>
-      'HangboardFormNumberOfHandsChanged { numberOfHands: $numberOfHandsSelected }';
+  HandsChanged(this.hands);
 
   @override
-  List<Object> get props => [numberOfHandsSelected];
+  String toString() => 'HandsChanged { hands: $hands }';
+
+  @override
+  List<Object> get props => [hands];
 }
 
-class HangboardFormHoldChanged extends HangboardFormEvent {
+class HoldChanged extends HangboardFormEvent {
   final Hold hold;
 
-  HangboardFormHoldChanged(this.hold);
+  HoldChanged(this.hold);
 
   @override
-  String toString() => 'HangboardFormHoldChanged { hold: $hold }';
+  String toString() => 'HoldChanged { hold: $hold }';
 
   @override
   List<Object> get props => [hold];
 }
 
-class HangboardFormFingerConfigurationChanged extends HangboardFormEvent {
+class FingerConfigurationChanged extends HangboardFormEvent {
   final FingerConfiguration fingerConfiguration;
 
-  HangboardFormFingerConfigurationChanged(this.fingerConfiguration);
+  FingerConfigurationChanged(this.fingerConfiguration);
 
   @override
-  String toString() =>
-      'HangboardFormFingerConfigurationChanged { fingerConfiguration: $fingerConfiguration }';
+  String toString() => 'ConfigurationChanged { fingerConfiguration: $fingerConfiguration }';
 
   @override
   List<Object> get props => [fingerConfiguration];
 }
 
-class HangboardFormDepthChanged extends HangboardFormEvent {
-  final String depth;
+class DepthChanged extends HangboardFormEvent {
+  final double depth;
 
-  HangboardFormDepthChanged(this.depth);
+  DepthChanged(this.depth);
 
   @override
-  String toString() => 'HangboardFormDepthChanged { depth: $depth }';
+  String toString() => 'DepthChanged { depth: $depth }';
 
   @override
   List<Object> get props => [depth];
 }
 
-class HangboardFormTimeOffChanged extends HangboardFormEvent {
-  final String timeOff;
+class TimeOffChanged extends HangboardFormEvent {
+  final int timeOff;
 
-  HangboardFormTimeOffChanged(this.timeOff);
+  TimeOffChanged(this.timeOff);
 
   @override
-  String toString() => 'HangboardFormTimeOffChanged { timeOff: $timeOff }';
+  String toString() => 'TimeOffChanged { timeOff: $timeOff }';
 
   @override
   List<Object> get props => [timeOff];
 }
 
-class HangboardFormTimeOnChanged extends HangboardFormEvent {
-  final String timeOn;
+class TimeOnChanged extends HangboardFormEvent {
+  final int timeOn;
 
-  HangboardFormTimeOnChanged(this.timeOn);
+  TimeOnChanged(this.timeOn);
 
   @override
-  String toString() => 'HangboardFormTimeOnChanged { timeOn: $timeOn }';
+  String toString() => 'TimeOnChanged { timeOn: $timeOn }';
 
   @override
   List<Object> get props => [timeOn];
 }
 
-class HangboardFormHangsPerSetChanged extends HangboardFormEvent {
-  final String hangsPerSet;
+class HangsPerSetChanged extends HangboardFormEvent {
+  final int hangsPerSet;
 
-  HangboardFormHangsPerSetChanged(this.hangsPerSet);
+  HangsPerSetChanged(this.hangsPerSet);
 
   @override
-  String toString() =>
-      'HangboardFormHangsPerSetChanged { hangsPerSet: $hangsPerSet }';
+  String toString() => 'HangsPerSetChanged { hangsPerSet: $hangsPerSet }';
 
   @override
   List<Object> get props => [hangsPerSet];
 }
 
-class HangboardFormTimeBetweenSetsChanged extends HangboardFormEvent {
+class TimeBetweenSetsChanged extends HangboardFormEvent {
   final String timeBetweenSets;
 
-  HangboardFormTimeBetweenSetsChanged(this.timeBetweenSets);
+  TimeBetweenSetsChanged(this.timeBetweenSets);
 
   @override
-  String toString() =>
-      'HangboardFormTimeBetweenSetsChanged { timeBetweenSets: $timeBetweenSets }';
+  String toString() => 'TimeBetweenSetsChanged { timeBetweenSets: $timeBetweenSets }';
 
   @override
   List<Object> get props => [timeBetweenSets];
@@ -143,8 +136,7 @@ class HangboardFormNumberOfSetsChanged extends HangboardFormEvent {
   HangboardFormNumberOfSetsChanged(this.numberOfSets);
 
   @override
-  String toString() =>
-      'HangboardFormNumberOfSetsChanged { numberOfSets: $numberOfSets }';
+  String toString() => 'HangboardFormNumberOfSetsChanged { numberOfSets: $numberOfSets }';
 
   @override
   List<Object> get props => [numberOfSets];
@@ -156,8 +148,7 @@ class HangboardFormResistanceChanged extends HangboardFormEvent {
   HangboardFormResistanceChanged(this.resistance);
 
   @override
-  String toString() =>
-      'HangboardFormResistanceChanged { resistance: $resistance }';
+  String toString() => 'HangboardFormResistanceChanged { resistance: $resistance }';
 
   @override
   List<Object> get props => [resistance];
@@ -199,36 +190,36 @@ class ValidHangboardFormSaved extends HangboardFormEvent {
   final String resistance;
 
   ValidHangboardFormSaved(
-      this.resistanceMeasurementSystem,
-      this.depthMeasurementSystem,
-      this.numberOfHandsSelected,
-      this.hold,
-      this.fingerConfiguration,
-      this.depth,
-      this.timeOff,
-      this.timeOn,
-      this.timeBetweenSets,
-      this.hangsPerSet,
-      this.numberOfSets,
-      this.resistance,
-      );
+    this.resistanceMeasurementSystem,
+    this.depthMeasurementSystem,
+    this.numberOfHandsSelected,
+    this.hold,
+    this.fingerConfiguration,
+    this.depth,
+    this.timeOff,
+    this.timeOn,
+    this.timeBetweenSets,
+    this.hangsPerSet,
+    this.numberOfSets,
+    this.resistance,
+  );
 
   @override
   String toString() => 'ValidHangboardFormSaved';
 
   @override
   List<Object> get props => [
-    resistanceMeasurementSystem,
-    depthMeasurementSystem,
-    numberOfHandsSelected,
-    hold,
-    fingerConfiguration,
-    depth,
-    timeOff,
-    timeOn,
-    timeBetweenSets,
-    hangsPerSet,
-    numberOfSets,
-    resistance,
-  ];
+        resistanceMeasurementSystem,
+        depthMeasurementSystem,
+        numberOfHandsSelected,
+        hold,
+        fingerConfiguration,
+        depth,
+        timeOff,
+        timeOn,
+        timeBetweenSets,
+        hangsPerSet,
+        numberOfSets,
+        resistance,
+      ];
 }

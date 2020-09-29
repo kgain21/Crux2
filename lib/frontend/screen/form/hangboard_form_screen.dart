@@ -135,7 +135,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 groupValue: hangboardFormState.hands,
                 onChanged: (value) {
                   Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  _hangboardFormBloc.add(HangboardFormNumberOfHandsChanged(value));
+                  _hangboardFormBloc.add(HandsChanged(value));
                 },
               ),
             ),
@@ -146,7 +146,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 groupValue: hangboardFormState.hands,
                 onChanged: (value) {
                   Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  _hangboardFormBloc.add(HangboardFormNumberOfHandsChanged(value));
+                  _hangboardFormBloc.add(HandsChanged(value));
                 },
               ),
             ),
@@ -171,7 +171,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             value: hangboardFormState.hold,
             onChanged: (value) {
               Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-              _hangboardFormBloc.add(HangboardFormHoldChanged(value));
+              _hangboardFormBloc.add(HoldChanged(value));
             },
             items: Hold.values.map((Hold hold) {
               return new DropdownMenuItem<Hold>(
@@ -205,7 +205,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               value: hangboardFormState.fingerConfiguration,
               onChanged: (value) {
                 Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                _hangboardFormBloc.add(HangboardFormFingerConfigurationChanged(value));
+                _hangboardFormBloc.add(FingerConfigurationChanged(value));
               },
               items: hangboardFormState.availableFingerConfigurations.map((fingerConfiguration) {
                 return DropdownMenuItem(
@@ -239,13 +239,13 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validDepth ? null : 'Invalid Depth';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(HangboardFormDepthChanged(value));
+              _hangboardFormBloc.add(DepthChanged(double.parse(value)));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.keyboard_tab),
               labelText: 'Depth (${hangboardFormState.depthUnit})',
             ),
-            keyboardType: TextInputType.numberWithOptions(signed: true, decimal: true),
+            keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
             onTap: () {
               Scaffold.of(scaffoldContext).hideCurrentSnackBar();
             },
@@ -271,7 +271,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     return hangboardFormState.validTimeOn ? null : 'Invalid Time On';
                   },
                   onChanged: (value) {
-                    _hangboardFormBloc.add(HangboardFormTimeOnChanged(value));
+                    _hangboardFormBloc.add(TimeOnChanged(value));
                   },
                   decoration: InputDecoration(
                     labelText: 'Time On (sec)',
@@ -293,7 +293,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     return hangboardFormState.validTimeOff ? null : 'Invalid Time Off';
                   },
                   onChanged: (value) {
-                    _hangboardFormBloc.add(HangboardFormTimeOffChanged(value));
+                    _hangboardFormBloc.add(TimeOffChanged(value));
                   },
                   decoration: InputDecoration(
                     labelText: 'Time Off (sec)',
@@ -338,7 +338,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validHangsPerSet ? null : 'Invalid Hangs Per Set';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(HangboardFormHangsPerSetChanged(value));
+              _hangboardFormBloc.add(HangsPerSetChanged(value));
             },
             decoration: InputDecoration(
               labelText: 'Hangs per set',
@@ -366,7 +366,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validTimeBetweenSets ? null : 'Invalid Time Between Sets';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(HangboardFormTimeBetweenSetsChanged(value));
+              _hangboardFormBloc.add(TimeBetweenSetsChanged(value));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.watch_later),
