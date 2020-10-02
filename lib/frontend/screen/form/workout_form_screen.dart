@@ -1,15 +1,33 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/form/hangboard_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+
+class WorkoutFormScreenArguments {
+  final CruxUser cruxUser;
+  final DateTime selectedDate;
+  final CruxWorkout cruxWorkout;
+
+  WorkoutFormScreenArguments({
+    @required this.cruxUser,
+    @required this.selectedDate,
+    @required this.cruxWorkout,
+  });
+}
 
 class WorkoutFormScreen extends StatelessWidget {
   static const routeName = '/workoutForm';
 
   final CruxUser cruxUser;
   final DateTime selectedDate;
+  final CruxWorkout cruxWorkout;
 
-  const WorkoutFormScreen(this.cruxUser, this.selectedDate);
+  const WorkoutFormScreen({
+    @required this.cruxUser,
+    @required this.selectedDate,
+    @required this.cruxWorkout,
+  });
 
   static const Map<String, String> gridTileMap = {
     'Stretching': WorkoutFormScreen.routeName,
@@ -118,11 +136,4 @@ class WorkoutFormScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class WorkoutFormScreenArguments {
-  final CruxUser cruxUser;
-  final DateTime selectedDate;
-
-  WorkoutFormScreenArguments(this.cruxUser, this.selectedDate);
 }

@@ -176,6 +176,7 @@ void main() {
       var workoutFormScreenArguments = pushedRoute.settings.arguments as WorkoutFormScreenArguments;
       expect(workoutFormScreenArguments.selectedDate, futureSelectedDate);
       expect(workoutFormScreenArguments.cruxUser, cruxUser);
+      expect(workoutFormScreenArguments.cruxWorkout, dartTest.isA<CruxWorkout>());
 
       expect(find.byType(WorkoutFormScreen), findsOneWidget);
     });

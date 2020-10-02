@@ -8,7 +8,6 @@ import 'package:crux/util/string_format_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HangboardFormScreen extends StatefulWidget {
@@ -69,13 +68,13 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         listener: (BuildContext context, HangboardFormState hangboardFormState) {
           if (hangboardFormState.isSuccess) {
             exerciseSavedSnackbar(context);
-            _hangboardFormBloc.add(HangboardFormFlagsReset());
+            _hangboardFormBloc.add(ResetFlags());
 //            BlocProvider.of<HangboardParentBloc>(context).add(HangboardParentUpdated());
           } else if (hangboardFormState.isDuplicate) {
             _exerciseExistsAlert(hangboardFormState);
-            _hangboardFormBloc.add(HangboardFormFlagsReset());
+            _hangboardFormBloc.add(ResetFlags());
           }
-          if (hangboardFormState is HangboardFormSaveInvalid) {
+          if (hangboardFormState is InvalidSave) {
 //            exerciseNotSavedSnackbar(context);
           }
         },
@@ -271,7 +270,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     return hangboardFormState.validTimeOn ? null : 'Invalid Time On';
                   },
                   onChanged: (value) {
-                    _hangboardFormBloc.add(TimeOnChanged(value));
+                    _hangboardFormBloc.add(TimeOnChanged(int.tryParse(value)));
                   },
                   decoration: InputDecoration(
                     labelText: 'Time On (sec)',
@@ -293,7 +292,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     return hangboardFormState.validTimeOff ? null : 'Invalid Time Off';
                   },
                   onChanged: (value) {
-                    _hangboardFormBloc.add(TimeOffChanged(value));
+                    _hangboardFormBloc.add(TimeOffChanged(int.tryParse(value)));
                   },
                   decoration: InputDecoration(
                     labelText: 'Time Off (sec)',
@@ -338,7 +337,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validHangsPerSet ? null : 'Invalid Hangs Per Set';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(HangsPerSetChanged(value));
+              _hangboardFormBloc.add(HangsPerSetChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
               labelText: 'Hangs per set',
@@ -366,7 +365,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validTimeBetweenSets ? null : 'Invalid Time Between Sets';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(TimeBetweenSetsChanged(value));
+              _hangboardFormBloc.add(TimeBetweenSetsChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.watch_later),
@@ -395,7 +394,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validNumberOfSets ? null : 'Invalid Number of Sets';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(HangboardFormNumberOfSetsChanged(value));
+              _hangboardFormBloc.add(NumberOfSetsChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
               labelText: 'Number of sets',
@@ -424,7 +423,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validResistance ? null : 'Invalid Resistance';
             },
             onChanged: (value) {
-              _hangboardFormBloc.add(HangboardFormResistanceChanged(value));
+              _hangboardFormBloc.add(ResistanceChanged(double.tryParse(value)));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.fitness_center),
@@ -460,7 +459,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   void _saveTileFields(BuildContext scaffoldContext, HangboardFormState hangboardFormState) {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _hangboardFormBloc.add(ValidHangboardFormSaved(
+      _hangboardFormBloc.add(ValidSave(
         hangboardFormState.resistanceUnit,
         hangboardFormState.depthUnit,
         hangboardFormState.hands,
@@ -475,7 +474,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         _resistanceController.text,
       ));
     } else {
-      _hangboardFormBloc.add(HangboardFormSaveInvalid());
+      _hangboardFormBloc.add(InvalidSave());
     }
   }
 

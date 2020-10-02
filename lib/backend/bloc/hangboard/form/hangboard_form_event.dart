@@ -119,7 +119,7 @@ class HangsPerSetChanged extends HangboardFormEvent {
 }
 
 class TimeBetweenSetsChanged extends HangboardFormEvent {
-  final String timeBetweenSets;
+  final int timeBetweenSets;
 
   TimeBetweenSetsChanged(this.timeBetweenSets);
 
@@ -130,52 +130,52 @@ class TimeBetweenSetsChanged extends HangboardFormEvent {
   List<Object> get props => [timeBetweenSets];
 }
 
-class HangboardFormNumberOfSetsChanged extends HangboardFormEvent {
-  final String numberOfSets;
+class NumberOfSetsChanged extends HangboardFormEvent {
+  final int numberOfSets;
 
-  HangboardFormNumberOfSetsChanged(this.numberOfSets);
+  NumberOfSetsChanged(this.numberOfSets);
 
   @override
-  String toString() => 'HangboardFormNumberOfSetsChanged { numberOfSets: $numberOfSets }';
+  String toString() => 'NumberOfSetsChanged { numberOfSets: $numberOfSets }';
 
   @override
   List<Object> get props => [numberOfSets];
 }
 
-class HangboardFormResistanceChanged extends HangboardFormEvent {
-  final String resistance;
+class ResistanceChanged extends HangboardFormEvent {
+  final double resistance;
 
-  HangboardFormResistanceChanged(this.resistance);
+  ResistanceChanged(this.resistance);
 
   @override
-  String toString() => 'HangboardFormResistanceChanged { resistance: $resistance }';
+  String toString() => 'ResistanceChanged { resistance: $resistance }';
 
   @override
   List<Object> get props => [resistance];
 }
 
-class HangboardFormFlagsReset extends HangboardFormEvent {
-  HangboardFormFlagsReset();
+class ResetFlags extends HangboardFormEvent {
+  ResetFlags();
 
   @override
-  String toString() => 'HangboardFormFlagsReset';
+  String toString() => 'ResetFlags';
 
   @override
   List<Object> get props => [];
 }
 
 //todo: simplify this to one save event?
-class HangboardFormSaveInvalid extends HangboardFormEvent {
-  HangboardFormSaveInvalid();
+class InvalidSave extends HangboardFormEvent {
+  InvalidSave();
 
   @override
-  String toString() => 'HangboardFormSaveInvalid';
+  String toString() => 'InvalidSave';
 
   @override
   List<Object> get props => [];
 }
 
-class ValidHangboardFormSaved extends HangboardFormEvent {
+class ValidSave extends HangboardFormEvent {
   final ResistanceUnit resistanceMeasurementSystem;
   final DepthUnit depthMeasurementSystem;
   final int numberOfHandsSelected;
@@ -189,7 +189,7 @@ class ValidHangboardFormSaved extends HangboardFormEvent {
   final String numberOfSets;
   final String resistance;
 
-  ValidHangboardFormSaved(
+  ValidSave(
     this.resistanceMeasurementSystem,
     this.depthMeasurementSystem,
     this.numberOfHandsSelected,

@@ -2,6 +2,7 @@ import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/form/workout_form_screen.dart';
 import 'package:crux/frontend/util_widget/loading_indicator.dart';
 import 'package:flutter/material.dart';
@@ -152,7 +153,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         mainAxisAlignment: MainAxisAlignment.center,
       );
     } else if (state is DashboardDateChangeNotFound) {
-      if (state.selectedDate.subtract(Duration(hours: 12)).difference(DateTime.now().subtract(Duration(days: 1))).isNegative) {
+      if (state.selectedDate
+          .subtract(Duration(hours: 12))
+          .difference(DateTime.now().subtract(Duration(days: 1)))
+          .isNegative) {
         return Column(
           key: Key('noWorkoutFoundAppBar'),
           mainAxisSize: MainAxisSize.min,
@@ -179,7 +183,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   Navigator.pushNamed(
                     context,
                     WorkoutFormScreen.routeName,
-                    arguments: WorkoutFormScreenArguments(cruxUser, state.selectedDate),
+                    arguments: WorkoutFormScreenArguments(
+                      cruxUser: cruxUser,
+                      selectedDate: state.selectedDate,
+                      cruxWorkout: CruxWorkout(),
+                    ),
                   );
                 },
               ),

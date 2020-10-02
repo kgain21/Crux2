@@ -52,8 +52,9 @@ class Crux extends StatelessWidget {
         return MaterialPageRoute(
           builder: (context) {
             return WorkoutFormScreen(
-              args.cruxUser,
-              args.selectedDate,
+              cruxUser: args.cruxUser,
+              selectedDate: args.selectedDate,
+              cruxWorkout: args.cruxWorkout,
 //              dashboardBloc: injector.get<DashboardBloc>(),
             );
           },

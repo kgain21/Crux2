@@ -17,7 +17,7 @@ void main() {
   setUp(() {
     navigatorObserverMock = NavigatorObserverMock();
 
-    subject = buildTestableWidget(WorkoutFormScreen(cruxUser, DateTime.now()),
+    subject = buildTestableWidget(WorkoutFormScreen(cruxUser: cruxUser, selectedDate: DateTime.now()),
         navigatorObserverMock: navigatorObserverMock);
   });
 

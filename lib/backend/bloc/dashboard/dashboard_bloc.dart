@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
-import 'package:crux/backend/repository/workout/workout_repository.dart';
+import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:flutter/cupertino.dart';
 
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {

@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/exception/workout_repository_exception.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
-import 'package:crux/backend/repository/workout/workout_repository.dart';
+import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:flutter/widgets.dart';
 
 class FirestoreWorkoutRepository implements BaseWorkoutRepository {

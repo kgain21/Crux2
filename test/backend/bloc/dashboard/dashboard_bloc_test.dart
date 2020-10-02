@@ -1,7 +1,7 @@
 import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
 import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
-import 'package:crux/backend/repository/workout/workout_repository.dart';
+import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 

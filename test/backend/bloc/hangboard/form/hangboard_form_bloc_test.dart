@@ -68,16 +68,105 @@ void main() {
       hangboardFormBloc.add(HandsChanged(1));
     });
 
-    test('emits [initialized, updated state] when user changes hold', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(hold: Hold.MEDIUM_PINCH),
-          ]));
+    group('hold changed tests emits [initialized, updated state]', () {
+      test('when user changes hold to POCKET', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        var depthChangedState = initialHangboardFormState.copyWith(depth: 1);
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              depthChangedState,
+              depthChangedState.copyWith(
+                hold: Hold.POCKET,
+                showFingerConfiguration: true,
+                availableFingerConfigurations: FingerConfiguration.values.sublist(0, 7),
+                showDepth: false,
+                depth: null,
+              ),
+            ]));
 
-      hangboardFormBloc.add(HoldChanged(Hold.MEDIUM_PINCH));
+        hangboardFormBloc.add(DepthChanged(1));
+        hangboardFormBloc.add(HoldChanged(Hold.POCKET));
+      });
+
+      test('when user changes hold to OPEN_HAND', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.copyWith(
+                hold: Hold.OPEN_HAND,
+                showFingerConfiguration: true,
+                availableFingerConfigurations: FingerConfiguration.values.sublist(4),
+                showDepth: true,
+              ),
+            ]));
+
+        hangboardFormBloc.add(HoldChanged(Hold.OPEN_HAND));
+      });
+
+      test('when user changes hold to FULL_CRIMP', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.copyWith(
+                hold: Hold.FULL_CRIMP,
+                showFingerConfiguration: false,
+                availableFingerConfigurations: null,
+                showDepth: true,
+              ),
+            ]));
+
+        hangboardFormBloc.add(HoldChanged(Hold.FULL_CRIMP));
+      });
+
+      test('when user changes hold to HALF_CRIMP', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.copyWith(
+                hold: Hold.HALF_CRIMP,
+                showFingerConfiguration: true,
+                availableFingerConfigurations: FingerConfiguration.values.sublist(4),
+                showDepth: true,
+              ),
+            ]));
+
+        hangboardFormBloc.add(HoldChanged(Hold.HALF_CRIMP));
+      });
+
+      test('when user changes hold to anything else', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        var depthChangedState = initialHangboardFormState.copyWith(depth: 1);
+        var fingerConfigurationChangedState =
+            depthChangedState.copyWith(fingerConfiguration: FingerConfiguration.INDEX_MIDDLE_RING);
+
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              depthChangedState,
+              fingerConfigurationChangedState,
+              fingerConfigurationChangedState.copyWith(
+                hold: Hold.SLOPER,
+                showFingerConfiguration: false,
+                availableFingerConfigurations: null,
+                fingerConfiguration: null,
+                showDepth: false,
+                depth: null,
+              ),
+            ]));
+
+        hangboardFormBloc.add(DepthChanged(1));
+        hangboardFormBloc.add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING));
+        hangboardFormBloc.add(HoldChanged(Hold.SLOPER));
+      });
     });
 
     test('emits [initialized, updated state] when user changes fingerConfiguration', () {
@@ -141,16 +230,77 @@ void main() {
       hangboardFormBloc.add(HangsPerSetChanged(6));
     });
 
-    test('emits [initialized, updated state] when user changes hangsPerSet', () {
+    test('emits [initialized, updated state] when user changes timeBetweenSets', () {
       var initialHangboardFormState = HangboardFormState.initial();
       expectLater(
           hangboardFormBloc,
           emitsInOrder([
             initialHangboardFormState,
-            initialHangboardFormState.copyWith(hangsPersSet: 6),
+            initialHangboardFormState.copyWith(timeBetweenSets: 180),
           ]));
 
-      hangboardFormBloc.add(HangsPerSetChanged(6));
+      hangboardFormBloc.add(TimeBetweenSetsChanged(180));
+    });
+
+    test('emits [initialized, updated state] when user changes numberOfSets', () {
+      var initialHangboardFormState = HangboardFormState.initial();
+      expectLater(
+          hangboardFormBloc,
+          emitsInOrder([
+            initialHangboardFormState,
+            initialHangboardFormState.copyWith(numberOfSets: 6),
+          ]));
+
+      hangboardFormBloc.add(NumberOfSetsChanged(6));
+    });
+
+    test('emits [initialized, updated state] when user changes resistance', () {
+      var initialHangboardFormState = HangboardFormState.initial();
+      expectLater(
+          hangboardFormBloc,
+          emitsInOrder([
+            initialHangboardFormState,
+            initialHangboardFormState.copyWith(resistance: 10.5),
+          ]));
+
+      hangboardFormBloc.add(ResistanceChanged(10.5));
+    });
+
+    /*test('emits [initialized, updated state] when resetFlags event occurs', () {
+      var initialHangboardFormState = HangboardFormState.initial();
+      expectLater(
+          hangboardFormBloc,
+          emitsInOrder([
+            initialHangboardFormState,
+            initialHangboardFormState.copyWith(
+                isDuplicate: false, isFailure: false, isSuccess: false),
+          ]));
+
+      hangboardFormBloc.add(ResetFlags());
+    });*/
+
+    test('emits [initialized, updated state] when user saves invalid form', () {
+      var initialHangboardFormState = HangboardFormState.initial();
+      expectLater(
+          hangboardFormBloc,
+          emitsInOrder([
+            initialHangboardFormState,
+            initialHangboardFormState.copyWith(autoValidate: true),
+          ]));
+
+      hangboardFormBloc.add(InvalidSave());
+    });
+
+    test('emits [initialized, updated state] when user saves valid form', () {
+      var initialHangboardFormState = HangboardFormState.initial();
+      expectLater(
+          hangboardFormBloc,
+          emitsInOrder([
+            initialHangboardFormState,
+            initialHangboardFormState.copyWith(autoValidate: true),
+          ]));
+
+//      hangboardFormBloc.add(ValidSave());
     });
   });
 }
