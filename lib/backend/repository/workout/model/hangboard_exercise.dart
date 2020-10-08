@@ -12,27 +12,27 @@ abstract class HangboardExercise implements Built<HangboardExercise, HangboardEx
 
   String get exerciseTitle;
 
-  String get depthMeasurementSystem;
+  String get depthUnit;
 
-  String get resistanceMeasurementSystem;
+  String get resistanceUnit;
 
-  int get numberOfHands;
+  int get hands;
 
-  String get holdType;
+  String get hold;
 
   String get fingerConfiguration;
 
-  double get holdDepth;
+  double get depth;
+
+  int get restDuration;
+
+  int get repDuration;
+
+  int get breakDuration;
 
   int get hangsPerSet;
 
   int get numberOfSets;
 
   int get resistance;
-
-  int get breakDuration;
-
-  int get repDuration;
-
-  int get restDuration;
 }

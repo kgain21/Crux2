@@ -3,16 +3,17 @@ import 'package:flutter/cupertino.dart';
 
 @immutable
 class CruxUser extends Equatable {
+  final String uid;
   final String displayName;
   final String email;
 
-  const CruxUser({@required this.displayName, @required this.email});
+  const CruxUser({@required this.uid, @required this.displayName, @required this.email});
 
   @override
-  List<Object> get props => [displayName, email];
+  List<Object> get props => [uid, displayName, email];
 
   @override
   String toString() {
-    return '''CruxUser: { displayName: $displayName, email: $email }''';
+    return '''CruxUser: { uid: $uid, displayName: $displayName, email: $email }''';
   }
 }

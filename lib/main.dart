@@ -63,7 +63,8 @@ class Crux extends StatelessWidget {
         case HangboardFormScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
-            return HangboardFormScreen();
+            return HangboardFormScreen(
+            );
           },
           settings: settings,
         );

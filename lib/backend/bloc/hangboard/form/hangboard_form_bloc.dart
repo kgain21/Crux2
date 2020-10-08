@@ -1,12 +1,16 @@
 import 'package:bloc/bloc.dart';
+import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'hangboard_form_event.dart';
 import 'hangboard_form_state.dart';
 
 class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
-  HangboardFormBloc();
+  final BaseWorkoutRepository baseWorkoutRepository;
+
+  HangboardFormBloc({@required this.baseWorkoutRepository});
 
   @override
   get initialState => HangboardFormState.initial();
@@ -103,23 +107,23 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
 
   Stream<HangboardFormState> _mapTimeOffChangedToState(TimeOffChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(timeOff: event.timeOff);
+    yield state.update(restDuration: event.timeOff);
   }
 
   Stream<HangboardFormState> _mapTimeOnChangedToState(TimeOnChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(timeOn: event.timeOn);
+    yield state.update(repDuration: event.timeOn);
   }
 
   Stream<HangboardFormState> _mapHangsPerSetChangedToState(HangsPerSetChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(hangsPersSet: event.hangsPerSet);
+    yield state.update(hangsPerSet: event.hangsPerSet);
   }
 
   Stream<HangboardFormState> _mapTimeBetweenSetsChangedToState(
       TimeBetweenSetsChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(timeBetweenSets: event.timeBetweenSets);
+    yield state.update(breakDuration: event.timeBetweenSets);
   }
 
   Stream<HangboardFormState> _mapNumberOfSetsChangedToState(NumberOfSetsChanged event) async* {

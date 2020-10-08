@@ -34,9 +34,11 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
 
         AuthResult authResult = await firebaseAuth.signInWithCredential(authCredential);
         return CruxUser(
+          uid: authResult.user.uid,
           displayName: authResult.user.displayName,
           email: authResult.user.email,
         );
+        //todo: left off here - adding uid to user for lookup/saving rather than by email
       }
       log('Google sign in process aborted.');
       return null;

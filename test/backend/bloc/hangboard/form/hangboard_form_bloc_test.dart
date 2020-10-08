@@ -4,13 +4,17 @@ import 'package:crux/backend/bloc/hangboard/form/hangboard_form_state.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
 import 'package:crux/model/unit.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import '../../dashboard/dashboard_bloc_test.dart';
+
 void main() {
+  BaseWorkoutRepositoryMock baseWorkoutRepositoryMock;
   HangboardFormBloc hangboardFormBloc;
 
   setUp(() {
-    hangboardFormBloc = HangboardFormBloc();
+    hangboardFormBloc = HangboardFormBloc(baseWorkoutRepository: baseWorkoutRepositoryMock);
   });
 
   tearDown(() {
@@ -200,7 +204,7 @@ void main() {
           hangboardFormBloc,
           emitsInOrder([
             initialHangboardFormState,
-            initialHangboardFormState.copyWith(timeOff: 3),
+            initialHangboardFormState.copyWith(restDuration: 3),
           ]));
 
       hangboardFormBloc.add(TimeOffChanged(3));
@@ -212,7 +216,7 @@ void main() {
           hangboardFormBloc,
           emitsInOrder([
             initialHangboardFormState,
-            initialHangboardFormState.copyWith(timeOn: 7),
+            initialHangboardFormState.copyWith(repDuration: 7),
           ]));
 
       hangboardFormBloc.add(TimeOnChanged(7));
@@ -224,7 +228,7 @@ void main() {
           hangboardFormBloc,
           emitsInOrder([
             initialHangboardFormState,
-            initialHangboardFormState.copyWith(hangsPersSet: 6),
+            initialHangboardFormState.copyWith(hangsPerSet: 6),
           ]));
 
       hangboardFormBloc.add(HangsPerSetChanged(6));
@@ -236,7 +240,7 @@ void main() {
           hangboardFormBloc,
           emitsInOrder([
             initialHangboardFormState,
-            initialHangboardFormState.copyWith(timeBetweenSets: 180),
+            initialHangboardFormState.copyWith(breakDuration: 180),
           ]));
 
       hangboardFormBloc.add(TimeBetweenSetsChanged(180));
@@ -291,16 +295,25 @@ void main() {
       hangboardFormBloc.add(InvalidSave());
     });
 
-    test('emits [initialized, updated state] when user saves valid form', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(autoValidate: true),
-          ]));
+    group('emits [initialized, updated state] when user saves valid form', () {
+      test('when ', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.copyWith(),
+            ]));
 
-//      hangboardFormBloc.add(ValidSave());
+        //todo: left off here - think about UI flow - saving each hbExercise individually will mean a lot of
+        //todo: repeated user interaction - can I simplify this?
+        //todo: also trying to figure out expected state after save - should return success flag? should save
+        //todo: hb model to repo - can mock that out...
+        when(baseWorkoutRepositoryMock.saveHangboardExercise(initialHangboardFormState, cruxWorkout))
+            .thenAnswer((_) => Future.value(true));
+
+        hangboardFormBloc.add(ValidSave());
+      });
     });
   });
 }

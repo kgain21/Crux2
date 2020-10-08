@@ -35,12 +35,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   final TextEditingController _numberOfSetsController = TextEditingController();
   final TextEditingController _resistanceController = TextEditingController();
 
-  int _numberOfHandsSelected;
-  String _depthMeasurementSystem;
-  String _resistanceMeasurementSystem;
-  Hold _hold;
-  FingerConfiguration _fingerConfiguration;
-
   HangboardFormBloc _hangboardFormBloc;
 
   @override
@@ -459,20 +453,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   void _saveTileFields(BuildContext scaffoldContext, HangboardFormState hangboardFormState) {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _hangboardFormBloc.add(ValidSave(
-        hangboardFormState.resistanceUnit,
-        hangboardFormState.depthUnit,
-        hangboardFormState.hands,
-        hangboardFormState.hold,
-        hangboardFormState.fingerConfiguration,
-        _depthController.text,
-        _timeOffController.text,
-        _timeOnController.text,
-        _timeBetweenSetsController.text,
-        _hangsPerSetController.text,
-        _numberOfSetsController.text,
-        _resistanceController.text,
-      ));
+      _hangboardFormBloc.add(ValidSave());
     } else {
       _hangboardFormBloc.add(InvalidSave());
     }

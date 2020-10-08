@@ -176,50 +176,12 @@ class InvalidSave extends HangboardFormEvent {
 }
 
 class ValidSave extends HangboardFormEvent {
-  final ResistanceUnit resistanceMeasurementSystem;
-  final DepthUnit depthMeasurementSystem;
-  final int numberOfHandsSelected;
-  final Hold hold;
-  final FingerConfiguration fingerConfiguration;
-  final String depth;
-  final String timeOff;
-  final String timeOn;
-  final String timeBetweenSets;
-  final String hangsPerSet;
-  final String numberOfSets;
-  final String resistance;
 
-  ValidSave(
-    this.resistanceMeasurementSystem,
-    this.depthMeasurementSystem,
-    this.numberOfHandsSelected,
-    this.hold,
-    this.fingerConfiguration,
-    this.depth,
-    this.timeOff,
-    this.timeOn,
-    this.timeBetweenSets,
-    this.hangsPerSet,
-    this.numberOfSets,
-    this.resistance,
-  );
+  ValidSave();
 
   @override
   String toString() => 'ValidHangboardFormSaved';
 
   @override
-  List<Object> get props => [
-        resistanceMeasurementSystem,
-        depthMeasurementSystem,
-        numberOfHandsSelected,
-        hold,
-        fingerConfiguration,
-        depth,
-        timeOff,
-        timeOn,
-        timeBetweenSets,
-        hangsPerSet,
-        numberOfSets,
-        resistance,
-      ];
+  List<Object> get props => [];
 }

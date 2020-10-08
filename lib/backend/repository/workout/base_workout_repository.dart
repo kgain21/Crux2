@@ -10,4 +10,6 @@ abstract class BaseWorkoutRepository {
   CruxWorkout updateWorkoutByDate(DateTime dateTime);
 
   bool deleteWorkoutByDateTime(DateTime dateTime);
+
+  CruxWorkout save
 }
