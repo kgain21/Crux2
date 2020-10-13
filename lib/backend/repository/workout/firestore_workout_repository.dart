@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:built_value/serializer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:crux/backend/repository/workout/exception/workout_repository_exception.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
-import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:flutter/widgets.dart';
 
 class FirestoreWorkoutRepository implements BaseWorkoutRepository {
@@ -28,25 +28,31 @@ class FirestoreWorkoutRepository implements BaseWorkoutRepository {
 
   @override
   Future<CruxWorkout> findWorkoutByDate(DateTime dateTime, CruxUser user) {
-    return firestore
-        .collection('/user/${user.email}/workouts') // this and .document just create objects - don't see them throwing errors that need to be caught
-        .document(dateTime.toIso8601String())
-        .get()
-        .then((workout) {
-      if (null != workout?.data) {
-        return serializers.deserializeWith(CruxWorkout.serializer, workout.data);
-      } else {
+    try {
+      return firestore
+          .collection('/user/${user.uid}/workouts')
+          .document(dateTime.toIso8601String())
+          .get()
+          .then((workout) {
+        if (null != workout?.data) {
+          return serializers.deserializeWith(CruxWorkout.serializer, workout.data);
+        }
         return null;
-      }
-    }, onError: (error) {
-      log('Error occurred finding workout for user $user and date $dateTime', error: error);
+      }).catchError((error) {
+        log(
+          'Error occurred deserializing workout for user ${user.uid} and date $dateTime',
+          error: error,
+        );
+        throw CruxWorkoutRepositoryException();
+      });
+    } catch (error) {
+      log('Error occurred finding workout for user ${user.uid} and date $dateTime', error: error);
       throw CruxWorkoutRepositoryException();
-    });
+    }
   }
 
   @override
-  CruxWorkout updateWorkoutByDate(DateTime dateTime) {
-    // TODO: implement updateWorkoutByDate
-    throw UnimplementedError();
+  Future<bool> updateWorkoutByDate(DateTime dateTime, CruxWorkout cruxWorkout) {
+    return Future.value(true);
   }
 }

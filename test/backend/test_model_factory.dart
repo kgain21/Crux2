@@ -10,39 +10,42 @@ import 'package:crux/backend/repository/workout/model/strength_workout.dart';
 import 'package:crux/backend/repository/workout/model/stretching_workout.dart';
 
 class TestModelFactory {
-
   static CruxWorkout getTypicalCruxWorkout() {
-    return CruxWorkout((cw) => cw
-      ..hangboardWorkout = (HangboardWorkoutBuilder()
-        ..workoutTitle = "Tuesday, May 26, 2020"
-        ..hangboardExercises = (ListBuilder<HangboardExercise>([
-          HangboardExercise((he) => he
-            ..breakDuration = 180
-            ..depthMeasurementSystem = "mm"
-            ..exerciseTitle = "Repeaters"
-            ..fingerConfiguration = "4 Finger"
-            ..hangsPerSet = 6
-            ..holdDepth = 12
-            ..holdType = "Half Crimp"
-            ..numberOfHands = 2
-            ..numberOfSets = 4
-            ..repDuration = 7
-            ..resistance = 25
-            ..resistanceMeasurementSystem = "lbs"
-            ..restDuration = 3
-            ..build())
-        ])
+    return CruxWorkout((cw) {
+      return cw
+        ..hangboardWorkout = (HangboardWorkoutBuilder()
+          ..workoutTitle = "Tuesday, May 26, 2020"
+          ..hangboardExercises =
+              (ListBuilder<HangboardExercise>([getTypicalHangboardExercise()])..build())
           ..build())
-        ..build())
-      ..climbingWorkout = (ClimbingWorkoutBuilder()..build())
-      ..stretchingWorkout = (StretchingWorkoutBuilder()..build())
-      ..strengthWorkout = (StrengthWorkoutBuilder()..build())
-      ..coreWorkout = (CoreWorkoutBuilder()..build())
-      ..campusBoardWorkout = (CampusBoardWorkoutBuilder()..build())
+        ..climbingWorkout = (ClimbingWorkoutBuilder()..build())
+        ..stretchingWorkout = (StretchingWorkoutBuilder()..build())
+        ..strengthWorkout = (StrengthWorkoutBuilder()..build())
+        ..coreWorkout = (CoreWorkoutBuilder()..build())
+        ..campusBoardWorkout = (CampusBoardWorkoutBuilder()..build())
+        ..build();
+    });
+  }
+
+  static HangboardExercise getTypicalHangboardExercise() {
+    return HangboardExercise((he) => he
+      ..breakDuration = 180
+      ..depthMeasurementSystem = "mm"
+      ..exerciseTitle = "Repeaters"
+      ..fingerConfiguration = "4 Finger"
+      ..hangsPerSet = 6
+      ..holdDepth = 12
+      ..holdType = "Half Crimp"
+      ..numberOfHands = 2
+      ..numberOfSets = 4
+      ..repDuration = 7
+      ..resistance = 25
+      ..resistanceMeasurementSystem = "lbs"
+      ..restDuration = 3
       ..build());
   }
 
   static CruxUser getTypicalCruxUser() {
-    return CruxUser(displayName: 'Kyle Gain', email: 'abc123@gmail.com');
+    return CruxUser(uid: '12345', displayName: 'Kyle Gain', email: 'abc123@gmail.com');
   }
 }

@@ -38,7 +38,6 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
           displayName: authResult.user.displayName,
           email: authResult.user.email,
         );
-        //todo: left off here - adding uid to user for lookup/saving rather than by email
       }
       log('Google sign in process aborted.');
       return null;
@@ -55,6 +54,7 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
       await firebaseAuth.signOut();
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signOut();
       return CruxUser(
+        uid: null,
         displayName: googleSignInAccount.displayName,
         email: googleSignInAccount.email,
       );

@@ -13,7 +13,7 @@ class GoogleSignInAccountMock extends Mock implements GoogleSignInAccount {}
 
 void main() {
   BaseAuthMock baseAuthMock;
-  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
+  final CruxUser cruxUser = CruxUser(uid: 'UID', displayName: 'Display Name', email: 'Email');
 
   AuthenticationBloc authenticationBloc;
 

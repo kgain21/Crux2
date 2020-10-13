@@ -33,7 +33,6 @@ dependencies:
   built_value: ^7.0.9
   built_collection: ^4.3.2
   resource: ^2.1.6
-#  analyzer: ^0.39.7
 
 dev_dependencies:
   test: ^1.9.0
