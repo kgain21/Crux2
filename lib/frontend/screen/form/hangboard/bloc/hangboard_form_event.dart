@@ -1,3 +1,5 @@
+import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
 import 'package:crux/model/unit.dart';
@@ -64,7 +66,7 @@ class FingerConfigurationChanged extends HangboardFormEvent {
   FingerConfigurationChanged(this.fingerConfiguration);
 
   @override
-  String toString() => 'ConfigurationChanged { fingerConfiguration: $fingerConfiguration }';
+  String toString() => 'FingerConfigurationChanged { fingerConfiguration: $fingerConfiguration }';
 
   @override
   List<Object> get props => [fingerConfiguration];
@@ -82,28 +84,28 @@ class DepthChanged extends HangboardFormEvent {
   List<Object> get props => [depth];
 }
 
-class TimeOffChanged extends HangboardFormEvent {
-  final int timeOff;
+class RestDurationChanged extends HangboardFormEvent {
+  final int restDuration;
 
-  TimeOffChanged(this.timeOff);
-
-  @override
-  String toString() => 'TimeOffChanged { timeOff: $timeOff }';
+  RestDurationChanged(this.restDuration);
 
   @override
-  List<Object> get props => [timeOff];
+  String toString() => 'RestDurationChanged { restDuration: $restDuration }';
+
+  @override
+  List<Object> get props => [restDuration];
 }
 
-class TimeOnChanged extends HangboardFormEvent {
-  final int timeOn;
+class RepDurationChanged extends HangboardFormEvent {
+  final int repDuration;
 
-  TimeOnChanged(this.timeOn);
-
-  @override
-  String toString() => 'TimeOnChanged { timeOn: $timeOn }';
+  RepDurationChanged(this.repDuration);
 
   @override
-  List<Object> get props => [timeOn];
+  String toString() => 'RepDurationChanged { repDuration: $repDuration }';
+
+  @override
+  List<Object> get props => [repDuration];
 }
 
 class HangsPerSetChanged extends HangboardFormEvent {
@@ -118,16 +120,28 @@ class HangsPerSetChanged extends HangboardFormEvent {
   List<Object> get props => [hangsPerSet];
 }
 
-class TimeBetweenSetsChanged extends HangboardFormEvent {
-  final int timeBetweenSets;
+class BreakDurationChanged extends HangboardFormEvent {
+  final int breakDuration;
 
-  TimeBetweenSetsChanged(this.timeBetweenSets);
-
-  @override
-  String toString() => 'TimeBetweenSetsChanged { timeBetweenSets: $timeBetweenSets }';
+  BreakDurationChanged(this.breakDuration);
 
   @override
-  List<Object> get props => [timeBetweenSets];
+  String toString() => 'BreakDurationChanged { breakDuration: $breakDuration }';
+
+  @override
+  List<Object> get props => [breakDuration];
+}
+
+class ShowRestDurationChanged extends HangboardFormEvent {
+  final bool showRestDuration;
+
+  ShowRestDurationChanged(this.showRestDuration);
+
+  @override
+  String toString() => 'ShowRestDurationChanged { showRestDuration: $showRestDuration }';
+
+  @override
+  List<Object> get props => [showRestDuration];
 }
 
 class NumberOfSetsChanged extends HangboardFormEvent {
@@ -176,12 +190,14 @@ class InvalidSave extends HangboardFormEvent {
 }
 
 class ValidSave extends HangboardFormEvent {
+  final CruxUser cruxUser;
+  final CruxWorkout cruxWorkout;
 
-  ValidSave();
+  ValidSave({@required this.cruxUser, @required this.cruxWorkout});
 
   @override
-  String toString() => 'ValidHangboardFormSaved';
+  String toString() => 'ValidHangboardFormSaved { cruxUser: $cruxUser, cruxWorkout: $cruxWorkout }';
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [cruxUser, cruxWorkout];
 }

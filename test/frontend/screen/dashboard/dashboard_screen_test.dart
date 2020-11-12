@@ -1,11 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
-import 'package:crux/frontend/screen/dashboard_screen.dart';
-import 'package:crux/frontend/screen/form/workout_form_screen.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
+import 'package:crux/frontend/screen/dashboard/dashboard_screen.dart';
+import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,7 +13,7 @@ import 'package:mockito/mockito.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:test/test.dart' as dartTest;
 
-import '../../test_util/widget_test_utils.dart';
+import '../../../test_util/widget_test_utils.dart';
 
 class ModalRouteMock extends Mock implements ModalRoute {}
 
@@ -25,7 +25,7 @@ void main() {
   NavigatorObserverMock navigatorObserverMock;
   DashboardBlocMock dashboardBlockMock;
 
-  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
+  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email', uid: '123');
   var dashboardUninitialized = DashboardUninitialized();
 
   dartTest.setUp(() {
@@ -107,7 +107,9 @@ void main() {
         Stream.fromIterable([
           DashboardUninitialized(),
           DashboardDateChangeInProgress(),
-          DashboardDateChangeSuccess(selectedDate: selectedDate, cruxWorkout: CruxWorkout()),
+          DashboardDateChangeSuccess(
+              selectedDate: selectedDate,
+              cruxWorkout: CruxWorkout((cw) => (cw..workoutDate = selectedDate).build())),
         ]),
       );
 
@@ -174,7 +176,6 @@ void main() {
       expect(pushedRoute.settings.arguments, isA<WorkoutFormScreenArguments>());
 
       var workoutFormScreenArguments = pushedRoute.settings.arguments as WorkoutFormScreenArguments;
-      expect(workoutFormScreenArguments.selectedDate, futureSelectedDate);
       expect(workoutFormScreenArguments.cruxUser, cruxUser);
       expect(workoutFormScreenArguments.cruxWorkout, dartTest.isA<CruxWorkout>());
 

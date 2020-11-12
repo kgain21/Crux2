@@ -26,33 +26,49 @@ class FirestoreWorkoutRepository implements BaseWorkoutRepository {
     throw UnimplementedError();
   }
 
+  /// Finds a workout given a date and user.
+  /// Returns the workout if found; null otherwise.
+  /// Throws an exception on deserialization error or database connection error for UI handling.
   @override
-  Future<CruxWorkout> findWorkoutByDate(DateTime dateTime, CruxUser user) {
+  Future<CruxWorkout> findWorkoutByDate(DateTime dateTime, CruxUser cruxUser) {
     try {
       return firestore
-          .collection('/user/${user.uid}/workouts')
+          .collection('/user/${cruxUser.uid}/workouts')
           .document(dateTime.toIso8601String())
           .get()
           .then((workout) {
         if (null != workout?.data) {
-          return serializers.deserializeWith(CruxWorkout.serializer, workout.data);
+          return Future.value(serializers.deserializeWith(CruxWorkout.serializer, workout.data));
         }
-        return null;
+        return Future.value(null);
       }).catchError((error) {
         log(
-          'Error occurred deserializing workout for user ${user.uid} and date $dateTime',
+          'Error occurred deserializing workout for user ${cruxUser.uid} and date $dateTime',
           error: error,
         );
         throw CruxWorkoutRepositoryException();
       });
     } catch (error) {
-      log('Error occurred finding workout for user ${user.uid} and date $dateTime', error: error);
+      log('Error occurred finding workout for user ${cruxUser.uid} and date $dateTime',
+          error: error);
       throw CruxWorkoutRepositoryException();
     }
   }
 
+  /// Updates a workout in Firestore given a user and workout model.
+  /// Returns the workout saved if update was successful; throws error otherwise.
   @override
-  Future<bool> updateWorkoutByDate(DateTime dateTime, CruxWorkout cruxWorkout) {
-    return Future.value(true);
+  Future<CruxWorkout> updateWorkout(CruxUser cruxUser, CruxWorkout cruxWorkout) async {
+    try {
+      return firestore
+          .collection('/user/${cruxUser.uid}/workouts')
+          .document('${cruxWorkout.workoutDate}')
+          .setData(serializers.serializeWith(CruxWorkout.serializer, cruxWorkout))
+          .then((_) => Future.value(cruxWorkout));
+    } catch (e) {
+      log('Error occurred updating workout for user ${cruxUser.uid} and date ${cruxWorkout.workoutDate}',
+          error: e);
+      return Future.error(CruxWorkoutRepositoryException());
+    }
   }
 }

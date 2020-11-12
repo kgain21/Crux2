@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
-import 'package:crux/backend/bloc/authentication/authentication_event.dart';
-import 'package:crux/backend/bloc/authentication/authentication_state.dart';
-import 'package:crux/frontend/screen/dashboard_screen.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_event.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_state.dart';
+import 'package:crux/frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

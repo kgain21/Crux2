@@ -1,23 +1,27 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
-import 'package:crux/frontend/screen/form/hangboard_form_screen.dart';
-import 'package:crux/frontend/screen/form/workout_form_screen.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
+import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
+import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../test_util/widget_test_utils.dart';
+import '../../../../test_util/widget_test_utils.dart';
 
 void main() {
   var subject;
 
   NavigatorObserverMock navigatorObserverMock;
 
-  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
+  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email', uid: '123');
 
   setUp(() {
     navigatorObserverMock = NavigatorObserverMock();
 
-    subject = buildTestableWidget(WorkoutFormScreen(cruxUser: cruxUser, selectedDate: DateTime.now()),
+    subject = buildTestableWidget(
+        WorkoutFormScreen(
+            cruxUser: cruxUser,
+            cruxWorkout: CruxWorkout((cw) => (cw..workoutDate = DateTime.now()).build())),
         navigatorObserverMock: navigatorObserverMock);
   });
 
@@ -31,8 +35,8 @@ void main() {
   });
 
   group('WorkoutFormScreen navigation tests', () {
-    testWidgets(
-        'Hangboard tile onClick should navigate to hangboard screen', (WidgetTester tester) async {
+    testWidgets('Hangboard tile onClick should navigate to hangboard screen',
+        (WidgetTester tester) async {
       await tester.pumpWidget(subject);
 
       final findHangboardTile = find.byKey(Key('hangboardFormTile'));

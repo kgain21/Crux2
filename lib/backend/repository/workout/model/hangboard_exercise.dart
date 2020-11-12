@@ -20,10 +20,13 @@ abstract class HangboardExercise implements Built<HangboardExercise, HangboardEx
 
   String get hold;
 
+  @nullable
   String get fingerConfiguration;
 
+  @nullable
   double get depth;
 
+  @nullable
   int get restDuration;
 
   int get repDuration;
@@ -34,5 +37,6 @@ abstract class HangboardExercise implements Built<HangboardExercise, HangboardEx
 
   int get numberOfSets;
 
-  int get resistance;
+  @nullable
+  double get resistance;
 }

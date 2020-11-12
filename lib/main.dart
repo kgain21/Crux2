@@ -1,15 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/application_context.dart';
-import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
-import 'package:crux/backend/bloc/simple_bloc_delegate.dart';
 import 'package:crux/backend/util/injector/injector.dart';
-import 'package:crux/frontend/screen/dashboard_screen.dart';
-import 'package:crux/frontend/screen/form/hangboard_form_screen.dart';
-import 'package:crux/frontend/screen/form/workout_form_screen.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
+import 'package:crux/frontend/screen/authentication/sign_in_screen.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
+import 'package:crux/frontend/screen/dashboard/dashboard_screen.dart';
+import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
+import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
+import 'package:crux/frontend/simple_bloc_delegate.dart';
 import 'package:flutter/material.dart';
-
-import 'frontend/screen/sign_in_screen.dart';
 
 Future<void> main() async {
   /// Needed to add this since there's an await in main() - update: not anymore but I'm leaving it JIC
@@ -21,7 +20,6 @@ Future<void> main() async {
 }
 
 class Crux extends StatelessWidget {
-
   /// Static and globally available for testing widget properties
   static final ThemeData themeData = ThemeData(
     primaryColor: Color(0xFFcfd8dc),
@@ -53,17 +51,19 @@ class Crux extends StatelessWidget {
           builder: (context) {
             return WorkoutFormScreen(
               cruxUser: args.cruxUser,
-              selectedDate: args.selectedDate,
               cruxWorkout: args.cruxWorkout,
 //              dashboardBloc: injector.get<DashboardBloc>(),
             );
           },
           settings: settings,
         );
-        case HangboardFormScreen.routeName:
+      case HangboardFormScreen.routeName:
+        final WorkoutFormScreenArguments args = settings.arguments;
         return MaterialPageRoute(
           builder: (context) {
             return HangboardFormScreen(
+              cruxUser: args.cruxUser,
+              cruxWorkout: args.cruxWorkout,
             );
           },
           settings: settings,

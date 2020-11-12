@@ -1,17 +1,16 @@
 import 'package:built_value/serializer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
 import 'package:crux/backend/repository/workout/firestore_workout_repository.dart';
 import 'package:crux/backend/serialization/serializers.dart';
 import 'package:crux/backend/service/authentication/google_sign_in_authentication_service.dart';
 import 'package:crux/backend/util/injector/injector.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class ApplicationContext {
   Injector initialize(Injector injector) {
-
     /* Authentication */
     injector.map((i) => CredentialManager(), isSingleton: true);
     injector.map((i) => FirebaseAuth.instance, isSingleton: true);
@@ -32,12 +31,15 @@ class ApplicationContext {
     /* Dashboard */
     injector.map((i) => Firestore.instance, isSingleton: true);
     injector.map((i) => serializers, isSingleton: true);
+
     injector.map(
         (i) => FirestoreWorkoutRepository(
             firestore: injector.get<Firestore>(), serializers: injector.get<Serializers>()),
         isSingleton: true);
+
     injector.map((i) => DashboardBloc(
-        workoutRepository: injector.get<FirestoreWorkoutRepository>()));
+          workoutRepository: injector.get<FirestoreWorkoutRepository>(),
+        ));
     /* Dashboard */
 
     return injector;

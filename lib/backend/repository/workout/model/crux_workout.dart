@@ -6,6 +6,7 @@ import 'package:crux/backend/repository/workout/model/core_workout.dart';
 import 'package:crux/backend/repository/workout/model/hangboard_workout.dart';
 import 'package:crux/backend/repository/workout/model/strength_workout.dart';
 import 'package:crux/backend/repository/workout/model/stretching_workout.dart';
+import 'package:flutter/foundation.dart';
 
 part 'crux_workout.g.dart';
 
@@ -15,6 +16,9 @@ abstract class CruxWorkout implements Built<CruxWorkout, CruxWorkoutBuilder> {
   factory CruxWorkout([updates(CruxWorkoutBuilder b)]) = _$CruxWorkout;
 
   static Serializer<CruxWorkout> get serializer => _$cruxWorkoutSerializer;
+
+  @required
+  DateTime get workoutDate;
 
   @nullable
   HangboardWorkout get hangboardWorkout;

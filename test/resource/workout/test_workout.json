@@ -1,21 +1,22 @@
 {
+  "workoutDate": "2020-05-26T12:00:00.000Z",
   "hangboardWorkout": {
     "workoutTitle": "Tuesday, May 26, 2020",
     "hangboardExercises": [
       {
-        "exerciseTitle": "Repeaters",
-        "depthMeasurementSystem": "mm",
-        "resistanceMeasurementSystem": "lbs",
-        "numberOfHands": 2,
-        "holdType": "Half Crimp",
-        "fingerConfiguration": "4 Finger",
-        "holdDepth": 12,
+        "exerciseTitle": "2 Handed 12mm Index/Middle/Ring/Pinkie Half Crimp",
+        "depthUnit": "mm",
+        "resistanceUnit": "lb",
+        "hands": 2,
+        "hold": "Half Crimp",
+        "repDuration": 7,
+        "breakDuration": 180,
         "hangsPerSet": 6,
         "numberOfSets": 4,
-        "resistance": 25,
-        "breakDuration": 180,
-        "repDuration": 7,
-        "restDuration": 3
+        "fingerConfiguration": "Index/Middle/Ring/Pinkie",
+        "depth": 12.0,
+        "restDuration": 3,
+        "resistance": 25.0
       }
     ]
   },

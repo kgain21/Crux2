@@ -86,7 +86,7 @@ void main() {
       when(firebaseUserMock.email).thenReturn('email');
 
       var actual = await googleSignInAuthenticationService.signIn();
-      var expected = CruxUser(displayName: 'display name', email: 'email');
+      var expected = CruxUser(displayName: 'display name', email: 'email', uid: '123');
 
       expect(actual, equals(expected));
       verify(googleSignInMock.signIn()).called(1);
@@ -144,7 +144,7 @@ void main() {
       when(googleSignInAccountMock.email).thenReturn('email');
 
       var actual = await googleSignInAuthenticationService.signOut();
-      var expected = CruxUser(displayName: 'display name', email: 'email');
+      var expected = CruxUser(displayName: 'display name', email: 'email', uid: '123');
 
       expect(actual, equals(expected));
       verify(firebaseAuthMock.signOut()).called(1);

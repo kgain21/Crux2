@@ -1,11 +1,11 @@
-import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/workout/base_workout_repository.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../../test_model_factory.dart';
+import '../../../../test_util/test_model_factory.dart';
 
 class BaseWorkoutRepositoryMock extends Mock implements BaseWorkoutRepository {}
 
@@ -42,7 +42,8 @@ void main() {
       var testUser = TestModelFactory.getTypicalCruxUser();
       var testWorkout = TestModelFactory.getTypicalCruxWorkout();
 
-      test('emits [uninitialized, dateChangeInProgress, dateChangeSuccess] given valid cruxUser and'
+      test(
+          'emits [uninitialized, dateChangeInProgress, dateChangeSuccess] given valid cruxUser and'
           ' selectedDate', () {
         expectLater(
             dashboardBloc,
@@ -57,7 +58,8 @@ void main() {
         dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
       });
 
-      test('emits [uninitialized, dateChangeInProgress, dateChangeError] given valid cruxUser and'
+      test(
+          'emits [uninitialized, dateChangeInProgress, dateChangeError] given valid cruxUser and'
           ' selectedDate when error occurs querying db', () {
         expectLater(
             dashboardBloc,
@@ -72,7 +74,8 @@ void main() {
         dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
       });
 
-      test('emits [uninitialized, dateChangeInProgress, dateChangeNotFound] given valid cruxUser'
+      test(
+          'emits [uninitialized, dateChangeInProgress, dateChangeNotFound] given valid cruxUser'
           ' and selectedDate when no workout found in db', () {
         expectLater(
             dashboardBloc,

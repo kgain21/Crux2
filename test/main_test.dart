@@ -1,4 +1,4 @@
-import 'package:crux/frontend/screen/sign_in_screen.dart';
+import 'package:crux/frontend/screen/authentication/sign_in_screen.dart';
 import 'package:crux/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

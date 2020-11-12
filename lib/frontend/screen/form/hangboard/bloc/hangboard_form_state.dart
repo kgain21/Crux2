@@ -1,3 +1,4 @@
+import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
 import 'package:crux/model/unit.dart';
@@ -13,7 +14,7 @@ class HangboardFormState extends Equatable {
   final bool showFingerConfiguration;
   final List<FingerConfiguration> availableFingerConfigurations;
 
-  final bool showTimeBetweenSets;
+  final bool showRestDuration;
   final bool showDepth;
 
   final DepthUnit depthUnit;
@@ -49,7 +50,7 @@ class HangboardFormState extends Equatable {
     this.showDepth,
     this.autoValidate,
     this.showFingerConfiguration,
-    this.showTimeBetweenSets,
+    this.showRestDuration,
     this.hands,
     this.hold,
     this.availableFingerConfigurations,
@@ -82,7 +83,7 @@ class HangboardFormState extends Equatable {
       autoValidate: false,
       availableFingerConfigurations: FingerConfiguration.values,
       showFingerConfiguration: false,
-      showTimeBetweenSets: true,
+      showRestDuration: true,
       hands: 2,
       hold: null,
       fingerConfiguration: null,
@@ -114,7 +115,7 @@ class HangboardFormState extends Equatable {
     bool autoValidate,
     List<FingerConfiguration> availableFingerConfigurations,
     bool showFingerConfiguration,
-    bool showTimeBetweenSets,
+    bool showRestDuration,
     int hands,
     Hold hold,
     FingerConfiguration fingerConfiguration,
@@ -144,7 +145,7 @@ class HangboardFormState extends Equatable {
       autoValidate: autoValidate,
       availableFingerConfigurations: availableFingerConfigurations,
       showFingerConfiguration: showFingerConfiguration,
-      showTimeBetweenSets: showTimeBetweenSets,
+      showRestDuration: showRestDuration,
       hands: hands,
       hold: hold,
       fingerConfiguration: fingerConfiguration,
@@ -176,7 +177,7 @@ class HangboardFormState extends Equatable {
     bool autoValidate,
     List<FingerConfiguration> availableFingerConfigurations,
     bool showFingerConfiguration,
-    bool showTimeBetweenSets,
+    bool showRestDuration,
     int hands,
     Hold hold,
     FingerConfiguration fingerConfiguration,
@@ -207,7 +208,7 @@ class HangboardFormState extends Equatable {
       availableFingerConfigurations:
           availableFingerConfigurations ?? this.availableFingerConfigurations,
       showFingerConfiguration: showFingerConfiguration ?? this.showFingerConfiguration,
-      showTimeBetweenSets: showTimeBetweenSets ?? this.showTimeBetweenSets,
+      showRestDuration: showRestDuration ?? this.showRestDuration,
       hands: hands ?? this.hands,
       hold: hold ?? this.hold,
       fingerConfiguration: fingerConfiguration ?? this.fingerConfiguration,
@@ -241,7 +242,7 @@ class HangboardFormState extends Equatable {
       autoValidate: $autoValidate,
       availableFingerConfigurations: $availableFingerConfigurations,
       showFingerConfiguration: $showFingerConfiguration,
-      showTimeBetweenSets: $showTimeBetweenSets,
+      showRestDuration: $showRestDuration,
       hands: $hands,
       hold: $hold,
       fingerConfiguration: $fingerConfiguration,
@@ -273,7 +274,7 @@ class HangboardFormState extends Equatable {
         showDepth,
         autoValidate,
         showFingerConfiguration,
-        showTimeBetweenSets,
+        showRestDuration,
         hands,
         hold,
         availableFingerConfigurations,
@@ -296,4 +297,21 @@ class HangboardFormState extends Equatable {
         isFailure,
         isDuplicate,
       ];
+
+  HangboardExercise toHangboardExercise() {
+    return HangboardExercise((he) => he
+      ..exerciseTitle = exerciseTitle
+      ..depthUnit = depthUnit.name
+      ..resistanceUnit = resistanceUnit.name
+      ..hands = hands
+      ..hold = hold.name
+      ..fingerConfiguration = fingerConfiguration.name
+      ..depth = depth
+      ..restDuration = restDuration
+      ..repDuration = repDuration
+      ..breakDuration = breakDuration
+      ..hangsPerSet = hangsPerSet
+      ..numberOfSets = numberOfSets
+      ..resistance = resistance);
+  }
 }

@@ -1,7 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/repository/workout/base_workout_repository.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
+import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
+import 'package:crux/util/string_format_util.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'hangboard_form_event.dart';
@@ -29,14 +32,16 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       return _mapFingerConfigurationChangedToState(event);
     } else if (event is DepthChanged) {
       return _mapDepthChangedToState(event);
-    } else if (event is TimeOffChanged) {
+    } else if (event is RestDurationChanged) {
       return _mapTimeOffChangedToState(event);
-    } else if (event is TimeOnChanged) {
+    } else if (event is RepDurationChanged) {
       return _mapTimeOnChangedToState(event);
     } else if (event is HangsPerSetChanged) {
       return _mapHangsPerSetChangedToState(event);
-    } else if (event is TimeBetweenSetsChanged) {
-      return _mapTimeBetweenSetsChangedToState(event);
+    } else if (event is BreakDurationChanged) {
+      return _mapBreakDurationChangedToState(event);
+    } else if (event is ShowRestDurationChanged) {
+      return _mapShowRestDurationChangedToState(event);
     } else if (event is NumberOfSetsChanged) {
       return _mapNumberOfSetsChangedToState(event);
     } else if (event is ResistanceChanged) {
@@ -45,6 +50,8 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       return _mapResetFlagsToState(event);
     } else if (event is InvalidSave) {
       return _mapInvalidSaveToState(event);
+    } else if (event is ValidSave) {
+      return _mapValidSaveToState(event);
     }
     return null;
   }
@@ -61,6 +68,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(hands: event.hands);
   }
 
+  ///
   Stream<HangboardFormState> _mapHoldChangedToState(HoldChanged event) async* {
     bool showFingerConfigurations = false;
     bool showDepth = false;
@@ -77,17 +85,18 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       showDepth = true;
     } else if (event.hold == Hold.FULL_CRIMP) {
       showDepth = true;
-    }
-    /*else {
+    } else {
       fingerConfiguration = null;
       depth = null;
-    }*/
+    }
 
     yield state.update(
       hold: event.hold,
       showFingerConfiguration: showFingerConfigurations,
       availableFingerConfigurations: availableFingerConfigurations,
       // todo - leaving these null for now. Test UI to see if nulling out all the time is better vs. only removing for particular holds
+      // basically saying WHENEVER a hold changes, remove depth/fingerConfig so old values don't remain set in the state by accident.
+      // this would force the user to redo values in some cases - need to test if this makes sense all the time vs. just for some cases
       fingerConfiguration: null,
       showDepth: showDepth,
       depth: null,
@@ -105,14 +114,14 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(depth: event.depth);
   }
 
-  Stream<HangboardFormState> _mapTimeOffChangedToState(TimeOffChanged event) async* {
+  Stream<HangboardFormState> _mapTimeOffChangedToState(RestDurationChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(restDuration: event.timeOff);
+    yield state.update(restDuration: event.restDuration);
   }
 
-  Stream<HangboardFormState> _mapTimeOnChangedToState(TimeOnChanged event) async* {
+  Stream<HangboardFormState> _mapTimeOnChangedToState(RepDurationChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(repDuration: event.timeOn);
+    yield state.update(repDuration: event.repDuration);
   }
 
   Stream<HangboardFormState> _mapHangsPerSetChangedToState(HangsPerSetChanged event) async* {
@@ -120,10 +129,14 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(hangsPerSet: event.hangsPerSet);
   }
 
-  Stream<HangboardFormState> _mapTimeBetweenSetsChangedToState(
-      TimeBetweenSetsChanged event) async* {
+  Stream<HangboardFormState> _mapBreakDurationChangedToState(BreakDurationChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(breakDuration: event.timeBetweenSets);
+    yield state.update(breakDuration: event.breakDuration);
+  }
+
+  Stream<HangboardFormState> _mapShowRestDurationChangedToState(
+      ShowRestDurationChanged event) async* {
+    yield state.update(showRestDuration: event.showRestDuration, restDuration: null);
   }
 
   Stream<HangboardFormState> _mapNumberOfSetsChangedToState(NumberOfSetsChanged event) async* {
@@ -146,5 +159,49 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
 
   Stream<HangboardFormState> _mapInvalidSaveToState(InvalidSave event) async* {
     yield state.update(autoValidate: true);
+  }
+
+  Stream<HangboardFormState> _mapValidSaveToState(ValidSave event) async* {
+    try {
+      var exerciseTitle = StringFormatUtil.createHangboardExerciseTitle(
+        hold: state.hold,
+        hands: state.hands,
+        fingerConfiguration: state.fingerConfiguration,
+        depth: state.depth,
+        depthUnit: state.depthUnit,
+      );
+      yield state.update(exerciseTitle: exerciseTitle);
+
+      HangboardExercise hangboardExercise = state.toHangboardExercise();
+
+      if (_isDuplicate(hangboardExercise, event)) {
+        yield state.update(isDuplicate: true, isSuccess: false, isFailure: false);
+      }
+
+      CruxWorkout workout = event.cruxWorkout
+          .rebuild((cw) => cw.hangboardWorkout.hangboardExercises.add(hangboardExercise));
+
+      var updatedWorkout = await baseWorkoutRepository.updateWorkout(event.cruxUser, workout);
+
+      if (updatedWorkout != null) {
+        yield state.update(isSuccess: true, isFailure: false, isDuplicate: false);
+      } else {
+        yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
+      }
+    } catch (e) {
+      yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
+    }
+  }
+
+  /// Check for duplicate exercises iterating through [hangboardExercises] and using overridden
+  /// equality operator from [HangboardExercise].
+  bool _isDuplicate(HangboardExercise hangboardExercise, ValidSave event) {
+    for(var exercise in event.cruxWorkout.hangboardWorkout.hangboardExercises) {
+      if (hangboardExercise == exercise) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

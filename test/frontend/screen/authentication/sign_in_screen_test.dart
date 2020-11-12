@@ -1,16 +1,17 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
-import 'package:crux/backend/bloc/authentication/authentication_event.dart';
-import 'package:crux/backend/bloc/authentication/authentication_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
-import 'package:crux/frontend/screen/dashboard_screen.dart';
-import 'package:crux/frontend/screen/sign_in_screen.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_event.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_state.dart';
+import 'package:crux/frontend/screen/authentication/sign_in_screen.dart';
+import 'package:crux/frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart' as dartTest;
 
-import '../../test_util/widget_test_utils.dart';
+import '../../../test_util/widget_test_utils.dart';
+
 
 class AuthenticationBlocMock extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
@@ -19,7 +20,7 @@ void main() {
   AuthenticationBlocMock authenticationBlocMock;
   NavigatorObserverMock navigatorObserverMock;
 
-  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email');
+  final CruxUser cruxUser = CruxUser(displayName: 'Display Name', email: 'Email', uid: '123');
 
   var subject;
 

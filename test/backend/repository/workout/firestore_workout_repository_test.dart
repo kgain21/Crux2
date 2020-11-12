@@ -1,13 +1,15 @@
+import 'dart:convert';
+
 import 'package:built_value/serializer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crux/backend/repository/workout/exception/workout_repository_exception.dart';
 import 'package:crux/backend/repository/workout/firestore_workout_repository.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
-import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:mockito/mockito.dart';
+import 'package:resource/resource.dart';
 import 'package:test/test.dart';
 
-import '../../test_model_factory.dart';
+import '../../../test_util/test_model_factory.dart';
 
 class FirestoreMock extends Mock implements Firestore {}
 
@@ -28,7 +30,7 @@ Future<void> main() async {
 
   FirestoreWorkoutRepository firestoreWorkoutRepository;
 
-  var testDate = DateTime(2020); // Jan 1, 2020
+  var testDate = DateTime(2020, 5, 26, 8, 0, 0).toUtc();
   var testUser = TestModelFactory.getTypicalCruxUser();
 
   setUp(() {
@@ -124,10 +126,31 @@ Future<void> main() async {
   group('updateWorkoutByDate tests', () {
     test('given valid date with corresponding workout, should update workout and return true',
         () async {
+      var workoutResource = const Resource('test/resource/workout/test_workout.json');
+      var testWorkout = await workoutResource.readAsString();
+      Map<String, dynamic> testWorkoutJson = json.decode(testWorkout);
 
       CruxWorkout cruxWorkout = TestModelFactory.getTypicalCruxWorkout();
-//      HangboardExercise hangboardExercise = TestModelFactory.getTypicalHangboardExercise();
-//      cruxWorkout.hangboardWorkout.hangboardExercises.toBuilder().add(hangboardExercise);
+
+      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+          .thenReturn(collectionReferenceMock);
+
+      when(collectionReferenceMock.document('$testDate'))
+          .thenReturn(documentReferenceMock);
+
+      when(serializersMock.serializeWith(any, cruxWorkout)).thenReturn(testWorkoutJson);
+
+      when(documentReferenceMock.setData(testWorkoutJson))
+          .thenAnswer((_) => Future.value(null));
+
+      CruxWorkout updatedWorkout =
+          await firestoreWorkoutRepository.updateWorkout(testUser, cruxWorkout);
+      assert(null != updatedWorkout);
+    });
+
+    test('given valid inputs with exception thrown, should handle exception and return null future',
+        () async {
+      CruxWorkout cruxWorkout = TestModelFactory.getTypicalCruxWorkout();
 
       when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
@@ -135,21 +158,10 @@ Future<void> main() async {
       when(collectionReferenceMock.document('${testDate.toIso8601String()}'))
           .thenReturn(documentReferenceMock);
 
-      when(serializersMock.serializeWith(cruxWorkout, any))
-          .thenReturn();
+      when(serializersMock.serializeWith(any, cruxWorkout)).thenThrow(Exception("Unit Test"));
 
-      when(documentReferenceMock.setData(cruxWorkout))
-          .thenAnswer((_) => Future<void>.value(null));
-
-//      when(documentSnapshotMock).thenReturn({"fake-key": "fake-value"});
-
-      bool didUpdate = await firestoreWorkoutRepository.updateWorkoutByDate(testDate, cruxWorkout);
-      assert(true == didUpdate);
-//      assert(null != actualCruxWorkout.coreWorkout);
-//      assert(null != actualCruxWorkout.strengthWorkout);
-//      assert(null != actualCruxWorkout.stretchingWorkout);
-//      assert(null != actualCruxWorkout.climbingWorkout);
-//      assert(null != actualCruxWorkout.hangboardWorkout);
+      await expectLater(() => firestoreWorkoutRepository.updateWorkout(testUser, cruxWorkout),
+          throwsA(const TypeMatcher<CruxWorkoutRepositoryException>()));
     });
   });
 

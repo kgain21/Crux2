@@ -1,10 +1,11 @@
-
 // TODO: Recommended to not use static method only classes --
 // https://dart.dev/guides/language/effective-dart/design#avoid-defining-a-class-that-contains-only-static-members
 // TODO: Refactor at some point
 
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/unit.dart';
+import 'package:flutter/foundation.dart';
 
 class StringFormatUtil {
   static String formatDepthAndHold(double depth, String depthMeasurementSystem,
@@ -22,49 +23,24 @@ class StringFormatUtil {
     }
   }
 
-  static formatHangsAndResistance(
-      int hangs, int resistance, String resistanceMeasurementSystem) {
+  /// Formatter for displaying the number of hangs left in an exercise with resistance included.
+  /// Number of hangs will be displayed in a separate widget on screen so will not be included in
+  /// this string.
+  //todo: resistance should be a double - rework this to include truncation + value/unit combination
+  //todo: in the same way that depth/depthUnit is done below. Could also apply to method above^
+  static formatHangsAndResistance(int hangs, int resistance, String resistanceMeasurementSystem) {
     if (hangs == null || hangs == 1) {
       if (resistance == null || resistance == 0) {
-        return ' Hang At Bodyweight';
+        return ' Hang At Body Weight';
       } else {
         return ' Hang With $resistance$resistanceMeasurementSystem';
       }
     } else {
       if (resistance == null || resistance == 0) {
-        return ' Hangs At Bodyweight';
+        return ' Hangs At Body Weight';
       }
       return ' Hangs With $resistance$resistanceMeasurementSystem';
     }
-  }
-
-  /// Formatter for the different [FingerConfiguration] available. Takes the
-  /// enum form and makes it a better looking String for the dropdown.
-  static String formatFingerConfiguration(
-      FingerConfiguration fingerConfiguration) {
-    if (fingerConfiguration != null) {
-      return fingerConfiguration
-          .toString()
-          .substring(20)
-          .split('_')
-          .map((word) {
-        return '${word.substring(0, 1).toUpperCase()}'
-            '${word.substring(1).toLowerCase()}';
-      }).join("-");
-    }
-    return '';
-  }
-
-  /// Formatter for the different [Hold] available. Takes the enum form and
-  /// makes it a better looking String for the dropdown.
-  static String formatHold(Hold hold) {
-    if (hold != null) {
-      return hold.toString().substring(5).split('_').map((word) {
-        return '${word.substring(0, 1).toUpperCase()}'
-            '${word.substring(1).toLowerCase()}';
-      }).join(" ");
-    }
-    return '';
   }
 
   static String formatDecimals(double decimal) {
@@ -79,32 +55,41 @@ class StringFormatUtil {
     if (decimal == 0.25) return '1/4';
     if (decimal == 0.125) return '1/8';
     var decimalString = decimal.toString().split('.');
-    if (decimalString[1] == '0')
-      return int.tryParse(decimalString[0]).toString();
+    if (decimalString[1] == '0') return int.tryParse(decimalString[0]).toString();
     return decimal.toString();
   }
 
-  static String createHangboardExerciseTitle(int numberOfHands, double depth,
-      String fingerConfiguration,
-      String hold,
-      String depthMeasurementSystem) {
-    String exerciseTitle = '${numberOfHands.toString()} Handed';
+  /// Formatter for hangboard exercise titles. Joins any provided elements to a title string, with
+  /// special handling for depth in the format of depth and unit next to each other if present.
+  /// If both depth and depthUnit are not present, no value will be mapped.
+  static String createHangboardExerciseTitle({
+    @required Hold hold,
+    @required int hands,
+    FingerConfiguration fingerConfiguration,
+    double depth,
+    DepthUnit depthUnit,
+  }) {
+    assert(hold != null, "Value for Hold must be present");
+    assert(hands != null, "Value for Hands must be present");
 
-    if(depth == null) {
-      exerciseTitle += ' $fingerConfiguration $hold';
-    } else {
-      /// Truncate .0 if possible
-      if(depth.floor() == depth) {
-        exerciseTitle +=
-        ' ${depth
-            .truncate()}$depthMeasurementSystem $fingerConfiguration $hold';
-      } else {
-        exerciseTitle +=
-        ' $depth$depthMeasurementSystem $fingerConfiguration $hold';
+    // formatting for depth/depthUnit i.e. '12mm' instead of '12.0 mm'
+    var depthString;
+    if (depth != null && depthUnit != null) {
+      depthString = depth.toString();
+      if (depth.floor() == depth) {
+        depthString = depth?.truncate().toString();
       }
+      depthString += depthUnit.name;
     }
 
-    /// Strip extra space if no fingerConfiguration is present
-    return exerciseTitle.replaceAll('  ', ' ');
+    List<String> titleElements = [
+      hands.toString(),
+      'Handed',
+      depthString,
+      fingerConfiguration.name,
+      hold.name,
+    ];
+
+    return titleElements.where((e) => e != null).join(" ");
   }
 }

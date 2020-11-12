@@ -1,9 +1,9 @@
-import 'package:crux/backend/bloc/dashboard/dashboard_bloc.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_event.dart';
-import 'package:crux/backend/bloc/dashboard/dashboard_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
-import 'package:crux/frontend/screen/form/workout_form_screen.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
+import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
+import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
 import 'package:crux/frontend/util_widget/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -185,8 +185,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     WorkoutFormScreen.routeName,
                     arguments: WorkoutFormScreenArguments(
                       cruxUser: cruxUser,
-                      selectedDate: state.selectedDate,
-                      cruxWorkout: CruxWorkout(),
+                      cruxWorkout: CruxWorkout((b) => b..workoutDate = state.selectedDate),
                     ),
                   );
                 },

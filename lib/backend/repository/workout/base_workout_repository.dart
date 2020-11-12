@@ -7,7 +7,7 @@ abstract class BaseWorkoutRepository {
 
   Future<CruxWorkout> findWorkoutByDate(DateTime dateTime, CruxUser cruxUser);
 
-  Future<bool> updateWorkoutByDate(DateTime dateTime, CruxWorkout cruxWorkout);
+  Future<CruxWorkout> updateWorkout(CruxUser cruxUser, CruxWorkout cruxWorkout);
 
   bool deleteWorkoutByDateTime(DateTime dateTime);
 }

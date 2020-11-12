@@ -1,8 +1,8 @@
-import 'package:crux/backend/bloc/authentication/authentication_bloc.dart';
-import 'package:crux/backend/bloc/authentication/authentication_event.dart';
-import 'package:crux/backend/bloc/authentication/authentication_state.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/service/authentication/authentication_service.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_event.dart';
+import 'package:crux/frontend/screen/authentication/bloc/authentication_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';

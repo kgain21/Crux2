@@ -6,10 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:resource/resource.dart';
 import 'package:collection/collection.dart';
 
-import '../test_model_factory.dart';
+import '../../test_util/test_model_factory.dart';
+
 
 void main() async {
-  //todo: left off here - want to use resource creation in save test - this lib is deprecated though and I need to find a new one
   var workoutResource = const Resource('test/resource/workout/test_workout.json');
   var testWorkout = await workoutResource.readAsString();
   Map<String, dynamic> testWorkoutJson = json.decode(testWorkout);
@@ -42,7 +42,7 @@ void main() async {
       assert(serializedCruxWorkout.containsKey("stretchingWorkout"));
       assert(serializedCruxWorkout.containsKey("climbingWorkout"));
       assert(serializedCruxWorkout.containsKey("hangboardWorkout"));
-      assert(DeepCollectionEquality().equals(testWorkoutJson, serializedCruxWorkout));
+      assert(DeepCollectionEquality.unordered().equals(testWorkoutJson, serializedCruxWorkout));
     });
   });
 }
