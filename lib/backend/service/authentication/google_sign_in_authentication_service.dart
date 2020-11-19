@@ -24,6 +24,8 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
   /// connects that user to the Firebase instance for access to their Crux data.
   @override
   Future<CruxUser> signIn() async {
+    // todo: add auto retry? get PlatformException(network_error, com.google.android.gms.common.api.ApiException: 7: , null)
+    //todo: sometimes on first signin in a while - docs say retrying should solve the problem
     try {
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
       if (null != googleSignInAccount) {
@@ -54,7 +56,7 @@ class GoogleSignInAuthenticationService implements BaseAuthenticationService {
       await firebaseAuth.signOut();
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signOut();
       return CruxUser(
-        uid: null,
+        uid: googleSignInAccount.id,
         displayName: googleSignInAccount.displayName,
         email: googleSignInAccount.email,
       );

@@ -2,6 +2,7 @@ import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
 import 'package:crux/model/unit.dart';
+import 'package:crux/util/null_util.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
@@ -16,6 +17,7 @@ class HangboardFormState extends Equatable {
 
   final bool showRestDuration;
   final bool showDepth;
+  final bool showResistance;
 
   final DepthUnit depthUnit;
   final ResistanceUnit resistanceUnit;
@@ -32,8 +34,8 @@ class HangboardFormState extends Equatable {
   final double resistance;
 
   final bool validDepth;
-  final bool validTimeOff;
-  final bool validTimeOn;
+  final bool validRestDuration;
+  final bool validRepDuration;
   final bool validHangsPerSet;
   final bool validTimeBetweenSets;
   final bool validNumberOfSets;
@@ -61,10 +63,11 @@ class HangboardFormState extends Equatable {
     this.breakDuration,
     this.hangsPerSet,
     this.numberOfSets,
+    this.showResistance,
     this.resistance,
     this.validDepth,
-    this.validTimeOff,
-    this.validTimeOn,
+    this.validRestDuration,
+    this.validRepDuration,
     this.validHangsPerSet,
     this.validTimeBetweenSets,
     this.validNumberOfSets,
@@ -93,10 +96,11 @@ class HangboardFormState extends Equatable {
       breakDuration: null,
       hangsPerSet: null,
       numberOfSets: null,
+      showResistance: false,
       resistance: null,
       validDepth: true,
-      validTimeOff: true,
-      validTimeOn: true,
+      validRestDuration: true,
+      validRepDuration: true,
       validHangsPerSet: true,
       validTimeBetweenSets: true,
       validNumberOfSets: true,
@@ -113,84 +117,23 @@ class HangboardFormState extends Equatable {
     ResistanceUnit resistanceUnit,
     bool showDepth,
     bool autoValidate,
-    List<FingerConfiguration> availableFingerConfigurations,
+    Nullable<List<FingerConfiguration>> availableFingerConfigurations,
     bool showFingerConfiguration,
     bool showRestDuration,
     int hands,
     Hold hold,
-    FingerConfiguration fingerConfiguration,
-    double depth,
-    int restDuration,
+    Nullable<FingerConfiguration> fingerConfiguration,
+    Nullable<double> depth,
+    Nullable<int> restDuration,
     int repDuration,
     int breakDuration,
     int hangsPerSet,
     int numberOfSets,
-    double resistance,
+    bool showResistance,
+    Nullable<double> resistance,
     bool validDepth,
-    bool validTimeOff,
-    bool validTimeOn,
-    bool validHangsPerSet,
-    bool validTimeBetweenSets,
-    bool validNumberOfSets,
-    bool validResistance,
-    bool isSuccess,
-    bool isFailure,
-    bool isDuplicate,
-  }) {
-    return copyWith(
-      exerciseTitle: exerciseTitle,
-      depthUnit: depthUnit,
-      resistanceUnit: resistanceUnit,
-      showDepth: showDepth,
-      autoValidate: autoValidate,
-      availableFingerConfigurations: availableFingerConfigurations,
-      showFingerConfiguration: showFingerConfiguration,
-      showRestDuration: showRestDuration,
-      hands: hands,
-      hold: hold,
-      fingerConfiguration: fingerConfiguration,
-      depth: depth,
-      restDuration: restDuration,
-      repDuration: repDuration,
-      breakDuration: breakDuration,
-      hangsPerSet: hangsPerSet,
-      numberOfSets: numberOfSets,
-      resistance: resistance,
-      validDepth: validDepth,
-      validTimeOff: validTimeOff,
-      validTimeOn: validTimeOn,
-      validHangsPerSet: validHangsPerSet,
-      validTimeBetweenSets: validTimeBetweenSets,
-      validNumberOfSets: validNumberOfSets,
-      validResistance: validResistance,
-      isSuccess: isSuccess,
-      isFailure: isFailure,
-      isDuplicate: isDuplicate,
-    );
-  }
-
-  HangboardFormState copyWith({
-    String exerciseTitle,
-    DepthUnit depthUnit,
-    ResistanceUnit resistanceUnit,
-    bool showDepth,
-    bool autoValidate,
-    List<FingerConfiguration> availableFingerConfigurations,
-    bool showFingerConfiguration,
-    bool showRestDuration,
-    int hands,
-    Hold hold,
-    FingerConfiguration fingerConfiguration,
-    double depth,
-    int restDuration,
-    int repDuration,
-    int breakDuration,
-    int hangsPerSet,
-    int numberOfSets,
-    double resistance,
-    bool validDepth,
-    bool validTimeOff,
-    bool validTimeOn,
+    bool validRestDuration,
+    bool validRepDuration,
     bool validHangsPerSet,
     bool validTimeBetweenSets,
     bool validNumberOfSets,
@@ -205,23 +148,26 @@ class HangboardFormState extends Equatable {
       resistanceUnit: resistanceUnit ?? this.resistanceUnit,
       showDepth: showDepth ?? this.showDepth,
       autoValidate: autoValidate ?? this.autoValidate,
-      availableFingerConfigurations:
-          availableFingerConfigurations ?? this.availableFingerConfigurations,
+      availableFingerConfigurations: availableFingerConfigurations == null
+          ? this.availableFingerConfigurations
+          : availableFingerConfigurations.value,
       showFingerConfiguration: showFingerConfiguration ?? this.showFingerConfiguration,
       showRestDuration: showRestDuration ?? this.showRestDuration,
       hands: hands ?? this.hands,
       hold: hold ?? this.hold,
-      fingerConfiguration: fingerConfiguration ?? this.fingerConfiguration,
-      depth: depth ?? this.depth,
-      restDuration: restDuration ?? this.restDuration,
+      fingerConfiguration:
+          fingerConfiguration == null ? this.fingerConfiguration : fingerConfiguration.value,
+      depth: depth == null ? this.depth : depth.value,
+      restDuration: restDuration == null ? this.restDuration : restDuration.value,
       repDuration: repDuration ?? this.repDuration,
       breakDuration: breakDuration ?? this.breakDuration,
       hangsPerSet: hangsPerSet ?? this.hangsPerSet,
       numberOfSets: numberOfSets ?? this.numberOfSets,
-      resistance: resistance ?? this.resistance,
+      showResistance: showResistance ?? this.showResistance,
+      resistance: resistance == null ? this.resistance : resistance.value,
       validDepth: validDepth ?? this.validDepth,
-      validTimeOff: validTimeOff ?? this.validTimeOff,
-      validTimeOn: validTimeOn ?? this.validTimeOn,
+      validRestDuration: validRestDuration ?? this.validRestDuration,
+      validRepDuration: validRepDuration ?? this.validRepDuration,
       validHangsPerSet: validHangsPerSet ?? this.validHangsPerSet,
       validTimeBetweenSets: validTimeBetweenSets ?? this.validTimeBetweenSets,
       validNumberOfSets: validNumberOfSets ?? this.validNumberOfSets,
@@ -252,10 +198,11 @@ class HangboardFormState extends Equatable {
       breakDuration: $breakDuration,
       hangsPerSet: $hangsPerSet,
       numberOfSets: $numberOfSets,
+      showResistance: $showResistance,
       resistance: $resistance,
       validDepth: $validDepth,
-      validTimeOff: $validTimeOff,
-      validTimeOn: $validTimeOn,
+      validRestDuration: $validRestDuration,
+      validRepDuration: $validRepDuration,
       validHangsPerSet: $validHangsPerSet,
       validTimeBetweenSets: $validTimeBetweenSets,
       validNumberOfSets: $validNumberOfSets,
@@ -285,10 +232,11 @@ class HangboardFormState extends Equatable {
         breakDuration,
         hangsPerSet,
         numberOfSets,
+        showResistance,
         resistance,
         validDepth,
-        validTimeOff,
-        validTimeOn,
+        validRestDuration,
+        validRepDuration,
         validHangsPerSet,
         validTimeBetweenSets,
         validNumberOfSets,
@@ -301,8 +249,8 @@ class HangboardFormState extends Equatable {
   HangboardExercise toHangboardExercise() {
     return HangboardExercise((he) => he
       ..exerciseTitle = exerciseTitle
-      ..depthUnit = depthUnit.name
-      ..resistanceUnit = resistanceUnit.name
+      ..depthUnit = depthUnit.abbreviation
+      ..resistanceUnit = resistanceUnit.abbreviation
       ..hands = hands
       ..hold = hold.name
       ..fingerConfiguration = fingerConfiguration.name

@@ -12,7 +12,11 @@ abstract class HangboardFormEvent extends Equatable {
   const HangboardFormEvent();
 }
 
-class ResistanceUnitChanged extends HangboardFormEvent {
+abstract class DebounceEvent extends HangboardFormEvent {}
+
+abstract class NonDebounceEvent extends HangboardFormEvent {}
+
+class ResistanceUnitChanged extends NonDebounceEvent {
   final ResistanceUnit resistanceUnit;
 
   ResistanceUnitChanged(this.resistanceUnit);
@@ -24,7 +28,7 @@ class ResistanceUnitChanged extends HangboardFormEvent {
   List<Object> get props => [resistanceUnit];
 }
 
-class DepthUnitChanged extends HangboardFormEvent {
+class DepthUnitChanged extends NonDebounceEvent {
   final DepthUnit depthUnit;
 
   DepthUnitChanged(this.depthUnit);
@@ -36,7 +40,7 @@ class DepthUnitChanged extends HangboardFormEvent {
   List<Object> get props => [depthUnit];
 }
 
-class HandsChanged extends HangboardFormEvent {
+class HandsChanged extends NonDebounceEvent {
   final int hands;
 
   HandsChanged(this.hands);
@@ -48,7 +52,7 @@ class HandsChanged extends HangboardFormEvent {
   List<Object> get props => [hands];
 }
 
-class HoldChanged extends HangboardFormEvent {
+class HoldChanged extends NonDebounceEvent {
   final Hold hold;
 
   HoldChanged(this.hold);
@@ -60,7 +64,7 @@ class HoldChanged extends HangboardFormEvent {
   List<Object> get props => [hold];
 }
 
-class FingerConfigurationChanged extends HangboardFormEvent {
+class FingerConfigurationChanged extends NonDebounceEvent {
   final FingerConfiguration fingerConfiguration;
 
   FingerConfigurationChanged(this.fingerConfiguration);
@@ -72,7 +76,7 @@ class FingerConfigurationChanged extends HangboardFormEvent {
   List<Object> get props => [fingerConfiguration];
 }
 
-class DepthChanged extends HangboardFormEvent {
+class DepthChanged extends DebounceEvent {
   final double depth;
 
   DepthChanged(this.depth);
@@ -84,7 +88,7 @@ class DepthChanged extends HangboardFormEvent {
   List<Object> get props => [depth];
 }
 
-class RestDurationChanged extends HangboardFormEvent {
+class RestDurationChanged extends DebounceEvent {
   final int restDuration;
 
   RestDurationChanged(this.restDuration);
@@ -96,7 +100,7 @@ class RestDurationChanged extends HangboardFormEvent {
   List<Object> get props => [restDuration];
 }
 
-class RepDurationChanged extends HangboardFormEvent {
+class RepDurationChanged extends DebounceEvent {
   final int repDuration;
 
   RepDurationChanged(this.repDuration);
@@ -108,7 +112,7 @@ class RepDurationChanged extends HangboardFormEvent {
   List<Object> get props => [repDuration];
 }
 
-class HangsPerSetChanged extends HangboardFormEvent {
+class HangsPerSetChanged extends DebounceEvent {
   final int hangsPerSet;
 
   HangsPerSetChanged(this.hangsPerSet);
@@ -120,7 +124,7 @@ class HangsPerSetChanged extends HangboardFormEvent {
   List<Object> get props => [hangsPerSet];
 }
 
-class BreakDurationChanged extends HangboardFormEvent {
+class BreakDurationChanged extends DebounceEvent {
   final int breakDuration;
 
   BreakDurationChanged(this.breakDuration);
@@ -132,7 +136,7 @@ class BreakDurationChanged extends HangboardFormEvent {
   List<Object> get props => [breakDuration];
 }
 
-class ShowRestDurationChanged extends HangboardFormEvent {
+class ShowRestDurationChanged extends NonDebounceEvent {
   final bool showRestDuration;
 
   ShowRestDurationChanged(this.showRestDuration);
@@ -144,7 +148,7 @@ class ShowRestDurationChanged extends HangboardFormEvent {
   List<Object> get props => [showRestDuration];
 }
 
-class NumberOfSetsChanged extends HangboardFormEvent {
+class NumberOfSetsChanged extends DebounceEvent {
   final int numberOfSets;
 
   NumberOfSetsChanged(this.numberOfSets);
@@ -156,7 +160,7 @@ class NumberOfSetsChanged extends HangboardFormEvent {
   List<Object> get props => [numberOfSets];
 }
 
-class ResistanceChanged extends HangboardFormEvent {
+class ResistanceChanged extends DebounceEvent {
   final double resistance;
 
   ResistanceChanged(this.resistance);
@@ -168,7 +172,19 @@ class ResistanceChanged extends HangboardFormEvent {
   List<Object> get props => [resistance];
 }
 
-class ResetFlags extends HangboardFormEvent {
+class ShowResistanceChanged extends NonDebounceEvent {
+  final bool showResistance;
+
+  ShowResistanceChanged(this.showResistance);
+
+  @override
+  String toString() => 'ShowResistanceChanged { showResistance: $showResistance }';
+
+  @override
+  List<Object> get props => [showResistance];
+}
+
+class ResetFlags extends NonDebounceEvent {
   ResetFlags();
 
   @override
@@ -179,7 +195,7 @@ class ResetFlags extends HangboardFormEvent {
 }
 
 //todo: simplify this to one save event?
-class InvalidSave extends HangboardFormEvent {
+class InvalidSave extends NonDebounceEvent {
   InvalidSave();
 
   @override
@@ -189,7 +205,7 @@ class InvalidSave extends HangboardFormEvent {
   List<Object> get props => [];
 }
 
-class ValidSave extends HangboardFormEvent {
+class ValidSave extends NonDebounceEvent {
   final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 

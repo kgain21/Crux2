@@ -5,6 +5,7 @@ import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dar
 import 'package:crux/frontend/screen/authentication/sign_in_screen.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/dashboard_screen.dart';
+import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dart';
 import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
 import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
 import 'package:crux/frontend/simple_bloc_delegate.dart';
@@ -28,6 +29,10 @@ class Crux extends StatelessWidget {
     errorColor: Color(0xFFFF6666),
     snackBarTheme: SnackBarThemeData(),
     fontFamily: 'Metropolis',
+//    appBarTheme: AppBarTheme(),
+    iconTheme: IconThemeData(
+      color: Color(0xFFcfd8dc)
+    )
   );
 
   static final Injector injector = ApplicationContext().initialize(Injector.injector);
@@ -62,6 +67,7 @@ class Crux extends StatelessWidget {
         return MaterialPageRoute(
           builder: (context) {
             return HangboardFormScreen(
+              hangboardFormBloc: injector.get<HangboardFormBloc>(),
               cruxUser: args.cruxUser,
               cruxWorkout: args.cruxWorkout,
             );

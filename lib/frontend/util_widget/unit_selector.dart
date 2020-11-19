@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Select between English and Metric units for depth and weight with radio buttons.
 /// This may need to be a more central user config - for now it is just used
@@ -13,16 +14,10 @@ class UnitSelector extends StatelessWidget with ChangeNotifier {
   @override
   Widget build(BuildContext context) {
     return Card(
+      key: Key('unitSelector'),
       child: Column(
         children: <Widget>[
-          new ExpansionTile(
-            key: PageStorageKey('unitSelector'),
-            initiallyExpanded: true,
-            title: new Text('Select your units'),
-            children: <Widget>[
-              unitRow(),
-            ],
-          ),
+
         ],
       ),
     );
@@ -36,13 +31,19 @@ class UnitSelector extends StatelessWidget with ChangeNotifier {
           fit: FlexFit.loose,
           child: Column(
             children: <Widget>[
-              new Text(
-                'Depth',
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FontAwesomeIcons.rulerHorizontal,),
+                  Text(
+                    'Depth',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                ],
               ),
-              new RadioListTile(
+              RadioListTile(
                 title: Text(
                   'Millimeters (mm)',
                   style: TextStyle(
@@ -55,7 +56,7 @@ class UnitSelector extends StatelessWidget with ChangeNotifier {
                   notifyListeners();
                 },
               ),
-              new RadioListTile(
+              RadioListTile(
                 title: Text(
                   'Inches (in)',
                   style: TextStyle(
@@ -71,45 +72,7 @@ class UnitSelector extends StatelessWidget with ChangeNotifier {
             ],
           ),
         ),
-        Flexible(
-          fit: FlexFit.loose,
-          child: Column(
-            children: <Widget>[
-              new Text(
-                'Resistance',
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-              new RadioListTile(
-                title: Text(
-                  'Kilograms (kg)',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                  ),
-                ),
-                groupValue: resistanceMeasurementSystem,
-                value: 'kg',
-                onChanged: (value) {
-                  notifyListeners();
-                },
-              ),
-              new RadioListTile(
-                title: Text(
-                  'Pounds (lb)',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                  ),
-                ),
-                groupValue: resistanceMeasurementSystem,
-                value: 'lb',
-                onChanged: (value) {
-                  notifyListeners();
-                },
-              ),
-            ],
-          ),
-        ),
+
       ],
     );
   }

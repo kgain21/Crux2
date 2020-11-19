@@ -4,6 +4,7 @@ import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.da
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
 import 'package:crux/model/unit.dart';
+import 'package:crux/util/null_util.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -37,61 +38,81 @@ void main() {
   });
 
   group('event handling', () {
-    test('emits [initialized, updated state] when user changes resistanceUnit', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(resistanceUnit: ResistanceUnit.POUNDS),
-          ]));
-
-      hangboardFormBloc.add(ResistanceUnitChanged(ResistanceUnit.POUNDS));
-    });
-
-    test('emits [initialized, updated state] when user changes depthUnit', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(depthUnit: DepthUnit.INCHES),
-          ]));
-
-      hangboardFormBloc.add(DepthUnitChanged(DepthUnit.INCHES));
-    });
-
-    test('emits [initialized, updated state] when user changes hands', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(hands: 1),
-          ]));
-
-      hangboardFormBloc.add(HandsChanged(1));
-    });
-
-    group('hold changed tests emit [initialized, updated state]', () {
-      test('when user changes hold to POCKET', () {
+    group('UnitChanged Tests', () {
+      test('emits [initialized, updated state] when user changes resistanceUnit', () {
         var initialHangboardFormState = HangboardFormState.initial();
-        var depthChangedState = initialHangboardFormState.copyWith(depth: 1);
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
               initialHangboardFormState,
+              initialHangboardFormState.update(resistanceUnit: ResistanceUnit.POUNDS),
+            ]));
+
+        hangboardFormBloc.add(ResistanceUnitChanged(ResistanceUnit.POUNDS));
+      });
+
+      test('emits [initialized, updated state] when user changes depthUnit', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(depthUnit: DepthUnit.INCHES),
+            ]));
+
+        hangboardFormBloc.add(DepthUnitChanged(DepthUnit.INCHES));
+      });
+    });
+
+    group('HandsChanged Tests', () {
+      test('emits [initialized, updated state] when user changes hands', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(hands: 1),
+            ]));
+
+        hangboardFormBloc.add(HandsChanged(1));
+      });
+    });
+
+    group('HoldChanged tests', () {
+      test('when user changes hold to POCKET', () async {
+        var initialHangboardFormState = HangboardFormState.initial();
+        var holdSelectedChangedState = initialHangboardFormState.update(
+          hold: Hold.HALF_CRIMP,
+          showFingerConfiguration: true,
+          showDepth: true,
+          availableFingerConfigurations: Nullable(FingerConfiguration.values.sublist(4)),
+        );
+        var fingerConfigurationChangedState = holdSelectedChangedState.update(
+            fingerConfiguration: Nullable(FingerConfiguration.INDEX_MIDDLE_RING_PINKIE));
+        var depthChangedState = fingerConfigurationChangedState.update(depth: Nullable(1));
+
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              holdSelectedChangedState,
+              fingerConfigurationChangedState,
               depthChangedState,
-              depthChangedState.copyWith(
+              depthChangedState.update(
                 hold: Hold.POCKET,
                 showFingerConfiguration: true,
-                availableFingerConfigurations: FingerConfiguration.values.sublist(0, 7),
+                availableFingerConfigurations: Nullable(FingerConfiguration.values.sublist(0, 7)),
+                fingerConfiguration: Nullable(null),
                 showDepth: false,
-                depth: null,
+                depth: Nullable(null),
               ),
             ]));
 
+        hangboardFormBloc.add(HoldChanged(Hold.HALF_CRIMP));
+        hangboardFormBloc
+            .add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING_PINKIE));
         hangboardFormBloc.add(DepthChanged(1));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(HoldChanged(Hold.POCKET));
       });
 
@@ -101,10 +122,10 @@ void main() {
             hangboardFormBloc,
             emitsInOrder([
               initialHangboardFormState,
-              initialHangboardFormState.copyWith(
+              initialHangboardFormState.update(
                 hold: Hold.OPEN_HAND,
                 showFingerConfiguration: true,
-                availableFingerConfigurations: FingerConfiguration.values.sublist(4),
+                availableFingerConfigurations: Nullable(FingerConfiguration.values.sublist(4)),
                 showDepth: true,
               ),
             ]));
@@ -118,10 +139,10 @@ void main() {
             hangboardFormBloc,
             emitsInOrder([
               initialHangboardFormState,
-              initialHangboardFormState.copyWith(
+              initialHangboardFormState.update(
                 hold: Hold.FULL_CRIMP,
                 showFingerConfiguration: false,
-                availableFingerConfigurations: null,
+                availableFingerConfigurations: Nullable(null),
                 showDepth: true,
               ),
             ]));
@@ -135,10 +156,10 @@ void main() {
             hangboardFormBloc,
             emitsInOrder([
               initialHangboardFormState,
-              initialHangboardFormState.copyWith(
+              initialHangboardFormState.update(
                 hold: Hold.HALF_CRIMP,
                 showFingerConfiguration: true,
-                availableFingerConfigurations: FingerConfiguration.values.sublist(4),
+                availableFingerConfigurations: Nullable(FingerConfiguration.values.sublist(4)),
                 showDepth: true,
               ),
             ]));
@@ -146,11 +167,13 @@ void main() {
         hangboardFormBloc.add(HoldChanged(Hold.HALF_CRIMP));
       });
 
-      test('when user changes hold to anything else', () {
+      test(
+          'should wipe out depth, fingerConfiguration, and hide those fields when user changes hold to anything else',
+          () async {
         var initialHangboardFormState = HangboardFormState.initial();
-        var depthChangedState = initialHangboardFormState.copyWith(depth: 1);
-        var fingerConfigurationChangedState =
-            depthChangedState.copyWith(fingerConfiguration: FingerConfiguration.INDEX_MIDDLE_RING);
+        var depthChangedState = initialHangboardFormState.update(depth: Nullable(1));
+        var fingerConfigurationChangedState = depthChangedState.update(
+            fingerConfiguration: Nullable(FingerConfiguration.INDEX_MIDDLE_RING));
 
         expectLater(
             hangboardFormBloc,
@@ -158,139 +181,202 @@ void main() {
               initialHangboardFormState,
               depthChangedState,
               fingerConfigurationChangedState,
-              fingerConfigurationChangedState.copyWith(
+              fingerConfigurationChangedState.update(
                 hold: Hold.SLOPER,
                 showFingerConfiguration: false,
-                availableFingerConfigurations: null,
-                fingerConfiguration: null,
+                availableFingerConfigurations: Nullable(null),
+                fingerConfiguration: Nullable(null),
                 showDepth: false,
-                depth: null,
+                depth: Nullable(null),
               ),
             ]));
 
         hangboardFormBloc.add(DepthChanged(1));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING));
         hangboardFormBloc.add(HoldChanged(Hold.SLOPER));
       });
     });
 
-    test('emits [initialized, updated state] when user changes fingerConfiguration', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(
-                fingerConfiguration: FingerConfiguration.INDEX_MIDDLE_RING),
-          ]));
+    group('FingerConfigurationChanged Tests', () {
+      test('emits [initialized, updated state] when user changes fingerConfiguration', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(
+                  fingerConfiguration: Nullable(FingerConfiguration.INDEX_MIDDLE_RING)),
+            ]));
 
-      hangboardFormBloc.add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING));
+        hangboardFormBloc.add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes depth', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(depth: 1.5),
-          ]));
+    group('DepthChanged Tests', () {
+      test('emits [initialized, updated state] when user changes depth', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(depth: Nullable(1.5)),
+            ]));
 
-      hangboardFormBloc.add(DepthChanged(1.5));
+        hangboardFormBloc.add(DepthChanged(1.5));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes restDuration', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(restDuration: 3),
-          ]));
+    group('RestDurationChanged Tests', () {
+      test('emits [initialized, updated state] when user changes restDuration', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(restDuration: Nullable(3)),
+            ]));
 
-      hangboardFormBloc.add(RestDurationChanged(3));
+        hangboardFormBloc.add(RestDurationChanged(3));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes repDuration', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(repDuration: 7),
-          ]));
+    group('RepDurationChanged Tests', () {
+      test('emits [initialized, updated state] when user changes repDuration', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(repDuration: 7),
+            ]));
 
-      hangboardFormBloc.add(RepDurationChanged(7));
+        hangboardFormBloc.add(RepDurationChanged(7));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes hangsPerSet', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(hangsPerSet: 6),
-          ]));
+    group('HangsPerSetChanged Tests', () {
+      test('emits [initialized, updated state] when user changes hangsPerSet', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(hangsPerSet: 6),
+            ]));
 
-      hangboardFormBloc.add(HangsPerSetChanged(6));
+        hangboardFormBloc.add(HangsPerSetChanged(6));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes showRestDuration', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      var secondState = initialHangboardFormState.copyWith(restDuration: 180);
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            secondState,
-            secondState.copyWith(
-              showRestDuration: false,
-              restDuration: null,
+    group('ShowRestDurationChanged Tests', () {
+      test(
+          'emits [initialized, updated state] when user changes showRestDuration, and should wipe out restDuration value',
+          () async {
+        var initialHangboardFormState = HangboardFormState.initial();
+        var secondState = initialHangboardFormState.update(restDuration: Nullable(180));
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              secondState,
+              secondState.update(
+                showRestDuration: false,
+                restDuration: Nullable(null),
 //              hangsPerSet: null,
 //              showHangsPerSet: false, -- proposing to only alert user and not forcefully change anything here
-            ),
-          ]));
+              ),
+            ]));
 
-      hangboardFormBloc.add(RestDurationChanged(180));
-      hangboardFormBloc.add(ShowRestDurationChanged(false));
-      //todo: manually turning this off should show an alert that number of hangs must be 1?
-      //todo: on toggle: immediately show alert, emit event anyway, update form state, check validation of showRestDuration(false) + hangsPerSet(1) on save?
+        hangboardFormBloc.add(RestDurationChanged(180));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
+        hangboardFormBloc.add(ShowRestDurationChanged(false));
+        //todo: manually turning this off should show an alert that number of hangs must be 1?
+        //todo: on toggle: immediately show alert, emit event anyway, update form state, check validation of showRestDuration(false) + hangsPerSet(1) on save?
+      });
     });
 
-    test('emits [initialized, updated state] when user changes breakDuration', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(breakDuration: 180),
-          ]));
+    group('BreakDurationChanged Tests', () {
+      test('emits [initialized, updated state] when user changes breakDuration', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(breakDuration: 180),
+            ]));
 
-      hangboardFormBloc.add(BreakDurationChanged(180));
+        hangboardFormBloc.add(BreakDurationChanged(180));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes numberOfSets', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(numberOfSets: 6),
-          ]));
+    group('NumberOfSetsChanged Tests', () {
+      test('emits [initialized, updated state] when user changes numberOfSets', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(numberOfSets: 6),
+            ]));
 
-      hangboardFormBloc.add(NumberOfSetsChanged(6));
+        hangboardFormBloc.add(NumberOfSetsChanged(6));
+      });
     });
 
-    test('emits [initialized, updated state] when user changes resistance', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(resistance: 10.5),
-          ]));
+    group('ShowResistanceChanged Tests', () {
+      test(
+          'emits [initialized, updated state] when user changes showResistance, and should wipe out resistance value',
+          () async {
+        var initialHangboardFormState = HangboardFormState.initial();
+        var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
+        var resistanceChangedState = showResistanceChangedState.update(resistance: Nullable(10.5));
 
-      hangboardFormBloc.add(ResistanceChanged(10.5));
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              showResistanceChangedState,
+              resistanceChangedState,
+              resistanceChangedState.update(
+                resistance: Nullable(null),
+                showResistance: false,
+              ),
+            ]));
+
+        hangboardFormBloc.add(ShowResistanceChanged(true));
+        hangboardFormBloc.add(ResistanceChanged(10.5));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
+        hangboardFormBloc.add(ShowResistanceChanged(false));
+      });
+    });
+
+    group('ResistanceChanged Tests', () {
+      test('when user changes resistance, should yield state with updated resistance field', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(resistance: Nullable(10.5)),
+            ]));
+
+        hangboardFormBloc.add(ResistanceChanged(10.5));
+      });
+//todo: left off here - starting to test / implement validations
+      test(
+          'when user changes resistance to negative value, should yield state with validResistance set to false',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validResistance: false),
+            ]));
+
+        hangboardFormBloc.add(ResistanceChanged(-10.5));
+      });
     });
 
     /*test('emits [initialized, updated state] when resetFlags event occurs', () {
@@ -299,28 +385,32 @@ void main() {
           hangboardFormBloc,
           emitsInOrder([
             initialHangboardFormState,
-            initialHangboardFormState.copyWith(
+            initialHangboardFormState.update(
                 isDuplicate: false, isFailure: false, isSuccess: false),
           ]));
 
       hangboardFormBloc.add(ResetFlags());
     });*/
 
-    test('emits [initialized, updated state] when user saves invalid form', () {
-      var initialHangboardFormState = HangboardFormState.initial();
-      expectLater(
-          hangboardFormBloc,
-          emitsInOrder([
-            initialHangboardFormState,
-            initialHangboardFormState.copyWith(autoValidate: true),
-          ]));
+    group('InvalidFormSaved Tests', () {
+      test(
+          'when user saves invalid form, should yield state with autoValidate set to true to show form errors',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(autoValidate: true),
+            ]));
 
-      hangboardFormBloc.add(InvalidSave());
+        hangboardFormBloc.add(InvalidSave());
+      });
     });
 
-    group('emits [initialized, updated state] when user saves valid form', () {
+    group('ValidFormSaved Tests', () {
       test('when db update occurs successfully, should return state with isSuccess set to true',
-          () {
+          () async {
         var cruxUser = TestModelFactory.getTypicalCruxUser();
         var originalCruxWorkout = TestModelFactory.getTypicalCruxWorkout();
 
@@ -339,24 +429,31 @@ void main() {
         when(baseWorkoutRepositoryMock.updateWorkout(cruxUser, expectedUpdatedCruxWorkout))
             .thenAnswer((_) => Future.value(expectedUpdatedCruxWorkout));
 
+        hangboardFormBloc.add(ShowResistanceChanged(true));
         hangboardFormBloc.add(ResistanceUnitChanged(ResistanceUnit.POUNDS));
         hangboardFormBloc.add(HoldChanged(Hold.HALF_CRIMP));
         hangboardFormBloc
             .add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING_PINKIE));
         hangboardFormBloc.add(HandsChanged(1));
         hangboardFormBloc.add(DepthChanged(14.0));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(RepDurationChanged(10));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(BreakDurationChanged(180));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ShowRestDurationChanged(false));
         hangboardFormBloc.add(HangsPerSetChanged(1));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(NumberOfSetsChanged(6));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ResistanceChanged(-25));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
 
         hangboardFormBloc.add(ValidSave(cruxUser: cruxUser, cruxWorkout: originalCruxWorkout));
       });
 
       test('when state is a duplicate exercise, should return state with isDuplicate set to true',
-          () {
+          () async {
         var cruxUser = TestModelFactory.getTypicalCruxUser();
         var originalCruxWorkout = TestModelFactory.getTypicalCruxWorkout();
         var finalHangboardFormState =
@@ -376,32 +473,40 @@ void main() {
               finalHangboardFormState,
             ));
 
+        hangboardFormBloc.add(ShowResistanceChanged(true));
         hangboardFormBloc.add(ResistanceUnitChanged(ResistanceUnit.POUNDS));
         hangboardFormBloc.add(HoldChanged(Hold.HALF_CRIMP));
         hangboardFormBloc
             .add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING_PINKIE));
         hangboardFormBloc.add(HandsChanged(1));
         hangboardFormBloc.add(DepthChanged(14.0));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(RepDurationChanged(10));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(BreakDurationChanged(180));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ShowRestDurationChanged(false));
         hangboardFormBloc.add(HangsPerSetChanged(1));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(NumberOfSetsChanged(6));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ResistanceChanged(-25));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
 
         hangboardFormBloc.add(ValidSave(cruxUser: cruxUser, cruxWorkout: originalCruxWorkout));
       });
 
-      test('when db call fails and throws exception, should return state with isFailure set to true', () {
+      test(
+          'when db call fails and throws exception, should return state with isFailure set to true',
+          () async {
         var cruxUser = TestModelFactory.getTypicalCruxUser();
         var originalCruxWorkout = TestModelFactory.getTypicalCruxWorkout();
         var finalHangboardFormState =
             TestModelFactory.getTypicalOneHandedHangboardWorkoutFormState();
 
-        finalHangboardFormState =
-            finalHangboardFormState.update(isFailure: true, isSuccess: false);
+        finalHangboardFormState = finalHangboardFormState.update(isFailure: true, isSuccess: false);
 
-        when(baseWorkoutRepositoryMock.updateWorkout(cruxUser, any())).thenReturn(null);
+        when(baseWorkoutRepositoryMock.updateWorkout(cruxUser, any)).thenReturn(null);
 
         expectLater(
             hangboardFormBloc,
@@ -409,18 +514,25 @@ void main() {
               finalHangboardFormState,
             ));
 
+        hangboardFormBloc.add(ShowResistanceChanged(true));
         hangboardFormBloc.add(ResistanceUnitChanged(ResistanceUnit.POUNDS));
         hangboardFormBloc.add(HoldChanged(Hold.HALF_CRIMP));
         hangboardFormBloc
             .add(FingerConfigurationChanged(FingerConfiguration.INDEX_MIDDLE_RING_PINKIE));
         hangboardFormBloc.add(HandsChanged(1));
         hangboardFormBloc.add(DepthChanged(14.0));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(RepDurationChanged(10));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(BreakDurationChanged(180));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ShowRestDurationChanged(false));
         hangboardFormBloc.add(HangsPerSetChanged(1));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(NumberOfSetsChanged(6));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ResistanceChanged(-25));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
 
         hangboardFormBloc.add(ValidSave(cruxUser: cruxUser, cruxWorkout: originalCruxWorkout));
       });

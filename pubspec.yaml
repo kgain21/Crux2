@@ -21,6 +21,7 @@ dependencies:
   cloud_firestore: ^0.13.5
 
   cupertino_icons: ^0.1.2
+  font_awesome_flutter: ^8.10.0
 
   bloc: ^4.0.0
   flutter_bloc: ^4.0.0

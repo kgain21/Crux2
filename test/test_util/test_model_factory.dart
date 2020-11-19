@@ -36,7 +36,7 @@ class TestModelFactory {
   static HangboardExercise getTypicalHangboardExercise() {
     return HangboardExercise((he) => he
       ..breakDuration = 180
-      ..depthUnit = DepthUnit.MILLIMETERS.name
+      ..depthUnit = DepthUnit.MILLIMETERS.abbreviation
       ..exerciseTitle = "2 Handed 12mm Index/Middle/Ring/Pinkie Half Crimp" //add "Repeaters" to this title
       ..fingerConfiguration = FingerConfiguration.INDEX_MIDDLE_RING_PINKIE.name
       ..hangsPerSet = 6
@@ -46,7 +46,7 @@ class TestModelFactory {
       ..numberOfSets = 4
       ..repDuration = 7
       ..resistance = 25
-      ..resistanceUnit = ResistanceUnit.POUNDS.name
+      ..resistanceUnit = ResistanceUnit.POUNDS.abbreviation
       ..restDuration = 3
       ..build());
   }
@@ -81,10 +81,11 @@ class TestModelFactory {
       breakDuration: 180,
       hangsPerSet: 1,
       numberOfSets: 6,
+      showResistance: true,
       resistance: -25.0,
       validDepth: true,
-      validTimeOff: true,
-      validTimeOn: true,
+      validRestDuration: true,
+      validRepDuration: true,
       validHangsPerSet: true,
       validTimeBetweenSets: true,
       validNumberOfSets: true,
@@ -121,10 +122,11 @@ class TestModelFactory {
       breakDuration: 180,
       hangsPerSet: 6,
       numberOfSets: 4,
+      showResistance: true,
       resistance: 25.0,
       validDepth: true,
-      validTimeOff: true,
-      validTimeOn: true,
+      validRestDuration: true,
+      validRepDuration: true,
       validHangsPerSet: true,
       validTimeBetweenSets: true,
       validNumberOfSets: true,

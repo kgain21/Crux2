@@ -6,10 +6,13 @@ import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.da
 import 'package:crux/frontend/util_widget/unit_selector.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/unit.dart';
+import 'package:crux/util/null_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HangboardFormScreenArguments {
   final CruxUser cruxUser;
@@ -28,14 +31,19 @@ class HangboardFormScreen extends StatefulWidget {
   final CruxWorkout cruxWorkout;
   final CruxUser cruxUser;
 
-  HangboardFormScreen({this.hangboardFormBloc, this.cruxWorkout, this.cruxUser});
+  HangboardFormScreen({
+    @required this.hangboardFormBloc,
+    @required this.cruxWorkout,
+    @required this.cruxUser,
+  });
 
   @override
-  State createState() => _HangboardFormScreenState();
+  State createState() => _HangboardFormScreenState(hangboardFormBloc);
 }
 
 class _HangboardFormScreenState extends State<HangboardFormScreen> {
-  final GlobalKey<FormState> formKey = GlobalKey(debugLabel: 'HangboardFormScreen');
+  final HangboardFormBloc hangboardFormBloc;
+  final GlobalKey<FormState> formKey = GlobalKey(debugLabel: 'hangboardForm');
 
   final TextEditingController _depthController = TextEditingController();
   final TextEditingController _timeOnController = TextEditingController();
@@ -45,6 +53,8 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   final TextEditingController _numberOfSetsController = TextEditingController();
   final TextEditingController _resistanceController = TextEditingController();
 
+  _HangboardFormScreenState(this.hangboardFormBloc);
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +63,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: Key('hangboardFormScaffold'),
       appBar: AppBar(
         title: Text('Create a new exercise'),
         actions: <Widget>[
@@ -64,31 +75,22 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         ],
       ),
       body: BlocListener(
-        bloc: widget.hangboardFormBloc,
+        bloc: hangboardFormBloc,
         listener: (BuildContext context, HangboardFormState hangboardFormState) {
           if (hangboardFormState.isSuccess) {
             exerciseSavedSnackbar(context);
-            widget.hangboardFormBloc.add(ResetFlags());
-//            BlocProvider.of<HangboardParentBloc>(context).add(HangboardParentUpdated());
+            hangboardFormBloc.add(ResetFlags());
           } else if (hangboardFormState.isDuplicate) {
             _exerciseExistsAlert(hangboardFormState);
-            widget.hangboardFormBloc.add(ResetFlags());
+            hangboardFormBloc.add(ResetFlags());
           }
-//          if (hangboardFormState is InvalidSave) {todo: wtf is going on here
-////            exerciseNotSavedSnackbar(context);
-//          }
         },
         child: BlocBuilder(
-          bloc: widget.hangboardFormBloc,
+          bloc: hangboardFormBloc,
           builder: (context, hangboardFormState) {
             return Builder(
               builder: (scaffoldContext) => Form(
                 key: formKey,
-                /*https://medium.com/saugo360/https-medium-com-saugo360-flutter-using-overlay-to-display-floating-widgets-2e6d0e8decb9
-                TODO: See if I can get the keyboard to jump to the text form field in focus (nice to have)
-                https://stackoverflow.com/questions/46841637/show-a-text-field-dialog-without-being-covered-by-keyboard/46849239#46849239
-                TODO: ^ this was the original solution to the keyboard covering text fields, might want to refer to it in the future
-                 */
                 child: ListView(
                   children: <Widget>[
                     UnitSelector(
@@ -99,14 +101,14 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     _holdDropdownTile(hangboardFormState, scaffoldContext),
                     _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
                     _depthTile(hangboardFormState, scaffoldContext),
-                    _timeOnTile(hangboardFormState, scaffoldContext),
+                    _durationTile(hangboardFormState, scaffoldContext),
                     // hangProtocolTile(),
                     _hangsPerSetTile(hangboardFormState, scaffoldContext),
-                    _timeBetweenSetsTile(hangboardFormState, scaffoldContext),
+                    _breakDurationTile(hangboardFormState, scaffoldContext),
                     _numberOfSetsTile(hangboardFormState, scaffoldContext),
                     _resistanceTile(hangboardFormState, scaffoldContext),
                     _saveButton(hangboardFormState, scaffoldContext)
-                  ].where(notNull).toList(),
+                  ].where(NullUtil.notNull).toList(),
                 ),
               ),
             );
@@ -116,15 +118,11 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  /// Nice way to conditionally add widgets to a list that I found.
-  /// Makes use of [where] and this function to make an [Iterable] which is then
-  /// turned back into a list without the null entries.
-  bool notNull(Object o) => o != null;
-
   Widget _handsRadioTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
+      key: Key('handsRadioTile'),
       child: ListTile(
-        key: PageStorageKey('handsTile'),
+        key: PageStorageKey('handsRadioTilePageStorage'),
         title: Row(
           children: <Widget>[
             Flexible(
@@ -134,7 +132,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 groupValue: hangboardFormState.hands,
                 onChanged: (value) {
                   Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  widget.hangboardFormBloc.add(HandsChanged(value));
+                  hangboardFormBloc.add(HandsChanged(value));
                 },
               ),
             ),
@@ -145,7 +143,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 groupValue: hangboardFormState.hands,
                 onChanged: (value) {
                   Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  widget.hangboardFormBloc.add(HandsChanged(value));
+                  hangboardFormBloc.add(HandsChanged(value));
                 },
               ),
             ),
@@ -157,9 +155,10 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 
   Widget _holdDropdownTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
+      key: Key('holdDropdownTile'),
       child: ListTile(
         leading: Icon(
-          Icons.pan_tool,
+          FontAwesomeIcons.solidHandRock,
         ),
         title: DropdownButtonHideUnderline(
           child: DropdownButton<Hold>(
@@ -170,7 +169,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             value: hangboardFormState.hold,
             onChanged: (value) {
               Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-              widget.hangboardFormBloc.add(HoldChanged(value));
+              hangboardFormBloc.add(HoldChanged(value));
             },
             items: Hold.values.map((Hold hold) {
               return DropdownMenuItem<Hold>(
@@ -190,10 +189,10 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
       HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     if (hangboardFormState.showFingerConfiguration) {
       return Card(
+        key: Key('fingerConfigurationDropdownTile'),
         child: ListTile(
           leading: Icon(
-            //TODO: find better icons on fontAwesome?
-            Icons.pan_tool,
+            FontAwesomeIcons.solidHandPaper,
           ),
           title: DropdownButtonHideUnderline(
             child: DropdownButton<FingerConfiguration>(
@@ -204,7 +203,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               value: hangboardFormState.fingerConfiguration,
               onChanged: (value) {
                 Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                widget.hangboardFormBloc.add(FingerConfigurationChanged(value));
+                hangboardFormBloc.add(FingerConfigurationChanged(value));
               },
               items: hangboardFormState.availableFingerConfigurations.map((fingerConfiguration) {
                 return DropdownMenuItem(
@@ -228,34 +227,75 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
       return null;
     }
     return Card(
+      key: Key('depthTile'),
       child: ListTile(
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
-          child: TextFormField(
-            controller: _depthController,
-            autovalidate: hangboardFormState.autoValidate,
-            validator: (_) {
-              return hangboardFormState.validDepth ? null : 'Invalid Depth';
-            },
-            onChanged: (value) {
-              widget.hangboardFormBloc.add(DepthChanged(double.parse(value)));
-            },
-            decoration: InputDecoration(
-              icon: Icon(Icons.keyboard_tab),
-              labelText: 'Depth (${hangboardFormState.depthUnit})',
-            ),
-            keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
-            onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-            },
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Expanded(
+                    child: RadioListTile(
+                      title: Text(
+                        '${DepthUnit.MILLIMETERS.name} (${DepthUnit.MILLIMETERS.abbreviation})',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                        ),
+                      ),
+                      groupValue: hangboardFormState.depthUnit,
+                      value: DepthUnit.MILLIMETERS,
+                      onChanged: (value) {
+                        hangboardFormBloc.add(DepthUnitChanged(value));
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile(
+                      title: Text(
+                        '${DepthUnit.INCHES.name} (${DepthUnit.INCHES.abbreviation})',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                        ),
+                      ),
+                      groupValue: hangboardFormState.depthUnit,
+                      value: DepthUnit.INCHES,
+                      onChanged: (value) {
+                        hangboardFormBloc.add(DepthUnitChanged(value));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              TextFormField(
+                controller: _depthController,
+                autovalidate: hangboardFormState.autoValidate,
+                validator: (_) {
+                  return hangboardFormState.validDepth ? null : 'Invalid Depth';
+                },
+                onChanged: (value) {
+                  hangboardFormBloc.add(DepthChanged(double.parse(value)));
+                },
+                decoration: InputDecoration(
+                  icon: Icon(FontAwesomeIcons.rulerHorizontal),
+                  labelText: 'Depth (${hangboardFormState.depthUnit.abbreviation})',
+                ),
+                keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                onTap: () {
+                  Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _timeOnTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
+  Widget _durationTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
+      key: Key('durationTile'),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
         child: Row(
@@ -267,13 +307,13 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   controller: _timeOnController,
                   autovalidate: hangboardFormState.autoValidate,
                   validator: (_) {
-                    return hangboardFormState.validTimeOn ? null : 'Invalid Time On';
+                    return hangboardFormState.validRepDuration ? null : 'Invalid Rep Duration';
                   },
                   onChanged: (value) {
-                    widget.hangboardFormBloc.add(RepDurationChanged(int.tryParse(value)));
+                    hangboardFormBloc.add(RepDurationChanged(int.tryParse(value)));
                   },
                   decoration: InputDecoration(
-                    labelText: 'Time On (sec)',
+                    labelText: 'Rep Duration (sec)',
                   ),
                   keyboardType: TextInputType.numberWithOptions(),
                   onTap: () {
@@ -289,13 +329,13 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   controller: _timeOffController,
                   autovalidate: hangboardFormState.autoValidate,
                   validator: (_) {
-                    return hangboardFormState.validTimeOff ? null : 'Invalid Time Off';
+                    return hangboardFormState.validRestDuration ? null : 'Invalid Rest Duration';
                   },
                   onChanged: (value) {
-                    widget.hangboardFormBloc.add(RestDurationChanged(int.tryParse(value)));
+                    hangboardFormBloc.add(RestDurationChanged(int.tryParse(value)));
                   },
                   decoration: InputDecoration(
-                    labelText: 'Time Off (sec)',
+                    labelText: 'Rest Duration (sec)',
                   ),
                   keyboardType: TextInputType.numberWithOptions(),
                   onTap: () {
@@ -327,6 +367,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 
   Widget _hangsPerSetTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
+      key: Key('hangsPerSetTile'),
       child: ListTile(
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
@@ -337,7 +378,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validHangsPerSet ? null : 'Invalid Hangs Per Set';
             },
             onChanged: (value) {
-              widget.hangboardFormBloc.add(HangsPerSetChanged(int.tryParse(value)));
+              hangboardFormBloc.add(HangsPerSetChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
               labelText: 'Hangs per set',
@@ -353,8 +394,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _timeBetweenSetsTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
+  Widget _breakDurationTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
+      key: Key('breakDurationTile'),
       child: ListTile(
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
@@ -365,7 +407,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               return hangboardFormState.validTimeBetweenSets ? null : 'Invalid Time Between Sets';
             },
             onChanged: (value) {
-              widget.hangboardFormBloc.add(BreakDurationChanged(int.tryParse(value)));
+              hangboardFormBloc.add(BreakDurationChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
               icon: Icon(Icons.watch_later),
@@ -383,18 +425,21 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 
   Widget _numberOfSetsTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
+      key: Key('numberOfSetsTile'),
       child: ListTile(
-        key: PageStorageKey<String>('numberOfSetsTile'),
+        key: PageStorageKey('numberOfSetsTilePageStorage'),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
+//todo: https://api.flutter.dev/flutter/material/TextFormField-class.html
+            //todo: ^ has example of autovalidation/autofocus on next element when user hits enter
             controller: _numberOfSetsController,
             autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
               return hangboardFormState.validNumberOfSets ? null : 'Invalid Number of Sets';
             },
             onChanged: (value) {
-              widget.hangboardFormBloc.add(NumberOfSetsChanged(int.tryParse(value)));
+              hangboardFormBloc.add(NumberOfSetsChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
               labelText: 'Number of sets',
@@ -412,41 +457,108 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 
   Widget _resistanceTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
-      child: ListTile(
-        key: PageStorageKey<String>('resistanceTile'),
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
-          child: TextFormField(
-            controller: _resistanceController,
-            autovalidate: hangboardFormState.autoValidate,
-            validator: (_) {
-              return hangboardFormState.validResistance ? null : 'Invalid Resistance';
-            },
-            onChanged: (value) {
-              widget.hangboardFormBloc.add(ResistanceChanged(double.tryParse(value)));
-            },
-            decoration: InputDecoration(
-              icon: Icon(Icons.fitness_center),
-              labelText: 'Resistance (${hangboardFormState.resistanceUnit})',
-            ),
-            keyboardType: TextInputType.numberWithOptions(),
-            onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-            },
-          ),
+      child: ExpansionTile(
+        onExpansionChanged: _resistanceTileVisibilityChanged,
+        key: ValueKey(hangboardFormState.showResistance),
+        initiallyExpanded: hangboardFormState.showResistance,
+        trailing: Switch(
+          value: hangboardFormState.showResistance,
+          onChanged: _resistanceTileVisibilityChanged,
         ),
+        title: Row(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+              child: Icon(
+                FontAwesomeIcons.weightHanging,
+                color: Theme.of(scaffoldContext).iconTheme.color,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              child: Text('Resistance'),
+            )
+          ],
+        ),
+        children: <Widget>[
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
+                child: RadioListTile(
+                  title: Text(
+                    '${ResistanceUnit.KILOGRAMS.name} (${ResistanceUnit.KILOGRAMS.abbreviation})',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  groupValue: hangboardFormState.resistanceUnit,
+                  value: ResistanceUnit.KILOGRAMS,
+                  onChanged: (value) {
+                    hangboardFormBloc.add(ResistanceUnitChanged(value));
+                  },
+                ),
+              ),
+              Expanded(
+                child: RadioListTile(
+                  title: Text(
+                    '${ResistanceUnit.POUNDS.name} (${ResistanceUnit.POUNDS.abbreviation})',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  groupValue: hangboardFormState.resistanceUnit,
+                  value: ResistanceUnit.POUNDS,
+                  onChanged: (value) {
+                    hangboardFormBloc.add(ResistanceUnitChanged(value));
+                  },
+                ),
+              ),
+            ],
+          ),
+          ListTile(
+            key: PageStorageKey<String>('resistanceTilePageStorage'),
+            title: Padding(
+              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
+              child: TextFormField(
+                controller: _resistanceController,
+                autovalidate: hangboardFormState.autoValidate,
+                validator: (_) {
+                  return hangboardFormState.validResistance ? null : 'Invalid Resistance';
+                },
+                onChanged: (value) {
+                  hangboardFormBloc.add(ResistanceChanged(double.tryParse(value)));
+                },
+                decoration: InputDecoration(
+                  labelText: 'Resistance (${hangboardFormState.resistanceUnit.abbreviation})',
+                ),
+                keyboardType: TextInputType.numberWithOptions(),
+                onTap: () {
+                  Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _resistanceTileVisibilityChanged(value) {
+    _resistanceController.clear();
+    hangboardFormBloc.add(ShowResistanceChanged(value));
   }
 
   Widget _saveButton(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
+      //todo: make this narrower
       child: RaisedButton(
+        key: Key('saveButton'),
         onPressed: () {
           _saveTileFields(scaffoldContext, hangboardFormState);
         },
-        child: Text('Save Exercise'),
+        child: Text('SAVE EXERCISE'),
       ),
     );
   }
@@ -459,9 +571,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   void _saveTileFields(BuildContext scaffoldContext, HangboardFormState hangboardFormState) {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      widget.hangboardFormBloc.add(ValidSave(cruxUser: widget.cruxUser, cruxWorkout: widget.cruxWorkout));
+      hangboardFormBloc.add(ValidSave(cruxUser: widget.cruxUser, cruxWorkout: widget.cruxWorkout));
     } else {
-      widget.hangboardFormBloc.add(InvalidSave());
+      hangboardFormBloc.add(InvalidSave());
     }
   }
 
@@ -618,10 +730,4 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     //todo: add this for resetting form
 //    _exerciseFormBloc.add(HangboardFormCleared());
   }
-
-//TODO: Figure out how to use date w/ firestore -- crashes app with this shit:
-//todo: java.lang.IllegalArgumentException: Unsupported value: Timestamp(seconds=1549021849, nanoseconds=676000000)
-/*data.putIfAbsent("created_date", () {
-      return DateTime.now();
-    });*/
 }

@@ -79,7 +79,7 @@ class StringFormatUtil {
       if (depth.floor() == depth) {
         depthString = depth?.truncate().toString();
       }
-      depthString += depthUnit.name;
+      depthString += depthUnit.abbreviation;
     }
 
     List<String> titleElements = [

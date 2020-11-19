@@ -4,8 +4,10 @@ import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:crux/model/finger_configuration.dart';
 import 'package:crux/model/hold_enum.dart';
+import 'package:crux/util/null_util.dart';
 import 'package:crux/util/string_format_util.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'hangboard_form_event.dart';
 import 'hangboard_form_state.dart';
@@ -17,6 +19,21 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
 
   @override
   get initialState => HangboardFormState.initial();
+
+  @override
+  Stream<Transition<HangboardFormEvent, HangboardFormState>> transformEvents(eventStream, next) {
+    /// Non text box fields don't need debounce
+    final nonDebounceStream = eventStream.where((event) {
+      return (event is NonDebounceEvent);
+    });
+
+    /// Debounce any field with a text box to delay validation
+    final debounceStream = eventStream.where((event) {
+      return (event is DebounceEvent);
+    }).debounceTime(Duration(milliseconds: 500));
+
+    return super.transformEvents(MergeStream([nonDebounceStream, debounceStream]), next);
+  }
 
   @override
   Stream<HangboardFormState> mapEventToState(event) {
@@ -44,6 +61,8 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       return _mapShowRestDurationChangedToState(event);
     } else if (event is NumberOfSetsChanged) {
       return _mapNumberOfSetsChangedToState(event);
+    } else if (event is ShowResistanceChanged) {
+      return _mapShowResistanceChangedToState(event);
     } else if (event is ResistanceChanged) {
       return _mapResistanceChangedToState(event);
     } else if (event is ResetFlags) {
@@ -73,7 +92,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     bool showFingerConfigurations = false;
     bool showDepth = false;
     double depth = state.depth;
-    List<FingerConfiguration> availableFingerConfigurations = FingerConfiguration.values;
+    List<FingerConfiguration> availableFingerConfigurations;
     FingerConfiguration fingerConfiguration = state.fingerConfiguration;
 
     if (event.hold == Hold.POCKET) {
@@ -93,30 +112,30 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(
       hold: event.hold,
       showFingerConfiguration: showFingerConfigurations,
-      availableFingerConfigurations: availableFingerConfigurations,
+      availableFingerConfigurations: Nullable(availableFingerConfigurations),
       // todo - leaving these null for now. Test UI to see if nulling out all the time is better vs. only removing for particular holds
       // basically saying WHENEVER a hold changes, remove depth/fingerConfig so old values don't remain set in the state by accident.
       // this would force the user to redo values in some cases - need to test if this makes sense all the time vs. just for some cases
-      fingerConfiguration: null,
+      fingerConfiguration: Nullable(null),
       showDepth: showDepth,
-      depth: null,
+      depth: Nullable(null),
     );
   }
 
   Stream<HangboardFormState> _mapFingerConfigurationChangedToState(
       FingerConfigurationChanged event) async* {
-    yield state.update(fingerConfiguration: event.fingerConfiguration);
+    yield state.update(fingerConfiguration: Nullable(event.fingerConfiguration));
   }
 
   Stream<HangboardFormState> _mapDepthChangedToState(DepthChanged event) async* {
     //todo: old project has non-negative validation - double check if this can just be handled by
     //todo: making text box not support negative numbers
-    yield state.update(depth: event.depth);
+    yield state.update(depth: Nullable(event.depth));
   }
 
   Stream<HangboardFormState> _mapTimeOffChangedToState(RestDurationChanged event) async* {
     //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(restDuration: event.restDuration);
+    yield state.update(restDuration: Nullable(event.restDuration));
   }
 
   Stream<HangboardFormState> _mapTimeOnChangedToState(RepDurationChanged event) async* {
@@ -136,7 +155,10 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
 
   Stream<HangboardFormState> _mapShowRestDurationChangedToState(
       ShowRestDurationChanged event) async* {
-    yield state.update(showRestDuration: event.showRestDuration, restDuration: null);
+    yield state.update(
+      showRestDuration: event.showRestDuration,
+      restDuration: Nullable(null),
+    );
   }
 
   Stream<HangboardFormState> _mapNumberOfSetsChangedToState(NumberOfSetsChanged event) async* {
@@ -144,9 +166,19 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(numberOfSets: event.numberOfSets);
   }
 
+  Stream<HangboardFormState> _mapShowResistanceChangedToState(ShowResistanceChanged event) async* {
+    yield state.update(
+      showResistance: event.showResistance,
+      resistance: Nullable(null),
+    );
+  }
+
   Stream<HangboardFormState> _mapResistanceChangedToState(ResistanceChanged event) async* {
-    //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(resistance: event.resistance);
+    if (null != event.resistance && event.resistance.isNegative) {
+      yield state.update(validResistance: false);
+    } else {
+      yield state.update(resistance: Nullable(event.resistance));
+    }
   }
 
   Stream<HangboardFormState> _mapResetFlagsToState(ResetFlags event) async* {
@@ -196,7 +228,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   /// Check for duplicate exercises iterating through [hangboardExercises] and using overridden
   /// equality operator from [HangboardExercise].
   bool _isDuplicate(HangboardExercise hangboardExercise, ValidSave event) {
-    for(var exercise in event.cruxWorkout.hangboardWorkout.hangboardExercises) {
+    for (var exercise in event.cruxWorkout.hangboardWorkout.hangboardExercises) {
       if (hangboardExercise == exercise) {
         return true;
       }
