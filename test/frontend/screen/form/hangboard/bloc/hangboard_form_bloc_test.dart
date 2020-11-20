@@ -225,10 +225,11 @@ void main() {
 
         hangboardFormBloc.add(DepthChanged(1.5));
       });
+      //todo: still validating and testing
     });
 
     group('RestDurationChanged Tests', () {
-      test('emits [initialized, updated state] when user changes restDuration', () {
+      test('when user changes restDuration', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -239,10 +240,24 @@ void main() {
 
         hangboardFormBloc.add(RestDurationChanged(3));
       });
+
+      test(
+          'when user changes restDuration to negative value, should yield state with validRestDuration set to false',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validRestDuration: false),
+            ]));
+
+        hangboardFormBloc.add(RestDurationChanged(-3));
+      });
     });
 
     group('RepDurationChanged Tests', () {
-      test('emits [initialized, updated state] when user changes repDuration', () {
+      test('when user changes repDuration, should yield state with updated restDuration', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -253,10 +268,24 @@ void main() {
 
         hangboardFormBloc.add(RepDurationChanged(7));
       });
+
+      test(
+          'when user changes repDuration to negative value, should yield state with validRepDuration set to false',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validRestDuration: false),
+            ]));
+
+        hangboardFormBloc.add(RepDurationChanged(-7));
+      });
     });
 
     group('HangsPerSetChanged Tests', () {
-      test('emits [initialized, updated state] when user changes hangsPerSet', () {
+      test('when user changes hangsPerSet, should yield state with updated hangsPerSet', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -266,6 +295,20 @@ void main() {
             ]));
 
         hangboardFormBloc.add(HangsPerSetChanged(6));
+      });
+
+      test(
+          'when user changes hangsPerSet to negative value, should yield state with validHangsPerSet set to false',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validHangsPerSet: false),
+            ]));
+
+        hangboardFormBloc.add(HangsPerSetChanged(-6));
       });
     });
 
@@ -297,7 +340,7 @@ void main() {
     });
 
     group('BreakDurationChanged Tests', () {
-      test('emits [initialized, updated state] when user changes breakDuration', () {
+      test('when user changes breakDuration, should yield state with updated breakDuration', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -308,10 +351,24 @@ void main() {
 
         hangboardFormBloc.add(BreakDurationChanged(180));
       });
+
+      test(
+          'when user changes breakDuration to negative value, should yield state with validBreakDuration set to false',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validBreakDuration: false),
+            ]));
+
+        hangboardFormBloc.add(BreakDurationChanged(-180));
+      });
     });
 
     group('NumberOfSetsChanged Tests', () {
-      test('emits [initialized, updated state] when user changes numberOfSets', () {
+      test('when user changes numberOfSets, should yield state with updated numberOfSets', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -322,12 +379,24 @@ void main() {
 
         hangboardFormBloc.add(NumberOfSetsChanged(6));
       });
+
+      test(
+          'when user changes numberOfSets to negative value, should yield state with validNumberOfSets set to false',
+          () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validNumberOfSets: false),
+            ]));
+
+        hangboardFormBloc.add(NumberOfSetsChanged(-6));
+      });
     });
 
     group('ShowResistanceChanged Tests', () {
-      test(
-          'emits [initialized, updated state] when user changes showResistance, and should wipe out resistance value',
-          () async {
+      test('when user changes showResistance, should wipe out resistance value', () async {
         var initialHangboardFormState = HangboardFormState.initial();
         var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
         var resistanceChangedState = showResistanceChangedState.update(resistance: Nullable(10.5));
@@ -349,6 +418,36 @@ void main() {
         await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
         hangboardFormBloc.add(ShowResistanceChanged(false));
       });
+
+      test(
+          'when user changes showResistance with invalid resistance, should set isValidResistance to true',
+          () async {
+        var initialHangboardFormState = HangboardFormState.initial();
+        var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
+        var resistanceChangedState = showResistanceChangedState.update(resistance: Nullable(10.5));
+        var resistanceChangedState2 =
+            resistanceChangedState.update(resistance: Nullable(null), validResistance: false);
+
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              showResistanceChangedState,
+              resistanceChangedState,
+              resistanceChangedState2,
+              resistanceChangedState2.update(
+                validResistance: true,
+                showResistance: false,
+              ),
+            ]));
+
+        hangboardFormBloc.add(ShowResistanceChanged(true));
+        hangboardFormBloc.add(ResistanceChanged(10.5));
+        await Future.delayed(Duration(milliseconds: 900)); // delay for debounced event
+        hangboardFormBloc.add(ResistanceChanged(null));
+        await Future.delayed(Duration(milliseconds: 700)); // delay for debounced event
+        hangboardFormBloc.add(ShowResistanceChanged(false));
+      });
     });
 
     group('ResistanceChanged Tests', () {
@@ -363,19 +462,22 @@ void main() {
 
         hangboardFormBloc.add(ResistanceChanged(10.5));
       });
-//todo: left off here - starting to test / implement validations
+
       test(
-          'when user changes resistance to negative value, should yield state with validResistance set to false',
+          'when showResistance is true and resistance is null, should yield state with validResistance set to false',
           () {
         var initialHangboardFormState = HangboardFormState.initial();
+        var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
               initialHangboardFormState,
-              initialHangboardFormState.update(validResistance: false),
+              showResistanceChangedState,
+              showResistanceChangedState.update(validResistance: false),
             ]));
 
-        hangboardFormBloc.add(ResistanceChanged(-10.5));
+        hangboardFormBloc.add(ShowResistanceChanged(true));
+        hangboardFormBloc.add(ResistanceChanged(null));
       });
     });
 

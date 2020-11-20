@@ -404,7 +404,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             controller: _timeBetweenSetsController,
             autovalidate: hangboardFormState.autoValidate,
             validator: (_) {
-              return hangboardFormState.validTimeBetweenSets ? null : 'Invalid Time Between Sets';
+              return hangboardFormState.validBreakDuration ? null : 'Invalid Time Between Sets';
             },
             onChanged: (value) {
               hangboardFormBloc.add(BreakDurationChanged(int.tryParse(value)));

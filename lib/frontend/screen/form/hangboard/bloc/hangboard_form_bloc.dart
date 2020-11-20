@@ -50,9 +50,9 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     } else if (event is DepthChanged) {
       return _mapDepthChangedToState(event);
     } else if (event is RestDurationChanged) {
-      return _mapTimeOffChangedToState(event);
+      return _mapRestDurationChangedToState(event);
     } else if (event is RepDurationChanged) {
-      return _mapTimeOnChangedToState(event);
+      return _mapRepDurationChangedToState(event);
     } else if (event is HangsPerSetChanged) {
       return _mapHangsPerSetChangedToState(event);
     } else if (event is BreakDurationChanged) {
@@ -128,29 +128,49 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapDepthChangedToState(DepthChanged event) async* {
-    //todo: old project has non-negative validation - double check if this can just be handled by
-    //todo: making text box not support negative numbers
-    yield state.update(depth: Nullable(event.depth));
+    if(event.depth == null || event.depth.isNegative || event.depth == 0) {
+      yield state.update(validDepth: false);
+    } else {
+      yield state.update(depth: Nullable(event.depth), validDepth: true,);
+    }
   }
 
-  Stream<HangboardFormState> _mapTimeOffChangedToState(RestDurationChanged event) async* {
-    //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(restDuration: Nullable(event.restDuration));
+  Stream<HangboardFormState> _mapRestDurationChangedToState(RestDurationChanged event) async* {
+    if (null == event.restDuration || event.restDuration.isNegative || event.restDuration == 0) {
+      yield state.update(validRestDuration: false);
+    } else {
+      yield state.update(restDuration: Nullable(event.restDuration), validRestDuration: true);
+    }
   }
 
-  Stream<HangboardFormState> _mapTimeOnChangedToState(RepDurationChanged event) async* {
-    //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(repDuration: event.repDuration);
+  Stream<HangboardFormState> _mapRepDurationChangedToState(RepDurationChanged event) async* {
+    if (event.repDuration == null || event.repDuration.isNegative || event.repDuration == 0) {
+      yield state.update(validRepDuration: false);
+    } else {
+      yield state.update(
+        repDuration: event.repDuration,
+        validRepDuration: true,
+      );
+    }
   }
 
   Stream<HangboardFormState> _mapHangsPerSetChangedToState(HangsPerSetChanged event) async* {
-    //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(hangsPerSet: event.hangsPerSet);
+    if (event.hangsPerSet == null || event.hangsPerSet.isNegative || event.hangsPerSet == 0) {
+      yield state.update(validHangsPerSet: false);
+    } else {
+      yield state.update(
+        hangsPerSet: event.hangsPerSet,
+        validHangsPerSet: true,
+      );
+    }
   }
 
   Stream<HangboardFormState> _mapBreakDurationChangedToState(BreakDurationChanged event) async* {
-    //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(breakDuration: event.breakDuration);
+    if (event.breakDuration == null || event.breakDuration.isNegative || event.breakDuration == 0) {
+      yield state.update(validBreakDuration: false);
+    } else {
+      yield state.update(breakDuration: event.breakDuration, validBreakDuration: true);
+    }
   }
 
   Stream<HangboardFormState> _mapShowRestDurationChangedToState(
@@ -162,22 +182,35 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapNumberOfSetsChangedToState(NumberOfSetsChanged event) async* {
-    //todo: same; make sure null values can't get through? think about what's optional/not
-    yield state.update(numberOfSets: event.numberOfSets);
+    if (event.numberOfSets == null || event.numberOfSets.isNegative || event.numberOfSets == 0) {
+      yield state.update(validNumberOfSets: false);
+    } else {
+      // always set to valid to remove previous validation errors
+      yield state.update(numberOfSets: event.numberOfSets, validNumberOfSets: true);
+    }
   }
 
   Stream<HangboardFormState> _mapShowResistanceChangedToState(ShowResistanceChanged event) async* {
     yield state.update(
       showResistance: event.showResistance,
       resistance: Nullable(null),
+      // remove resistance on hide so old values don't get added accidentally
+      validResistance:
+          true, // validate so removed resistance doesn't show validation error and prevent save
     );
   }
 
   Stream<HangboardFormState> _mapResistanceChangedToState(ResistanceChanged event) async* {
-    if (null != event.resistance && event.resistance.isNegative) {
-      yield state.update(validResistance: false);
+    // resistanceChanged can only come from resistance text input; any null/0 values from there should be
+    // considered invalid since the input field must be toggled on to reach that state.
+    if (event.resistance == null || event.resistance == 0) {
+      yield state.update(
+        validResistance: false,
+        resistance: Nullable(null),
+      );
     } else {
-      yield state.update(resistance: Nullable(event.resistance));
+      // always set to valid to remove previous validation errors
+      yield state.update(resistance: Nullable(event.resistance), validResistance: true);
     }
   }
 

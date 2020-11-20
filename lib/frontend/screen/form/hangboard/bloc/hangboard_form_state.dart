@@ -37,7 +37,7 @@ class HangboardFormState extends Equatable {
   final bool validRestDuration;
   final bool validRepDuration;
   final bool validHangsPerSet;
-  final bool validTimeBetweenSets;
+  final bool validBreakDuration;
   final bool validNumberOfSets;
   final bool validResistance;
 
@@ -69,7 +69,7 @@ class HangboardFormState extends Equatable {
     this.validRestDuration,
     this.validRepDuration,
     this.validHangsPerSet,
-    this.validTimeBetweenSets,
+    this.validBreakDuration,
     this.validNumberOfSets,
     this.validResistance,
     this.isSuccess,
@@ -102,7 +102,7 @@ class HangboardFormState extends Equatable {
       validRestDuration: true,
       validRepDuration: true,
       validHangsPerSet: true,
-      validTimeBetweenSets: true,
+      validBreakDuration: true,
       validNumberOfSets: true,
       validResistance: true,
       isSuccess: false,
@@ -135,7 +135,7 @@ class HangboardFormState extends Equatable {
     bool validRestDuration,
     bool validRepDuration,
     bool validHangsPerSet,
-    bool validTimeBetweenSets,
+    bool validBreakDuration,
     bool validNumberOfSets,
     bool validResistance,
     bool isSuccess,
@@ -169,7 +169,7 @@ class HangboardFormState extends Equatable {
       validRestDuration: validRestDuration ?? this.validRestDuration,
       validRepDuration: validRepDuration ?? this.validRepDuration,
       validHangsPerSet: validHangsPerSet ?? this.validHangsPerSet,
-      validTimeBetweenSets: validTimeBetweenSets ?? this.validTimeBetweenSets,
+      validBreakDuration: validBreakDuration ?? this.validBreakDuration,
       validNumberOfSets: validNumberOfSets ?? this.validNumberOfSets,
       validResistance: validResistance ?? this.validResistance,
       isSuccess: isSuccess ?? this.isSuccess,
@@ -204,7 +204,7 @@ class HangboardFormState extends Equatable {
       validRestDuration: $validRestDuration,
       validRepDuration: $validRepDuration,
       validHangsPerSet: $validHangsPerSet,
-      validTimeBetweenSets: $validTimeBetweenSets,
+      validBreakDuration: $validBreakDuration,
       validNumberOfSets: $validNumberOfSets,
       validResistance: $validResistance,
       isSuccess: $isSuccess,
@@ -238,7 +238,7 @@ class HangboardFormState extends Equatable {
         validRestDuration,
         validRepDuration,
         validHangsPerSet,
-        validTimeBetweenSets,
+        validBreakDuration,
         validNumberOfSets,
         validResistance,
         isSuccess,
