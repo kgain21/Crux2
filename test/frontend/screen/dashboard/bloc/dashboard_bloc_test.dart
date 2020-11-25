@@ -71,6 +71,7 @@ void main() {
 
         when(baseWorkoutRepositoryMock.findWorkoutByDate(selectedDate, testUser))
             .thenAnswer((_) => Future.error(Exception('Dashboard date changed test')));
+
         dashboardBloc.add(CalendarDateChanged(selectedDate: selectedDate, cruxUser: testUser));
       });
 

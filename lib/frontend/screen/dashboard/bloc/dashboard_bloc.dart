@@ -28,16 +28,24 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     yield DashboardDateChangeInProgress();
 
     var date = event.selectedDate;
-    CruxWorkout cruxWorkout =
-        await workoutRepository.findWorkoutByDate(date, event.cruxUser).catchError((error) async* {
+
+    try {
+      CruxWorkout cruxWorkout = await workoutRepository
+          .findWorkoutByDate(date, event.cruxUser)
+          .catchError((error) async* {
+        log('Failed to retrieve CruxWorkout.', error: error);
+        yield DashboardDateChangeError(selectedDate: date);
+      });
+
+      if (null != cruxWorkout) {
+        yield DashboardDateChangeSuccess(selectedDate: date, cruxWorkout: cruxWorkout);
+      } else {
+        yield DashboardDateChangeNotFound(selectedDate: date);
+      }
+
+    } catch (error) {
       log('Failed to retrieve CruxWorkout.', error: error);
       yield DashboardDateChangeError(selectedDate: date);
-    });
-
-    if (null != cruxWorkout) {
-      yield DashboardDateChangeSuccess(selectedDate: date, cruxWorkout: cruxWorkout);
-    } else {
-      yield DashboardDateChangeNotFound(selectedDate: date);
     }
   }
 }

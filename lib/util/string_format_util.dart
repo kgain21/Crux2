@@ -3,13 +3,14 @@
 // TODO: Refactor at some point
 
 import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/hang_protocol.dart';
+import 'package:crux/model/hold.dart';
 import 'package:crux/model/unit.dart';
 import 'package:flutter/foundation.dart';
 
 class StringFormatUtil {
-  static String formatDepthAndHold(double depth, String depthMeasurementSystem,
-      String fingerConfiguration, String hold) {
+  static String formatDepthAndHold(
+      double depth, String depthMeasurementSystem, String fingerConfiguration, String hold) {
     if (depth == null || depth == 0) {
       if (fingerConfiguration == null || fingerConfiguration == '') {
         return hold;
@@ -68,9 +69,16 @@ class StringFormatUtil {
     FingerConfiguration fingerConfiguration,
     double depth,
     DepthUnit depthUnit,
+    HangProtocol hangProtocol,
   }) {
     assert(hold != null, "Value for Hold must be present");
     assert(hands != null, "Value for Hands must be present");
+
+    var handsString;
+    if (hands == 1)
+      handsString = 'One';
+    else
+      handsString = 'Two';
 
     // formatting for depth/depthUnit i.e. '12mm' instead of '12.0 mm'
     var depthString;
@@ -83,11 +91,11 @@ class StringFormatUtil {
     }
 
     List<String> titleElements = [
-      hands.toString(),
-      'Handed',
+      '$handsString-Handed',
       depthString,
-      fingerConfiguration.name,
+      fingerConfiguration.abbreviation,
       hold.name,
+      hangProtocol == HangProtocol.NONE ? null : hangProtocol.name,
     ];
 
     return titleElements.where((e) => e != null).join(" ");

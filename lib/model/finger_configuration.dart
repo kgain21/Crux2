@@ -38,4 +38,31 @@ extension FingerConfigurationExtension on FingerConfiguration {
         return null;
     }
   }
+
+  String get abbreviation {
+    switch(this) {
+      case FingerConfiguration.INDEX:
+        return 'I';
+      case FingerConfiguration.MIDDLE:
+        return 'M';
+      case FingerConfiguration.RING:
+        return 'R';
+      case FingerConfiguration.PINKIE:
+        return 'P';
+      case FingerConfiguration.INDEX_MIDDLE:
+        return 'I/M';
+      case FingerConfiguration.MIDDLE_RING:
+        return 'M/R';
+      case FingerConfiguration.RING_PINKIE:
+        return 'R/P';
+      case FingerConfiguration.INDEX_MIDDLE_RING:
+        return 'I/M/R';
+      case FingerConfiguration.MIDDLE_RING_PINKIE:
+        return 'M/R/P';
+      case FingerConfiguration.INDEX_MIDDLE_RING_PINKIE:
+        return 'I/M/R/P';
+      default:
+        return null;
+    }
+  }
 }

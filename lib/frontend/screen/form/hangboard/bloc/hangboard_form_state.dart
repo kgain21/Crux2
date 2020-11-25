@@ -1,6 +1,7 @@
 import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/hang_protocol.dart';
+import 'package:crux/model/hold.dart';
 import 'package:crux/model/unit.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:equatable/equatable.dart';
@@ -22,6 +23,7 @@ class HangboardFormState extends Equatable {
   final DepthUnit depthUnit;
   final ResistanceUnit resistanceUnit;
   final int hands;
+  final HangProtocol hangProtocol;
   final Hold hold;
   final FingerConfiguration fingerConfiguration;
 
@@ -55,6 +57,7 @@ class HangboardFormState extends Equatable {
     this.showRestDuration,
     this.hands,
     this.hold,
+    this.hangProtocol,
     this.availableFingerConfigurations,
     this.fingerConfiguration,
     this.depth,
@@ -88,6 +91,7 @@ class HangboardFormState extends Equatable {
       showFingerConfiguration: false,
       showRestDuration: true,
       hands: 2,
+      hangProtocol: null,
       hold: null,
       fingerConfiguration: null,
       depth: null,
@@ -121,6 +125,7 @@ class HangboardFormState extends Equatable {
     bool showFingerConfiguration,
     bool showRestDuration,
     int hands,
+    HangProtocol hangProtocol,
     Hold hold,
     Nullable<FingerConfiguration> fingerConfiguration,
     Nullable<double> depth,
@@ -154,6 +159,7 @@ class HangboardFormState extends Equatable {
       showFingerConfiguration: showFingerConfiguration ?? this.showFingerConfiguration,
       showRestDuration: showRestDuration ?? this.showRestDuration,
       hands: hands ?? this.hands,
+      hangProtocol: hangProtocol ?? this.hangProtocol,
       hold: hold ?? this.hold,
       fingerConfiguration:
           fingerConfiguration == null ? this.fingerConfiguration : fingerConfiguration.value,
@@ -190,6 +196,7 @@ class HangboardFormState extends Equatable {
       showFingerConfiguration: $showFingerConfiguration,
       showRestDuration: $showRestDuration,
       hands: $hands,
+      hangProtocol: $hangProtocol,
       hold: $hold,
       fingerConfiguration: $fingerConfiguration,
       depth: $depth,
@@ -223,6 +230,7 @@ class HangboardFormState extends Equatable {
         showFingerConfiguration,
         showRestDuration,
         hands,
+        hangProtocol,
         hold,
         availableFingerConfigurations,
         fingerConfiguration,
@@ -252,6 +260,7 @@ class HangboardFormState extends Equatable {
       ..depthUnit = depthUnit.abbreviation
       ..resistanceUnit = resistanceUnit.abbreviation
       ..hands = hands
+      ..hangProtocol = hangProtocol.name
       ..hold = hold.name
       ..fingerConfiguration = fingerConfiguration.name
       ..depth = depth

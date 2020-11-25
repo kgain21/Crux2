@@ -29,9 +29,8 @@ class Crux extends StatelessWidget {
     errorColor: Color(0xFFFF6666),
     snackBarTheme: SnackBarThemeData(),
     fontFamily: 'Metropolis',
-//    appBarTheme: AppBarTheme(),
     iconTheme: IconThemeData(
-      color: Color(0xFFcfd8dc)
+      color: Colors.black38
     )
   );
 

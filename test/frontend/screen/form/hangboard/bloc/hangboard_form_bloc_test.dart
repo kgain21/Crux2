@@ -2,7 +2,8 @@ import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dar
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_event.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.dart';
 import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/hang_protocol.dart';
+import 'package:crux/model/hold.dart';
 import 'package:crux/model/unit.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:mockito/mockito.dart';
@@ -39,7 +40,7 @@ void main() {
 
   group('event handling', () {
     group('UnitChanged Tests', () {
-      test('emits [initialized, updated state] when user changes resistanceUnit', () {
+      test('when user changes resistanceUnit, should yield state with updated resistanceUnit', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -51,7 +52,7 @@ void main() {
         hangboardFormBloc.add(ResistanceUnitChanged(ResistanceUnit.POUNDS));
       });
 
-      test('emits [initialized, updated state] when user changes depthUnit', () {
+      test('when user changes depthUnit, should yield state with updated depthUnit', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -65,7 +66,7 @@ void main() {
     });
 
     group('HandsChanged Tests', () {
-      test('emits [initialized, updated state] when user changes hands', () {
+      test('when user changes hands, should yield state with updated hands', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -75,6 +76,20 @@ void main() {
             ]));
 
         hangboardFormBloc.add(HandsChanged(1));
+      });
+    });
+
+    group('HangProtocolChanged Tests', () {
+      test('when user changes hangProtocol, should yield state with updated hangProtocol', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(hangProtocol: HangProtocol.MAX_HANGS),
+            ]));
+
+        hangboardFormBloc.add(HangProtocolChanged(HangProtocol.MAX_HANGS));
       });
     });
 
@@ -214,7 +229,7 @@ void main() {
     });
 
     group('DepthChanged Tests', () {
-      test('emits [initialized, updated state] when user changes depth', () {
+      test('when user changes depth, should yield state with updated depth', () {
         var initialHangboardFormState = HangboardFormState.initial();
         expectLater(
             hangboardFormBloc,
@@ -225,7 +240,19 @@ void main() {
 
         hangboardFormBloc.add(DepthChanged(1.5));
       });
-      //todo: still validating and testing
+
+      test('when user changes depth to negative value, should yield state with validDepth set to false', () {
+        var initialHangboardFormState = HangboardFormState.initial();
+        expectLater(
+            hangboardFormBloc,
+            emitsInOrder([
+              initialHangboardFormState,
+              initialHangboardFormState.update(validDepth: false),
+            ]));
+
+        hangboardFormBloc.add(DepthChanged(-1.5));
+      });
+
     });
 
     group('RestDurationChanged Tests', () {
@@ -277,7 +304,7 @@ void main() {
             hangboardFormBloc,
             emitsInOrder([
               initialHangboardFormState,
-              initialHangboardFormState.update(validRestDuration: false),
+              initialHangboardFormState.update(validRepDuration: false),
             ]));
 
         hangboardFormBloc.add(RepDurationChanged(-7));

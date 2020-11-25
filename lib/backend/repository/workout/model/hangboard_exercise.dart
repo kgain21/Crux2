@@ -18,6 +18,8 @@ abstract class HangboardExercise implements Built<HangboardExercise, HangboardEx
 
   int get hands;
 
+  String get hangProtocol;
+
   String get hold;
 
   @nullable

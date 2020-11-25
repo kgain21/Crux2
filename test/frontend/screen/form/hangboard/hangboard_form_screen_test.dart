@@ -38,9 +38,11 @@ void main() {
 
   group('HangboardFormScreen structural tests', () {
     final findScaffold = find.byKey(Key('hangboardFormScaffold'));
-    final findUnitsTile = find.byKey(Key('unitSelector'));
+    final findHandsRadioTile = find.byKey(Key('handsRadioTile'));
+    final findHangProtocolDropdownTile = find.byKey(Key('hangProtocolDropdownTile'));
     final findHoldDropdownTile = find.byKey(Key('holdDropdownTile'));
-    final findDurationTile = find.byKey(Key('durationTile'));
+    final findRepDurationTile = find.byKey(Key('repDurationTile'));
+    final findRestDurationTile = find.byKey(Key('restDurationTile'));
     final findHangsPerSetTile = find.byKey(Key('hangsPerSetTile'));
     final findBreakDurationTile = find.byKey(Key('breakDurationTile'));
     final findNumberOfSetsTile = find.byKey(Key('numberOfSetsTile'));
@@ -60,12 +62,15 @@ void main() {
       await tester.pumpWidget(subject);
 
       expect(findScaffold, findsOneWidget);
-      expect(findUnitsTile, findsOneWidget);
+      expect(findHandsRadioTile, findsOneWidget);
+      expect(findHangProtocolDropdownTile, findsOneWidget);
       expect(findHoldDropdownTile, findsOneWidget);
-      expect(findDurationTile, findsOneWidget);
+      expect(findRepDurationTile, findsOneWidget);
+      expect(findRestDurationTile, findsOneWidget);
       expect(findHangsPerSetTile, findsOneWidget);
       expect(findBreakDurationTile, findsOneWidget);
       expect(findNumberOfSetsTile, findsOneWidget);
+      //todo: I think this is because the testing screen is too small to render everything, might need to scroll down to find this
       expect(findResistanceTile, findsOneWidget);
       expect(findSaveButton, findsOneWidget);
 

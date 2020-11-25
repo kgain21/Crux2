@@ -3,7 +3,7 @@ import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
 import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/hold.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:crux/util/string_format_util.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,6 +43,8 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       return _mapDepthUnitChangedToState(event);
     } else if (event is HandsChanged) {
       return _mapHandsChangedToState(event);
+    } else if (event is HangProtocolChanged) {
+      return _mapHangProtocolChangedToState(event);
     } else if (event is HoldChanged) {
       return _mapHoldChangedToState(event);
     } else if (event is FingerConfigurationChanged) {
@@ -87,6 +89,10 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(hands: event.hands);
   }
 
+  Stream<HangboardFormState> _mapHangProtocolChangedToState(HangProtocolChanged event) async* {
+    yield state.update(hangProtocol: event.hangProtocol);
+  }
+
   ///
   Stream<HangboardFormState> _mapHoldChangedToState(HoldChanged event) async* {
     bool showFingerConfigurations = false;
@@ -128,7 +134,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapDepthChangedToState(DepthChanged event) async* {
-    if(event.depth == null || event.depth.isNegative || event.depth == 0) {
+    if(doubleFieldInvalid(event.depth)) {
       yield state.update(validDepth: false);
     } else {
       yield state.update(depth: Nullable(event.depth), validDepth: true,);
@@ -136,7 +142,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapRestDurationChangedToState(RestDurationChanged event) async* {
-    if (null == event.restDuration || event.restDuration.isNegative || event.restDuration == 0) {
+    if (integerFieldInvalid(event.restDuration)) {
       yield state.update(validRestDuration: false);
     } else {
       yield state.update(restDuration: Nullable(event.restDuration), validRestDuration: true);
@@ -144,7 +150,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapRepDurationChangedToState(RepDurationChanged event) async* {
-    if (event.repDuration == null || event.repDuration.isNegative || event.repDuration == 0) {
+    if (integerFieldInvalid(event.repDuration)) {
       yield state.update(validRepDuration: false);
     } else {
       yield state.update(
@@ -155,7 +161,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapHangsPerSetChangedToState(HangsPerSetChanged event) async* {
-    if (event.hangsPerSet == null || event.hangsPerSet.isNegative || event.hangsPerSet == 0) {
+    if (integerFieldInvalid(event.hangsPerSet)) {
       yield state.update(validHangsPerSet: false);
     } else {
       yield state.update(
@@ -166,7 +172,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapBreakDurationChangedToState(BreakDurationChanged event) async* {
-    if (event.breakDuration == null || event.breakDuration.isNegative || event.breakDuration == 0) {
+    if (integerFieldInvalid(event.breakDuration)) {
       yield state.update(validBreakDuration: false);
     } else {
       yield state.update(breakDuration: event.breakDuration, validBreakDuration: true);
@@ -182,7 +188,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapNumberOfSetsChangedToState(NumberOfSetsChanged event) async* {
-    if (event.numberOfSets == null || event.numberOfSets.isNegative || event.numberOfSets == 0) {
+    if (integerFieldInvalid(event.numberOfSets)) {
       yield state.update(validNumberOfSets: false);
     } else {
       // always set to valid to remove previous validation errors
@@ -227,6 +233,8 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapValidSaveToState(ValidSave event) async* {
+    //todo: need to validate that dropdown tiles have a value selected since their initial state is null.
+    //todo: probably want to show an alert if nothing was selected
     try {
       var exerciseTitle = StringFormatUtil.createHangboardExerciseTitle(
         hold: state.hold,
@@ -269,4 +277,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
 
     return false;
   }
+
+  bool integerFieldInvalid(int field) => field == null || field.isNegative || field == 0;
+  bool doubleFieldInvalid(double field) => field == null || field.isNegative || field == 0;
 }

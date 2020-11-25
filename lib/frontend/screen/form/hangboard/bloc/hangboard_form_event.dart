@@ -1,7 +1,8 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hold_enum.dart';
+import 'package:crux/model/hang_protocol.dart';
+import 'package:crux/model/hold.dart';
 import 'package:crux/model/unit.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,18 @@ class HandsChanged extends NonDebounceEvent {
 
   @override
   List<Object> get props => [hands];
+}
+
+class HangProtocolChanged extends NonDebounceEvent {
+  final HangProtocol hangProtocol;
+
+  HangProtocolChanged(this.hangProtocol);
+
+  @override
+  String toString() => 'HangProtocolChanged { hangProtocol: $hangProtocol }';
+
+  @override
+  List<Object> get props => [hangProtocol];
 }
 
 class HoldChanged extends NonDebounceEvent {

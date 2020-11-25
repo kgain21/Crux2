@@ -4,10 +4,11 @@
     "workoutTitle": "Tuesday, May 26, 2020",
     "hangboardExercises": [
       {
-        "exerciseTitle": "2 Handed 12mm Index/Middle/Ring/Pinkie Half Crimp",
+        "exerciseTitle": "Two-Handed 12mm I/M/R/P Half Crimp Repeaters",
         "depthUnit": "mm",
         "resistanceUnit": "lb",
         "hands": 2,
+        "hangProtocol": "Repeaters",
         "hold": "Half Crimp",
         "repDuration": 7,
         "breakDuration": 180,
