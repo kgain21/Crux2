@@ -10,6 +10,7 @@ import 'package:crux/model/unit.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -61,15 +62,24 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   }
 
   @override
+  void dispose() {
+    _depthController.dispose();
+    _repDurationController.dispose();
+    _restDurationController.dispose();
+    _hangsPerSetController.dispose();
+    _timeBetweenSetsController.dispose();
+    _numberOfSetsController.dispose();
+    _resistanceController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: Key('hangboardFormScaffold'),
       appBar: AppBar(
         title: Text(
           'Create a new exercise',
-          style: TextStyle(
-            color: Colors.black54,
-          ),
         ),
         actions: <Widget>[
           IconButton(
@@ -94,25 +104,26 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           bloc: hangboardFormBloc,
           builder: (context, hangboardFormState) {
             return Builder(
-              builder: (scaffoldContext) => Form(
-                key: formKey,
-                child: ListView(
-                  children: <Widget>[
-                    _handsRadioTile(hangboardFormState, scaffoldContext),
-                    _holdDropdownTile(hangboardFormState, scaffoldContext),
-                    _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
-                    _depthTile(hangboardFormState, scaffoldContext),
-                    _hangProtocolDropdownTile(hangboardFormState, scaffoldContext),
-                    _repDurationTile(hangboardFormState, scaffoldContext),
-                    _restDurationTile(hangboardFormState, scaffoldContext),
-                    _breakDurationTile(hangboardFormState, scaffoldContext),
-                    _hangsPerSetTile(hangboardFormState, scaffoldContext),
-                    _numberOfSetsTile(hangboardFormState, scaffoldContext),
-                    _resistanceTile(hangboardFormState, scaffoldContext),
-                    _saveButton(hangboardFormState, scaffoldContext)
-                  ].where(NullUtil.notNull).toList(),
-                ),
-              ),
+              builder: (scaffoldContext) =>
+                  Form(
+                    key: formKey,
+                    child: ListView(
+                      children: <Widget>[
+                        _handsRadioTile(hangboardFormState, scaffoldContext),
+                        _holdDropdownTile(hangboardFormState, scaffoldContext),
+                        _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
+                        _depthTile(hangboardFormState, scaffoldContext),
+                        _hangProtocolDropdownTile(hangboardFormState, scaffoldContext),
+                        _repDurationTile(hangboardFormState, scaffoldContext),
+                        _restDurationTile(hangboardFormState, scaffoldContext),
+                        _breakDurationTile(hangboardFormState, scaffoldContext),
+                        _hangsPerSetTile(hangboardFormState, scaffoldContext),
+                        _numberOfSetsTile(hangboardFormState, scaffoldContext),
+                        _resistanceTile(hangboardFormState, scaffoldContext),
+                        _saveButton(hangboardFormState, scaffoldContext)
+                      ].where(NullUtil.notNull).toList(),
+                    ),
+                  ),
             );
           },
         ),
@@ -134,9 +145,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               child: RadioListTile(
                 title: Text(
                   'One hand',
-                  style: TextStyle(
-                    color: Colors.black54,
-                  ),
                 ),
                 value: 1,
                 groupValue: hangboardFormState.hands,
@@ -150,9 +158,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               child: RadioListTile(
                 title: Text(
                   'Two hands',
-                  style: TextStyle(
-                    color: Colors.black54,
-                  ),
                 ),
                 value: 2,
                 groupValue: hangboardFormState.hands,
@@ -175,55 +180,51 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         leading: Icon(
           FontAwesomeIcons.solidHandRock,
         ),
-        title: DropdownButtonHideUnderline(
-          child: DropdownButton<Hold>(
-            elevation: 10,
+        title: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+          child: DropdownButtonFormField(
+            value: hangboardFormState.hold,
+            onChanged: (value) {
+              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              hangboardFormBloc.add(HoldChanged(value));
+            },
             hint: Text(
               'Choose a hold',
               style: TextStyle(
                 color: Colors.black54,
               ),
             ),
-            value: hangboardFormState.hold,
-            onChanged: (value) {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-              hangboardFormBloc.add(HoldChanged(value));
-            },
             items: Hold.values.map((Hold hold) {
               return DropdownMenuItem<Hold>(
                 child: Text(
                   hold.name,
-                  style: TextStyle(
-                    color: Colors.black54,
-                  ),
                 ),
                 value: hold,
               );
             }).toList(),
+            validator: (_) {
+              return hangboardFormState.hold != null ? null : 'Please select a hold.';
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _fingerConfigurationDropdownTile(
-      HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
-    if (hangboardFormState.showFingerConfiguration) {
+  Widget _fingerConfigurationDropdownTile(HangboardFormState hangboardFormState,
+      BuildContext scaffoldContext) {
+    if (!hangboardFormState.showFingerConfiguration) {
+      return null;
+    } else {
       return Card(
         key: Key('fingerConfigurationDropdownTile'),
         child: ListTile(
           leading: Icon(
             FontAwesomeIcons.solidHandPaper,
           ),
-          title: DropdownButtonHideUnderline(
-            child: DropdownButton<FingerConfiguration>(
-              elevation: 10,
-              hint: Text(
-                'Choose a finger configuration',
-                style: TextStyle(
-                  color: Colors.black54,
-                ),
-              ),
+          title: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+            child: DropdownButtonFormField(
               value: hangboardFormState.fingerConfiguration,
               onChanged: (value) {
                 Scaffold.of(scaffoldContext).hideCurrentSnackBar();
@@ -237,98 +238,113 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   value: fingerConfiguration,
                 );
               }).toList(),
+              hint: Text(
+                'Choose a finger configuration',
+                style: TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              validator: (_) {
+                return hangboardFormState.fingerConfiguration != null
+                    ? null
+                    : 'Please select a finger configuration.';
+              },
             ),
           ),
         ),
       );
-    } else {
-      return null;
     }
   }
 
   Widget _depthTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
+    if(hangboardFormState.depth == null) {
+      _depthController.clear();
+    }
     if (!hangboardFormState.showDepth) {
       return null;
     }
     return Card(
       key: Key('depthTile'),
       child: ListTile(
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Expanded(
-                    child: RadioListTile(
-                      title: Text(
-                        '${DepthUnit.MILLIMETERS.name} (${DepthUnit.MILLIMETERS.abbreviation})',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.black54,
-                        ),
+        leading: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(FontAwesomeIcons.ruler),
+          ],
+        ),
+        title: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Flexible(
+                  child: RadioListTile(
+                    title: Text(
+                      '${DepthUnit.MILLIMETERS.name} (${DepthUnit.MILLIMETERS.abbreviation})',
+                      style: TextStyle(
+                        fontSize: 14.0,
                       ),
-                      groupValue: hangboardFormState.depthUnit,
-                      value: DepthUnit.MILLIMETERS,
-                      onChanged: (value) {
-                        hangboardFormBloc.add(DepthUnitChanged(value));
-                      },
                     ),
+                    groupValue: hangboardFormState.depthUnit,
+                    value: DepthUnit.MILLIMETERS,
+                    onChanged: (value) {
+                      hangboardFormBloc.add(DepthUnitChanged(value));
+                    },
                   ),
-                  Expanded(
-                    child: RadioListTile(
-                      title: Text(
-                        '${DepthUnit.INCHES.name} (${DepthUnit.INCHES.abbreviation})',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      groupValue: hangboardFormState.depthUnit,
-                      value: DepthUnit.INCHES,
-                      onChanged: (value) {
-                        hangboardFormBloc.add(DepthUnitChanged(value));
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              TextFormField(
-                controller: _depthController,
-                autovalidate: hangboardFormState.autoValidate,
-                validator: (_) {
-                  return hangboardFormState.validDepth ? null : 'Invalid depth';
-                },
-                onChanged: (value) {
-                  hangboardFormBloc.add(DepthChanged(double.parse(value)));
-                },
-                decoration: InputDecoration(
-                  icon: Icon(FontAwesomeIcons.ruler),
-                  labelText: 'Depth (${hangboardFormState.depthUnit.abbreviation})',
                 ),
-                keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
-                onTap: () {
-                  Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                },
-              ),
-            ],
+                Flexible(
+                  child: RadioListTile(
+                    title: Text(
+                      '${DepthUnit.INCHES.name} (${DepthUnit.INCHES.abbreviation})',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                    groupValue: hangboardFormState.depthUnit,
+                    value: DepthUnit.INCHES,
+                    onChanged: (value) {
+                      hangboardFormBloc.add(DepthUnitChanged(value));
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
+          child: TextFormField(
+            controller: _depthController,
+            autovalidate: hangboardFormState.autoValidate,
+            validator: (_) {
+              return hangboardFormState.validDepth ? null : 'Invalid depth';
+            },
+            onChanged: (value) {
+              hangboardFormBloc.add(DepthChanged(double.parse(value)));
+            },
+            decoration: InputDecoration(
+              labelText: 'Depth (${hangboardFormState.depthUnit.abbreviation})',
+            ),
+            keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+            onTap: () {
+              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _hangProtocolDropdownTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
+  Widget _hangProtocolDropdownTile(HangboardFormState hangboardFormState,
+      BuildContext scaffoldContext) {
     return Card(
       key: Key('hangProtocolDropdownTile'),
       child: ListTile(
         leading: Icon(
           FontAwesomeIcons.solidEdit,
         ),
-        title: DropdownButtonHideUnderline(
-          child: DropdownButton<HangProtocol>(
-            elevation: 10,
+        title: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+          child: DropdownButtonFormField(
             hint: Text(
               'Choose hang protocol',
               style: TextStyle(
@@ -348,6 +364,11 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 value: hangProtocol,
               );
             }).toList(),
+            validator: (_) {
+              return hangboardFormState.hangProtocol != null
+                  ? null
+                  : 'Please select a hang protocol.';
+            },
           ),
         ),
       ),
@@ -358,6 +379,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     return Card(
       key: Key('repDurationTile'),
       child: ListTile(
+        leading: Icon(FontAwesomeIcons.hourglassStart),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
@@ -371,7 +393,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             },
             decoration: InputDecoration(
               labelText: 'Rep duration (sec)',
-              icon: Icon(FontAwesomeIcons.hourglassStart),
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
@@ -387,30 +408,30 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     return Card(
       key: Key('restDurationTile'),
       child: ListTile(
+        leading: Icon(FontAwesomeIcons.hourglassEnd),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: hangboardFormState.showRestDuration
               ? TextFormField(
-                  controller: _restDurationController,
-                  autovalidate: hangboardFormState.autoValidate,
-                  validator: (_) {
-                    return hangboardFormState.validRestDuration ? null : 'Invalid rest duration';
-                  },
-                  onChanged: (value) {
-                    hangboardFormBloc.add(RestDurationChanged(int.tryParse(value)));
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Rest duration (sec)',
-                    icon: Icon(FontAwesomeIcons.hourglassEnd),
-                  ),
-                  keyboardType: TextInputType.numberWithOptions(),
-                  onTap: () {
-                    Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-                  },
-                )
+            controller: _restDurationController,
+            autovalidate: hangboardFormState.autoValidate,
+            validator: (_) {
+              return hangboardFormState.validRestDuration ? null : 'Invalid rest duration';
+            },
+            onChanged: (value) {
+              hangboardFormBloc.add(RestDurationChanged(int.tryParse(value)));
+            },
+            decoration: InputDecoration(
+              labelText: 'Rest duration (sec)',
+            ),
+            keyboardType: TextInputType.numberWithOptions(),
+            onTap: () {
+              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+            },
+          )
               : Row(
-                  children: <Widget>[],
-                ),
+            children: <Widget>[],
+          ),
         ),
         trailing: Switch(
           value: hangboardFormState.showRestDuration,
@@ -426,6 +447,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     return Card(
       key: Key('breakDurationTile'),
       child: ListTile(
+        leading: Icon(FontAwesomeIcons.stopwatch),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
@@ -438,7 +460,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               hangboardFormBloc.add(BreakDurationChanged(int.tryParse(value)));
             },
             decoration: InputDecoration(
-              icon: Icon(FontAwesomeIcons.stopwatch),
               labelText: 'Time between sets (sec)',
             ),
             keyboardType: TextInputType.numberWithOptions(),
@@ -455,6 +476,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     return Card(
       key: Key('hangsPerSetTile'),
       child: ListTile(
+        leading: Icon(FontAwesomeIcons.ellipsisH),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
@@ -468,7 +490,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             },
             decoration: InputDecoration(
               labelText: 'Hangs per set',
-              icon: Icon(FontAwesomeIcons.ellipsisH),
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
@@ -484,6 +505,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     return Card(
       key: Key('numberOfSetsTile'),
       child: ListTile(
+        leading: Icon(FontAwesomeIcons.ellipsisV),
         key: PageStorageKey('numberOfSetsTilePageStorage'),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
@@ -500,8 +522,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             },
             decoration: InputDecoration(
               labelText: 'Number of sets',
-//              icon: Icon(FontAwesomeIcons.listOl),
-              icon: Icon(FontAwesomeIcons.ellipsisV),
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
@@ -517,6 +537,10 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     return Card(
       key: Key('resistanceTile'),
       child: ExpansionTile(
+        leading: Icon(
+          FontAwesomeIcons.weightHanging,
+          color: Colors.black38,
+        ),
         onExpansionChanged: _resistanceTileVisibilityChanged,
         key: ValueKey(hangboardFormState.showResistance),
         initiallyExpanded: hangboardFormState.showResistance,
@@ -524,24 +548,11 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           value: hangboardFormState.showResistance,
           onChanged: _resistanceTileVisibilityChanged,
         ),
-        title: Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
-              child: Icon(
-                FontAwesomeIcons.weightHanging,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-              child: Text(
-                'Resistance',
-                style: TextStyle(
-                  color: Colors.black54,
-                ),
-              ),
-            )
-          ],
+        title: Text(
+          'Resistance',
+          style: TextStyle(
+            color: Colors.black54,
+          ),
         ),
         children: <Widget>[
           Row(
@@ -553,7 +564,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     '${ResistanceUnit.KILOGRAMS.name} (${ResistanceUnit.KILOGRAMS.abbreviation})',
                     style: TextStyle(
                       fontSize: 14.0,
-                      color: Colors.black54,
                     ),
                   ),
                   groupValue: hangboardFormState.resistanceUnit,
@@ -569,7 +579,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                     '${ResistanceUnit.POUNDS.name} (${ResistanceUnit.POUNDS.abbreviation})',
                     style: TextStyle(
                       fontSize: 14.0,
-                      color: Colors.black54,
                     ),
                   ),
                   groupValue: hangboardFormState.resistanceUnit,
@@ -616,14 +625,37 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 
   Widget _saveButton(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      //todo: make this narrower
-      child: RaisedButton(
-        key: Key('saveButton'),
-        onPressed: () {
-          _saveTileFields(scaffoldContext, hangboardFormState);
-        },
-        child: Text('SAVE EXERCISE'),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            constraints: BoxConstraints(
+              maxHeight: 45.0,
+              minWidth: 275.0,
+            ),
+            child: RaisedButton(
+              elevation: 4.0,
+              color: Theme
+                  .of(context)
+                  .accentColor,
+              key: Key('saveButton'),
+              onPressed: () {
+                _saveTileFields(scaffoldContext, hangboardFormState);
+              },
+              child: Text(
+                'SAVE EXERCISE',
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .button,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -711,7 +743,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   children: <Widget>[
                     Text(
                       'Exercise saved!',
-                      style: TextStyle(color: Theme.of(scaffoldContext).accentColor),
+                      style: TextStyle(color: Theme
+                          .of(scaffoldContext)
+                          .accentColor),
                     ),
                   ],
                 ),

@@ -93,35 +93,32 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(hangProtocol: event.hangProtocol);
   }
 
-  ///
+  /// Logic to alter form fields shown based on hold selected.
+  /// By default, all fields and values will be removed. Holds only add what they need when
+  /// selected.
   Stream<HangboardFormState> _mapHoldChangedToState(HoldChanged event) async* {
     bool showFingerConfigurations = false;
     bool showDepth = false;
-    double depth = state.depth;
+
+    // Either show all fingerConfigurations or none - wasn't able to find a way to 'reset'
+    // DropDownButton when given different list indices that didn't line up.
     List<FingerConfiguration> availableFingerConfigurations;
-    FingerConfiguration fingerConfiguration = state.fingerConfiguration;
 
     if (event.hold == Hold.POCKET) {
-      availableFingerConfigurations = FingerConfiguration.values.sublist(0, 7);
       showFingerConfigurations = true;
+      availableFingerConfigurations = FingerConfiguration.values;
     } else if (event.hold == Hold.OPEN_HAND || event.hold == Hold.HALF_CRIMP) {
       showFingerConfigurations = true;
-      availableFingerConfigurations = FingerConfiguration.values.sublist(4);
+      availableFingerConfigurations = FingerConfiguration.values;
       showDepth = true;
     } else if (event.hold == Hold.FULL_CRIMP) {
       showDepth = true;
-    } else {
-      fingerConfiguration = null;
-      depth = null;
     }
 
     yield state.update(
       hold: event.hold,
       showFingerConfiguration: showFingerConfigurations,
       availableFingerConfigurations: Nullable(availableFingerConfigurations),
-      // todo - leaving these null for now. Test UI to see if nulling out all the time is better vs. only removing for particular holds
-      // basically saying WHENEVER a hold changes, remove depth/fingerConfig so old values don't remain set in the state by accident.
-      // this would force the user to redo values in some cases - need to test if this makes sense all the time vs. just for some cases
       fingerConfiguration: Nullable(null),
       showDepth: showDepth,
       depth: Nullable(null),
@@ -233,8 +230,6 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapValidSaveToState(ValidSave event) async* {
-    //todo: need to validate that dropdown tiles have a value selected since their initial state is null.
-    //todo: probably want to show an alert if nothing was selected
     try {
       var exerciseTitle = StringFormatUtil.createHangboardExerciseTitle(
         hold: state.hold,
@@ -242,6 +237,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
         fingerConfiguration: state.fingerConfiguration,
         depth: state.depth,
         depthUnit: state.depthUnit,
+        hangProtocol: state.hangProtocol,
       );
       yield state.update(exerciseTitle: exerciseTitle);
 
@@ -269,6 +265,10 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   /// Check for duplicate exercises iterating through [hangboardExercises] and using overridden
   /// equality operator from [HangboardExercise].
   bool _isDuplicate(HangboardExercise hangboardExercise, ValidSave event) {
+    if(event.cruxWorkout.hangboardWorkout == null) {
+      return false;
+    }
+
     for (var exercise in event.cruxWorkout.hangboardWorkout.hangboardExercises) {
       if (hangboardExercise == exercise) {
         return true;
