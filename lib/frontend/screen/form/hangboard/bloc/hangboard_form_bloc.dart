@@ -131,10 +131,13 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   Stream<HangboardFormState> _mapDepthChangedToState(DepthChanged event) async* {
-    if(doubleFieldInvalid(event.depth)) {
+    if (doubleFieldInvalid(event.depth)) {
       yield state.update(validDepth: false);
     } else {
-      yield state.update(depth: Nullable(event.depth), validDepth: true,);
+      yield state.update(
+        depth: Nullable(event.depth),
+        validDepth: true,
+      );
     }
   }
 
@@ -196,16 +199,15 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   Stream<HangboardFormState> _mapShowResistanceChangedToState(ShowResistanceChanged event) async* {
     yield state.update(
       showResistance: event.showResistance,
+      // Remove resistance on hide so old values don't get added accidentally
       resistance: Nullable(null),
-      // remove resistance on hide so old values don't get added accidentally
-      validResistance:
-          true, // validate so removed resistance doesn't show validation error and prevent save
+      // If resistance is shown, set valid to false so that auto-validation happens.
+      // If resistance is hidden, set valid to true so that save can happen.
+      validResistance: !event.showResistance,
     );
   }
 
   Stream<HangboardFormState> _mapResistanceChangedToState(ResistanceChanged event) async* {
-    // resistanceChanged can only come from resistance text input; any null/0 values from there should be
-    // considered invalid since the input field must be toggled on to reach that state.
     if (event.resistance == null || event.resistance == 0) {
       yield state.update(
         validResistance: false,
@@ -213,7 +215,10 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       );
     } else {
       // always set to valid to remove previous validation errors
-      yield state.update(resistance: Nullable(event.resistance), validResistance: true);
+      yield state.update(
+        resistance: Nullable(event.resistance),
+        validResistance: true,
+      );
     }
   }
 
@@ -231,41 +236,55 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
 
   Stream<HangboardFormState> _mapValidSaveToState(ValidSave event) async* {
     try {
-      var exerciseTitle = StringFormatUtil.createHangboardExerciseTitle(
-        hold: state.hold,
-        hands: state.hands,
-        fingerConfiguration: state.fingerConfiguration,
-        depth: state.depth,
-        depthUnit: state.depthUnit,
-        hangProtocol: state.hangProtocol,
-      );
-      yield state.update(exerciseTitle: exerciseTitle);
+      yield* _addExerciseTitleToState();
 
       HangboardExercise hangboardExercise = state.toHangboardExercise();
 
       if (_isDuplicate(hangboardExercise, event)) {
         yield state.update(isDuplicate: true, isSuccess: false, isFailure: false);
-      }
-
-      CruxWorkout workout = event.cruxWorkout
-          .rebuild((cw) => cw.hangboardWorkout.hangboardExercises.add(hangboardExercise));
-
-      var updatedWorkout = await baseWorkoutRepository.updateWorkout(event.cruxUser, workout);
-
-      if (updatedWorkout != null) {
-        yield state.update(isSuccess: true, isFailure: false, isDuplicate: false);
       } else {
-        yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
+        var cruxWorkout = event.cruxWorkout;
+        if (cruxWorkout.hangboardWorkout == null) {
+          cruxWorkout = cruxWorkout.rebuild((cw) => cw
+            ..hangboardWorkout.update((hw) => hw
+              ..workoutTitle = "Tuesday, May 26, 2020"
+              ..hangboardExercises.update((he) => he..build())
+              ..build()));
+        }
+
+        CruxWorkout workout = cruxWorkout
+            .rebuild((cw) => cw.hangboardWorkout.hangboardExercises.add(hangboardExercise));
+
+        var updatedWorkout = await baseWorkoutRepository.updateWorkout(event.cruxUser, workout);
+
+        if (updatedWorkout != null) {
+          yield state.update(isSuccess: true, isFailure: false, isDuplicate: false);
+        } else {
+          yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
+        }
       }
     } catch (e) {
       yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
     }
   }
 
+  Stream<HangboardFormState> _addExerciseTitleToState() async* {
+    var exerciseTitle = StringFormatUtil.createHangboardExerciseTitle(
+      hold: state.hold,
+      hands: state.hands,
+      fingerConfiguration: state.fingerConfiguration,
+      depth: state.depth,
+      depthUnit: state.depthUnit,
+      hangProtocol: state.hangProtocol,
+    );
+
+    yield state.update(exerciseTitle: exerciseTitle);
+  }
+
   /// Check for duplicate exercises iterating through [hangboardExercises] and using overridden
   /// equality operator from [HangboardExercise].
   bool _isDuplicate(HangboardExercise hangboardExercise, ValidSave event) {
-    if(event.cruxWorkout.hangboardWorkout == null) {
+    if (event.cruxWorkout.hangboardWorkout == null) {
       return false;
     }
 
@@ -279,5 +298,6 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   }
 
   bool integerFieldInvalid(int field) => field == null || field.isNegative || field == 0;
+
   bool doubleFieldInvalid(double field) => field == null || field.isNegative || field == 0;
 }

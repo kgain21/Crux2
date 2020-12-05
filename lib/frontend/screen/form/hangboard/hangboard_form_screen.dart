@@ -98,32 +98,34 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           } else if (hangboardFormState.isDuplicate) {
             _exerciseExistsAlert(hangboardFormState);
             hangboardFormBloc.add(ResetFlags());
+          } else if(hangboardFormState.isFailure) {
+            _exerciseExistsAlert(hangboardFormState);
+            hangboardFormBloc.add(ResetFlags());
           }
         },
         child: BlocBuilder(
           bloc: hangboardFormBloc,
           builder: (context, hangboardFormState) {
             return Builder(
-              builder: (scaffoldContext) =>
-                  Form(
-                    key: formKey,
-                    child: ListView(
-                      children: <Widget>[
-                        _handsRadioTile(hangboardFormState, scaffoldContext),
-                        _holdDropdownTile(hangboardFormState, scaffoldContext),
-                        _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
-                        _depthTile(hangboardFormState, scaffoldContext),
-                        _hangProtocolDropdownTile(hangboardFormState, scaffoldContext),
-                        _repDurationTile(hangboardFormState, scaffoldContext),
-                        _restDurationTile(hangboardFormState, scaffoldContext),
-                        _breakDurationTile(hangboardFormState, scaffoldContext),
-                        _hangsPerSetTile(hangboardFormState, scaffoldContext),
-                        _numberOfSetsTile(hangboardFormState, scaffoldContext),
-                        _resistanceTile(hangboardFormState, scaffoldContext),
-                        _saveButton(hangboardFormState, scaffoldContext)
-                      ].where(NullUtil.notNull).toList(),
-                    ),
-                  ),
+              builder: (scaffoldContext) => Form(
+                key: formKey,
+                child: ListView(
+                  children: <Widget>[
+                    _handsRadioTile(hangboardFormState, scaffoldContext),
+                    _holdDropdownTile(hangboardFormState, scaffoldContext),
+                    _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
+                    _depthTile(hangboardFormState, scaffoldContext),
+                    _hangProtocolDropdownTile(hangboardFormState, scaffoldContext),
+                    _repDurationTile(hangboardFormState, scaffoldContext),
+                    _restDurationTile(hangboardFormState, scaffoldContext),
+                    _breakDurationTile(hangboardFormState, scaffoldContext),
+                    _hangsPerSetTile(hangboardFormState, scaffoldContext),
+                    _numberOfSetsTile(hangboardFormState, scaffoldContext),
+                    _resistanceTile(hangboardFormState, scaffoldContext),
+                    _saveButton(hangboardFormState, scaffoldContext)
+                  ].where(NullUtil.notNull).toList(),
+                ),
+              ),
             );
           },
         ),
@@ -149,7 +151,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 value: 1,
                 groupValue: hangboardFormState.hands,
                 onChanged: (value) {
-                  Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
                   hangboardFormBloc.add(HandsChanged(value));
                 },
               ),
@@ -162,7 +164,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 value: 2,
                 groupValue: hangboardFormState.hands,
                 onChanged: (value) {
-                  Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
                   hangboardFormBloc.add(HandsChanged(value));
                 },
               ),
@@ -183,9 +185,10 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
           child: DropdownButtonFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             value: hangboardFormState.hold,
             onChanged: (value) {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
               hangboardFormBloc.add(HoldChanged(value));
             },
             hint: Text(
@@ -211,8 +214,8 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _fingerConfigurationDropdownTile(HangboardFormState hangboardFormState,
-      BuildContext scaffoldContext) {
+  Widget _fingerConfigurationDropdownTile(
+      HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     if (!hangboardFormState.showFingerConfiguration) {
       return null;
     } else {
@@ -225,9 +228,12 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           title: Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
             child: DropdownButtonFormField(
+              autovalidateMode: hangboardFormState.autoValidate
+                  ? AutovalidateMode.always
+                  : AutovalidateMode.disabled,
               value: hangboardFormState.fingerConfiguration,
               onChanged: (value) {
-                Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
                 hangboardFormBloc.add(FingerConfigurationChanged(value));
               },
               items: hangboardFormState.availableFingerConfigurations.map((fingerConfiguration) {
@@ -257,7 +263,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   }
 
   Widget _depthTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
-    if(hangboardFormState.depth == null) {
+    if (hangboardFormState.depth == null) {
       _depthController.clear();
     }
     if (!hangboardFormState.showDepth) {
@@ -314,19 +320,19 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
             controller: _depthController,
-            autovalidate: hangboardFormState.autoValidate,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (_) {
               return hangboardFormState.validDepth ? null : 'Invalid depth';
             },
             onChanged: (value) {
-              hangboardFormBloc.add(DepthChanged(double.parse(value)));
+              hangboardFormBloc.add(DepthChanged(double.tryParse(value)));
             },
             decoration: InputDecoration(
               labelText: 'Depth (${hangboardFormState.depthUnit.abbreviation})',
             ),
             keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
             onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
             },
           ),
         ),
@@ -334,8 +340,10 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  Widget _hangProtocolDropdownTile(HangboardFormState hangboardFormState,
-      BuildContext scaffoldContext) {
+  // todo: left off wrapping up form validations. Debounce fields are validating early with new autovalidate type. Probably want to go back to old way
+
+  Widget _hangProtocolDropdownTile(
+      HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
       key: Key('hangProtocolDropdownTile'),
       child: ListTile(
@@ -345,6 +353,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
           child: DropdownButtonFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             hint: Text(
               'Choose hang protocol',
               style: TextStyle(
@@ -353,7 +362,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             value: hangboardFormState.hangProtocol,
             onChanged: (value) {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
               hangboardFormBloc.add(HangProtocolChanged(value));
             },
             items: HangProtocol.values.map((hangProtocol) {
@@ -384,7 +393,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
             controller: _repDurationController,
-            autovalidate: hangboardFormState.autoValidate,
+            autovalidateMode: hangboardFormState.autoValidate
+                ? AutovalidateMode.always
+                : AutovalidateMode.disabled,
             validator: (_) {
               return hangboardFormState.validRepDuration ? null : 'Invalid rep duration';
             },
@@ -396,7 +407,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
             },
           ),
         ),
@@ -413,25 +424,28 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: hangboardFormState.showRestDuration
               ? TextFormField(
-            controller: _restDurationController,
-            autovalidate: hangboardFormState.autoValidate,
-            validator: (_) {
-              return hangboardFormState.validRestDuration ? null : 'Invalid rest duration';
-            },
-            onChanged: (value) {
-              hangboardFormBloc.add(RestDurationChanged(int.tryParse(value)));
-            },
-            decoration: InputDecoration(
-              labelText: 'Rest duration (sec)',
-            ),
-            keyboardType: TextInputType.numberWithOptions(),
-            onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
-            },
-          )
+                  controller: _restDurationController,
+                  autovalidateMode: hangboardFormState.autoValidate
+                      ? AutovalidateMode.always
+                      : AutovalidateMode.disabled,
+                  validator: (_) {
+                    return hangboardFormState.validRestDuration ? null : 'Invalid rest duration';
+                  },
+                  onChanged: (value) {
+                    hangboardFormBloc.add(RestDurationChanged(int.tryParse(value)));
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Rest duration (sec)',
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(),
+                  onTap: () {
+                    ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
+                  },
+                )
               : Row(
-            children: <Widget>[],
-          ),
+            //todo: tie this to hang protocol? make toggle look more like resistance?
+                  children: <Widget>[],
+                ),
         ),
         trailing: Switch(
           value: hangboardFormState.showRestDuration,
@@ -452,7 +466,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
             controller: _timeBetweenSetsController,
-            autovalidate: hangboardFormState.autoValidate,
+            autovalidateMode: hangboardFormState.autoValidate
+                ? AutovalidateMode.always
+                : AutovalidateMode.disabled,
             validator: (_) {
               return hangboardFormState.validBreakDuration ? null : 'Invalid time between sets';
             },
@@ -464,7 +480,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
             },
           ),
         ),
@@ -481,7 +497,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
           child: TextFormField(
             controller: _hangsPerSetController,
-            autovalidate: hangboardFormState.autoValidate,
+            autovalidateMode: hangboardFormState.autoValidate
+                ? AutovalidateMode.always
+                : AutovalidateMode.disabled,
             validator: (_) {
               return hangboardFormState.validHangsPerSet ? null : 'Invalid hangs per set';
             },
@@ -493,7 +511,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
             },
           ),
         ),
@@ -513,7 +531,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
 //todo: https://api.flutter.dev/flutter/material/TextFormField-class.html
             //todo: ^ has example of autovalidation/autofocus on next element when user hits enter
             controller: _numberOfSetsController,
-            autovalidate: hangboardFormState.autoValidate,
+            autovalidateMode: hangboardFormState.autoValidate
+                ? AutovalidateMode.always
+                : AutovalidateMode.disabled,
             validator: (_) {
               return hangboardFormState.validNumberOfSets ? null : 'Invalid Number of Sets';
             },
@@ -525,7 +545,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             keyboardType: TextInputType.numberWithOptions(),
             onTap: () {
-              Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+              ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
             },
           ),
         ),
@@ -596,7 +616,9 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
               child: TextFormField(
                 controller: _resistanceController,
-                autovalidate: hangboardFormState.autoValidate,
+                autovalidateMode: hangboardFormState.autoValidate
+                    ? AutovalidateMode.always
+                    : AutovalidateMode.disabled,
                 validator: (_) {
                   return hangboardFormState.validResistance ? null : 'Invalid Resistance';
                 },
@@ -608,7 +630,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                 ),
                 keyboardType: TextInputType.numberWithOptions(),
                 onTap: () {
-                  Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
                 },
               ),
             ),
@@ -636,19 +658,14 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
             ),
             child: RaisedButton(
               elevation: 4.0,
-              color: Theme
-                  .of(context)
-                  .accentColor,
+              color: Theme.of(context).accentColor,
               key: Key('saveButton'),
               onPressed: () {
                 _saveTileFields(scaffoldContext, hangboardFormState);
               },
               child: Text(
                 'SAVE EXERCISE',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .button,
+                style: Theme.of(context).textTheme.button,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.0),
@@ -743,9 +760,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   children: <Widget>[
                     Text(
                       'Exercise saved!',
-                      style: TextStyle(color: Theme
-                          .of(scaffoldContext)
-                          .accentColor),
+                      style: TextStyle(color: Theme.of(scaffoldContext).accentColor),
                     ),
                   ],
                 ),
@@ -767,7 +782,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                         ],
                       ),
                       onPressed: () {
-                        Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
                       },
                     ),
                     FlatButton(
@@ -779,7 +794,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                       onPressed: () {
                         formKey.currentState.reset();
                         clearFields();
-                        Scaffold.of(scaffoldContext).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
                       },
                     ),
                   ],

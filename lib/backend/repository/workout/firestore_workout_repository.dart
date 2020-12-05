@@ -62,7 +62,7 @@ class FirestoreWorkoutRepository implements BaseWorkoutRepository {
     try {
       return firestore
           .collection('/user/${cruxUser.uid}/workouts')
-          .document('${cruxWorkout.workoutDate}')
+          .document('${cruxWorkout.workoutDate.toUtc()}')
           .setData(serializers.serializeWith(CruxWorkout.serializer, cruxWorkout))
           .then((_) => Future.value(cruxWorkout));
     } catch (e) {
