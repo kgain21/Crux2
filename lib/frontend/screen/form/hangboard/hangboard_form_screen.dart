@@ -89,48 +89,52 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
           ),
         ],
       ),
-      body: BlocListener(
-        bloc: hangboardFormBloc,
-        listener: (BuildContext context, HangboardFormState hangboardFormState) {
-          if (hangboardFormState.isSuccess) {
-            exerciseSavedSnackbar(context);
-            hangboardFormBloc.add(ResetFlags());
-          } else if (hangboardFormState.isDuplicate) {
-            _exerciseExistsAlert(hangboardFormState);
-            hangboardFormBloc.add(ResetFlags());
-          } else if(hangboardFormState.isFailure) {
-            _exerciseExistsAlert(hangboardFormState);
-            hangboardFormBloc.add(ResetFlags());
-          }
-        },
-        child: BlocBuilder(
-          bloc: hangboardFormBloc,
-          builder: (context, hangboardFormState) {
-            return Builder(
-              builder: (scaffoldContext) => Form(
-                key: formKey,
-                child: ListView(
-                  children: <Widget>[
-                    _handsRadioTile(hangboardFormState, scaffoldContext),
-                    _holdDropdownTile(hangboardFormState, scaffoldContext),
-                    _fingerConfigurationDropdownTile(hangboardFormState, scaffoldContext),
-                    _depthTile(hangboardFormState, scaffoldContext),
-                    _hangProtocolDropdownTile(hangboardFormState, scaffoldContext),
-                    _repDurationTile(hangboardFormState, scaffoldContext),
-                    _restDurationTile(hangboardFormState, scaffoldContext),
-                    _breakDurationTile(hangboardFormState, scaffoldContext),
-                    _hangsPerSetTile(hangboardFormState, scaffoldContext),
-                    _numberOfSetsTile(hangboardFormState, scaffoldContext),
-                    _resistanceTile(hangboardFormState, scaffoldContext),
-                    _saveButton(hangboardFormState, scaffoldContext)
-                  ].where(NullUtil.notNull).toList(),
+      body: BlocProvider<HangboardFormBloc>(
+        create: (_) => hangboardFormBloc,
+        child: BlocListener<HangboardFormBloc, HangboardFormState>(
+          listener: _listenForHangboardFormState,
+          child: BlocBuilder<HangboardFormBloc, HangboardFormState>(
+            cubit: hangboardFormBloc,
+            builder: (context, state) {
+              return Builder(
+                builder: (scaffoldContext) => Form(
+                  key: formKey,
+                  child: ListView(
+                    children: <Widget>[
+                      _handsRadioTile(state, scaffoldContext),
+                      _holdDropdownTile(state, scaffoldContext),
+                      _fingerConfigurationDropdownTile(state, scaffoldContext),
+                      _depthTile(state, scaffoldContext),
+                      _hangProtocolDropdownTile(state, scaffoldContext),
+                      _repDurationTile(state, scaffoldContext),
+                      _restDurationTile(state, scaffoldContext),
+                      _breakDurationTile(state, scaffoldContext),
+                      _hangsPerSetTile(state, scaffoldContext),
+                      _numberOfSetsTile(state, scaffoldContext),
+                      _resistanceTile(state, scaffoldContext),
+                      _saveButton(state, scaffoldContext)
+                    ].where(NullUtil.notNull).toList(),
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
+  }
+
+  void _listenForHangboardFormState(context, state) {
+    if (state.isSuccess) {
+      _exerciseSavedSnackbar(context);
+      hangboardFormBloc.add(ResetFlags());
+    } else if (state.isDuplicate) {
+      _exerciseExistsAlert(state);
+      hangboardFormBloc.add(ResetFlags());
+    } else if (state.isFailure) {
+      _exerciseSaveErrorSnackbar(context);
+      hangboardFormBloc.add(ResetFlags());
+    }
   }
 
   Widget _handsRadioTile(HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
@@ -340,8 +344,6 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  // todo: left off wrapping up form validations. Debounce fields are validating early with new autovalidate type. Probably want to go back to old way
-
   Widget _hangProtocolDropdownTile(
       HangboardFormState hangboardFormState, BuildContext scaffoldContext) {
     return Card(
@@ -443,7 +445,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   },
                 )
               : Row(
-            //todo: tie this to hang protocol? make toggle look more like resistance?
+                  //todo: tie this to hang protocol? make toggle look more like resistance?
                   children: <Widget>[],
                 ),
         ),
@@ -745,8 +747,8 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
     );
   }
 
-  void exerciseSavedSnackbar(BuildContext scaffoldContext) {
-    Scaffold.of(scaffoldContext).showSnackBar(
+  void _exerciseSavedSnackbar(BuildContext scaffoldContext) {
+    ScaffoldMessenger.of(scaffoldContext).showSnackBar(
       SnackBar(
         duration: Duration(days: 1),
         content: Row(
@@ -768,13 +770,79 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     FlatButton(
+                        child: Row(
+                          children: <Widget>[
+                            Text('Back'),
+                          ],
+                        ),
+                        onPressed: () {
+                          ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
+                          Navigator.of(context).pop();
+                        }),
+                    FlatButton(
                       child: Row(
                         children: <Widget>[
-                          Text('Back'),
+                          Text('Continue editing'),
                         ],
                       ),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
+                      },
                     ),
+                    FlatButton(
+                      child: Row(
+                        children: <Widget>[
+                          Text('Reset'),
+                        ],
+                      ),
+                      onPressed: () {
+                        formKey.currentState.reset();
+                        clearFields();
+                        ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _exerciseSaveErrorSnackbar(BuildContext scaffoldContext) {
+    ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+      SnackBar(
+        duration: Duration(days: 1),
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Exercise failed to save. Please try again.',
+                      style: TextStyle(color: Theme.of(scaffoldContext).errorColor),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    FlatButton(
+                        child: Row(
+                          children: <Widget>[
+                            Text('Back'),
+                          ],
+                        ),
+                        onPressed: () {
+                          ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
+                          Navigator.of(context).pop();
+                        }),
                     FlatButton(
                       child: Row(
                         children: <Widget>[

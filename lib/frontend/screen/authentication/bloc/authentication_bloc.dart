@@ -7,10 +7,7 @@ import 'package:flutter/widgets.dart';
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   BaseAuthenticationService authenticationService;
 
-  AuthenticationBloc({@required this.authenticationService});
-
-  @override
-  get initialState => AuthenticationUninitialized();
+  AuthenticationBloc({@required this.authenticationService}) : super(AuthenticationUninitialized());
 
   @override
   Stream<AuthenticationState> mapEventToState(event) {

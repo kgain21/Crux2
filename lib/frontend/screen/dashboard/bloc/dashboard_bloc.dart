@@ -11,10 +11,7 @@ import 'dashboard_state.dart';
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   BaseWorkoutRepository workoutRepository;
 
-  DashboardBloc({@required this.workoutRepository});
-
-  @override
-  get initialState => DashboardUninitialized();
+  DashboardBloc({@required this.workoutRepository}): super(DashboardUninitialized());
 
   @override
   Stream<DashboardState> mapEventToState(event) {
@@ -40,7 +37,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       if (null != cruxWorkout) {
         yield DashboardDateChangeSuccess(selectedDate: date, cruxWorkout: cruxWorkout);
       } else {
-        yield DashboardDateChangeNotFound(selectedDate: date);
+        var cruxWorkout = CruxWorkout((b) => b..workoutDate = date);
+        yield DashboardDateChangeNotFound(selectedDate: date, cruxWorkout: cruxWorkout);
       }
 
     } catch (error) {

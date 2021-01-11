@@ -26,13 +26,13 @@ void main() {
 
   group('basic checks', () {
     test('initial state is correct', () {
-      expect(hangboardFormBloc.initialState, HangboardFormState.initial());
+      expect(hangboardFormBloc.state, HangboardFormState.initial());
     });
 
     test('close does not emit new states', () {
       expectLater(
         hangboardFormBloc,
-        emitsInOrder([HangboardFormState.initial(), emitsDone]),
+        emitsInOrder([emitsDone]),
       );
       hangboardFormBloc.close();
     });
@@ -45,7 +45,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(resistanceUnit: ResistanceUnit.POUNDS),
             ]));
 
@@ -57,7 +56,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(depthUnit: DepthUnit.INCHES),
             ]));
 
@@ -71,7 +69,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(hands: 1),
             ]));
 
@@ -85,7 +82,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(hangProtocol: HangProtocol.MAX_HANGS),
             ]));
 
@@ -95,8 +91,7 @@ void main() {
 
     group('HoldChanged tests', () {
       test('when user changes hold to POCKET', () async {
-        var initialHangboardFormState = HangboardFormState.initial();
-        var holdSelectedChangedState = initialHangboardFormState.update(
+        var holdSelectedChangedState = HangboardFormState.initial().update(
           hold: Hold.HALF_CRIMP,
           showFingerConfiguration: true,
           showDepth: true,
@@ -109,7 +104,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               holdSelectedChangedState,
               fingerConfigurationChangedState,
               depthChangedState,
@@ -136,7 +130,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(
                 hold: Hold.OPEN_HAND,
                 showFingerConfiguration: true,
@@ -153,7 +146,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(
                 hold: Hold.FULL_CRIMP,
                 showFingerConfiguration: false,
@@ -170,7 +162,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(
                 hold: Hold.HALF_CRIMP,
                 showFingerConfiguration: true,
@@ -185,15 +176,13 @@ void main() {
       test(
           'should wipe out depth, fingerConfiguration, and hide those fields when user changes hold to anything else',
           () async {
-        var initialHangboardFormState = HangboardFormState.initial();
-        var depthChangedState = initialHangboardFormState.update(depth: Nullable(1));
+        var depthChangedState = HangboardFormState.initial().update(depth: Nullable(1));
         var fingerConfigurationChangedState = depthChangedState.update(
             fingerConfiguration: Nullable(FingerConfiguration.INDEX_MIDDLE_RING));
 
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               depthChangedState,
               fingerConfigurationChangedState,
               fingerConfigurationChangedState.update(
@@ -219,7 +208,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(
                   fingerConfiguration: Nullable(FingerConfiguration.INDEX_MIDDLE_RING)),
             ]));
@@ -234,7 +222,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(depth: Nullable(1.5)),
             ]));
 
@@ -246,7 +233,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(validDepth: false),
             ]));
 
@@ -261,7 +247,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(restDuration: Nullable(3)),
             ]));
 
@@ -275,7 +260,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(validRestDuration: false),
             ]));
 
@@ -289,7 +273,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(repDuration: 7),
             ]));
 
@@ -303,7 +286,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(validRepDuration: false),
             ]));
 
@@ -317,7 +299,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(hangsPerSet: 6),
             ]));
 
@@ -331,7 +312,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(validHangsPerSet: false),
             ]));
 
@@ -343,12 +323,10 @@ void main() {
       test(
           'emits [initialized, updated state] when user changes showRestDuration, and should wipe out restDuration value',
           () async {
-        var initialHangboardFormState = HangboardFormState.initial();
-        var secondState = initialHangboardFormState.update(restDuration: Nullable(180));
+        var secondState = HangboardFormState.initial().update(restDuration: Nullable(180));
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               secondState,
               secondState.update(
                 showRestDuration: false,
@@ -372,7 +350,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(breakDuration: 180),
             ]));
 
@@ -386,7 +363,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(validBreakDuration: false),
             ]));
 
@@ -400,7 +376,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(numberOfSets: 6),
             ]));
 
@@ -414,7 +389,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(validNumberOfSets: false),
             ]));
 
@@ -424,14 +398,12 @@ void main() {
 
     group('ShowResistanceChanged Tests', () {
       test('when user changes showResistance, should wipe out resistance value', () async {
-        var initialHangboardFormState = HangboardFormState.initial();
-        var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
+        var showResistanceChangedState = HangboardFormState.initial().update(showResistance: true);
         var resistanceChangedState = showResistanceChangedState.update(resistance: Nullable(10.5));
 
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               showResistanceChangedState,
               resistanceChangedState,
               resistanceChangedState.update(
@@ -449,8 +421,7 @@ void main() {
       test(
           'when user changes showResistance with invalid resistance, should set isValidResistance to true',
           () async {
-        var initialHangboardFormState = HangboardFormState.initial();
-        var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
+        var showResistanceChangedState = HangboardFormState.initial().update(showResistance: true);
         var resistanceChangedState = showResistanceChangedState.update(resistance: Nullable(10.5));
         var resistanceChangedState2 =
             resistanceChangedState.update(resistance: Nullable(null), validResistance: false);
@@ -458,7 +429,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               showResistanceChangedState,
               resistanceChangedState,
               resistanceChangedState2,
@@ -483,7 +453,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(resistance: Nullable(10.5)),
             ]));
 
@@ -493,12 +462,10 @@ void main() {
       test(
           'when showResistance is true and resistance is null, should yield state with validResistance set to false',
           () {
-        var initialHangboardFormState = HangboardFormState.initial();
-        var showResistanceChangedState = initialHangboardFormState.update(showResistance: true);
+        var showResistanceChangedState = HangboardFormState.initial().update(showResistance: true);
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               showResistanceChangedState,
               showResistanceChangedState.update(validResistance: false),
             ]));
@@ -529,7 +496,6 @@ void main() {
         expectLater(
             hangboardFormBloc,
             emitsInOrder([
-              initialHangboardFormState,
               initialHangboardFormState.update(autoValidate: true),
             ]));
 

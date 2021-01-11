@@ -27,21 +27,20 @@ void main() {
   });
 
   test('initial state is correct', () {
-    expect(authenticationBloc.initialState, AuthenticationUninitialized());
+    expect(authenticationBloc.state, AuthenticationUninitialized());
   });
 
   test('close does not emit new states', () {
     expectLater(
       authenticationBloc,
-      emitsInOrder([AuthenticationUninitialized(), emitsDone]),
+      emitsInOrder([emitsDone]),
     );
     authenticationBloc.close();
   });
 
   group('Google sign in', () {
-    test('emits [uninitialized, inProgress, success] with FirebaseUser for normal sign in', () {
+    test('emits [inProgress, success] with FirebaseUser for normal sign in', () {
       final expectedResponse = [
-        AuthenticationUninitialized(),
         AuthenticationInProgress(),
         AuthenticationSuccess(cruxUser: cruxUser)
       ];
@@ -53,9 +52,8 @@ void main() {
       authenticationBloc.add(GoogleSignInButtonTapped());
     });
 
-    test('emits [uninitialized, inProgress, failure] when sign in fails', () {
+    test('emits [inProgress, failure] when sign in fails', () {
       final expectedResponse = [
-        AuthenticationUninitialized(),
         AuthenticationInProgress(),
         AuthenticationFailure()
       ];
@@ -67,9 +65,8 @@ void main() {
       authenticationBloc.add(GoogleSignInButtonTapped());
     });
 
-    test('emits [uninitialized, inProgress, error] when sign in errors', () {
+    test('emits [inProgress, error] when sign in errors', () {
       final expectedResponse = [
-        AuthenticationUninitialized(),
         AuthenticationInProgress(),
         AuthenticationError()
       ];
@@ -83,9 +80,8 @@ void main() {
   });
 
   group('Google sign out', () {
-    test('emits [uninitialized, inProgress, uninitialized] when sign out succeeds', () {
+    test('emits [inProgress, uninitialized] when sign out succeeds', () {
       final expectedResponse = [
-        AuthenticationUninitialized(), // had to add this one as an initial state
         AuthenticationInProgress(),
         AuthenticationUninitialized(),
       ];
@@ -97,9 +93,8 @@ void main() {
       authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUser));
     });
 
-    test('emits [uninitialized, inProgress, failure] when sign out fails', () {
+    test('emits [inProgress, failure] when sign out fails', () {
       final expectedResponse = [
-        AuthenticationUninitialized(), // had to add this one as an initial state
         AuthenticationInProgress(),
         AuthenticationFailure(),
       ];
@@ -111,9 +106,8 @@ void main() {
       authenticationBloc.add(AppBarSignOutButtonTapped(cruxUser: cruxUser));
     });
 
-    test('emits [uninitialized, inProgress, error] when sign out errors', () {
+    test('emits [inProgress, error] when sign out errors', () {
       final expectedResponse = [
-        AuthenticationUninitialized(), // had to add this one as an initial state
         AuthenticationInProgress(),
         AuthenticationError(),
       ];

@@ -1,8 +1,10 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
+import 'package:crux/frontend/screen/form/workout/bloc/workout_form_screen_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WorkoutFormScreenArguments {
   final CruxUser cruxUser;
@@ -14,16 +16,28 @@ class WorkoutFormScreenArguments {
   });
 }
 
-class WorkoutFormScreen extends StatelessWidget {
+class WorkoutFormScreen extends StatefulWidget {
   static const routeName = '/workoutForm';
 
+  final WorkoutFormBloc workoutFormScreenBloc;
   final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 
   const WorkoutFormScreen({
+    @required this.workoutFormScreenBloc,
     @required this.cruxUser,
     @required this.cruxWorkout,
   });
+
+  @override
+  State<StatefulWidget> createState() =>
+      _WorkoutFormScreenState(workoutFormBloc: workoutFormScreenBloc);
+}
+
+class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
+  final WorkoutFormBloc workoutFormBloc;
+
+  _WorkoutFormScreenState({@required this.workoutFormBloc});
 
   static const Map<String, String> gridTileMap = {
     'Stretching': WorkoutFormScreen.routeName,
@@ -39,61 +53,78 @@ class WorkoutFormScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         key: Key('workoutFormScaffold'),
-        body: CustomScrollView(
-          slivers: <Widget>[
-            _buildAppBar(context),
-            SliverPadding(
-              padding: EdgeInsets.all(8.0),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return GridTile(
-                      key: Key('${gridTileMap.values.toList()[index].replaceAll('/', '')}Tile'),
-                      header: Checkbox(
-                        value: false,
-                        onChanged: (selected) {
-                          return null;
-                        },
+        body: BlocProvider(
+          create: (_) => workoutFormBloc,
+          child: BlocListener<WorkoutFormBloc, WorkoutFormState>(
+            listener: (context, state) {
+              if(state is WorkoutFormUninitialized) {
+                workoutFormBloc.add(WorkoutFormInitialized());
+              }
+            },
+            child: BlocBuilder<WorkoutFormBloc, WorkoutFormState>(
+              cubit: workoutFormBloc,
+              builder: (context, state) => CustomScrollView(
+                slivers: <Widget>[
+                  _buildAppBar(context),
+                  SliverPadding(
+                    padding: EdgeInsets.all(8.0),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate(
+                        [hangboardWorkoutListTile(context, state)],
                       ),
-                      footer: GridTileBar(
-                        title: Text(gridTileMap.keys.toList()[index]),
-                      ),
-                      child: GestureDetector(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                            color: Theme.of(context).accentColor,
-                            /*gradient: LinearGradient(
-                              begin: Alignment(0.0, 1.0),
-                              end: Alignment(0.0, -1.0),
-                              colors: <Color>[
-                                Theme.of(context).accentColor,
-                                Color(0x00000000),
-                              ],
-                            ),*/
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            gridTileMap.values.toList()[index],
-                            arguments: WorkoutFormScreenArguments(cruxWorkout: cruxWorkout, cruxUser: cruxUser)
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  childCount: gridTileMap.length,
-                ),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 5.0,
-                  crossAxisSpacing: 5.0,
-                ),
+                    ),
+                  )
+                ],
               ),
-            )
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ListTile hangboardWorkoutListTile(BuildContext context, WorkoutFormState state) {
+    return ListTile(
+      tileColor: Theme.of(context).accentColor,
+      key: Key('hangboardWorkoutTile'),
+      title: GridTileBar(
+        title: Text('Hangboard Workout'),
+        subtitle: Text('${state.cruxWorkout?.hangboardWorkout?.workoutTitle ?? ''}'),
+      ),
+      subtitle: GestureDetector(
+        child: Row(
+          //todo: fucking around with this layout - can't seem to get bullets centered w/ row & col.
+          //todo: also need to turn this into a bloc to stream state - added new exercise and it did not
+          //todo: show up after navigating back. Think a bloc would solve this but double check to make sure.
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: state.cruxWorkout?.hangboardWorkout?.hangboardExercises
+                      ?.map((exercise) => Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '${String.fromCharCode(0x2022)} ${exercise.exerciseTitle}',
+                              textAlign: TextAlign.left,
+                            ),
+                          ))
+                      ?.toList() ??
+                  [
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Text(
+                          'No hangboard workout created for selected day. Tap to start making one!'),
+                    ),
+                  ],
+            ),
           ],
         ),
+        onTap: () {
+          Navigator.pushNamed(context, gridTileMap["Hangboard"],
+              arguments: HangboardFormScreenArguments(
+                  cruxUser: state.cruxUser, cruxWorkout: state.cruxWorkout));
+        },
       ),
     );
   }

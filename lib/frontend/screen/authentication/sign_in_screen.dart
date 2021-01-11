@@ -29,31 +29,33 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(context) {
     return Scaffold(
       key: Key('signInScaffold'),
-      body: BlocListener<AuthenticationBloc, AuthenticationState>(
-        key: Key('authenticationBlocListener'),
-        bloc: authenticationBloc,
-        listener: _listenForAuthenticationBlocState,
-        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-          key: Key('authenticationBlocBuilder'),
-          bloc: authenticationBloc,
-          builder: (context, state) {
-            return Center(
-              child: Stack(
-                key: Key('signInStack'),
-                children: <Widget>[
-                  buildBackgroundImage(context),
-                  buildContentOutlineOverlay(context),
-                  buildTitleButtonOverlay(context),
-                ],
-              ),
-            );
-          },
+      body: BlocProvider(
+        create: (_) => authenticationBloc,
+        child: BlocListener<AuthenticationBloc, AuthenticationState>(
+          key: Key('authenticationBlocListener'),
+          listener: _listenForAuthenticationState,
+          child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+            cubit: authenticationBloc,
+            key: Key('authenticationBlocBuilder'),
+            builder: (context, state) {
+              return Center(
+                child: Stack(
+                  key: Key('signInStack'),
+                  children: <Widget>[
+                    buildBackgroundImage(context),
+                    buildContentOutlineOverlay(context),
+                    buildTitleButtonOverlay(context),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
-  void _listenForAuthenticationBlocState(context, state) {
+  void _listenForAuthenticationState(context, state) {
     if (state is AuthenticationSuccess) {
       Navigator.pushNamed(
         context,
@@ -62,7 +64,7 @@ class _SignInScreenState extends State<SignInScreen> {
       );
     }
     else if (state is AuthenticationFailure) {
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         key: Key('failureSnackBar'),
         content: Text(
             'Sign in authentication failed. Please check your credentials and try again or continue as a guest.'),
@@ -71,7 +73,7 @@ class _SignInScreenState extends State<SignInScreen> {
       ));
     }
     else if (state is AuthenticationError) {
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         key: Key('errorSnackBar'),
         content:
             Text('Network error occurred signing in. Please try again or continue as a guest.'),

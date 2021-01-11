@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 @immutable
 abstract class DashboardState extends Equatable {
+  //todo: revisit this - do I want to have named states like this or mirror the form state instead?
   final DateTime selectedDate;
 
   const DashboardState(this.selectedDate);
@@ -49,12 +50,15 @@ class DashboardDateChangeError extends DashboardState {
 
 class DashboardDateChangeNotFound extends DashboardState {
   final DateTime selectedDate;
+  final CruxWorkout cruxWorkout;
 
   @override
-  List<Object> get props => [selectedDate];
+  List<Object> get props => [selectedDate, cruxWorkout];
 
   @override
-  String toString() => '''DashboardDateChangeNotFound: { selectedDate: $selectedDate }''';
+  String toString() =>
+      '''DashboardDateChangeNotFound: { selectedDate: $selectedDate, cruxWorkout: $cruxWorkout }''';
 
-  const DashboardDateChangeNotFound({@required this.selectedDate}) : super(selectedDate);
+  const DashboardDateChangeNotFound({@required this.selectedDate, @required this.cruxWorkout})
+      : super(selectedDate);
 }

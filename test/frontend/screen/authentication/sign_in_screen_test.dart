@@ -13,7 +13,7 @@ import 'package:test/test.dart' as dartTest;
 import '../../../test_util/widget_test_utils.dart';
 
 
-class AuthenticationBlocMock extends MockBloc<AuthenticationEvent, AuthenticationState>
+class AuthenticationBlocMock extends MockBloc<AuthenticationState>
     implements AuthenticationBloc {}
 
 void main() {
@@ -52,7 +52,7 @@ void main() {
 
     testWidgets('Test Sign In Screen basic structure with AuthenticationUninitialized state',
         (WidgetTester tester) async {
-      whenListen(authenticationBlocMock, Stream.value(AuthenticationUninitialized()));
+//      whenListen(authenticationBlocMock, Stream.value(AuthenticationUninitialized()));
 
       await tester.pumpWidget(subject);
 

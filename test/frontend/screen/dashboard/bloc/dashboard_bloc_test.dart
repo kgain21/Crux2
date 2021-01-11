@@ -24,7 +24,7 @@ void main() {
 
   group('basic checks', () {
     test('initial state is correct', () {
-      expect(dashboardBloc.initialState, DashboardUninitialized());
+      expect(dashboardBloc.state, DashboardUninitialized());
     });
 
     test('close does not emit new states', () {

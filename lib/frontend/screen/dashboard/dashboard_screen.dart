@@ -1,5 +1,4 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
-import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
@@ -17,7 +16,10 @@ class DashboardScreen extends StatefulWidget {
   final CruxUser cruxUser;
   final DashboardBloc dashboardBloc;
 
-  const DashboardScreen({@required this.cruxUser, @required this.dashboardBloc});
+  const DashboardScreen({
+    @required this.cruxUser,
+    @required this.dashboardBloc,
+  });
 
   @override
   _DashboardScreenState createState() => _DashboardScreenState(dashboardBloc, cruxUser);
@@ -61,25 +63,27 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: SafeArea(
         child: Scaffold(
           key: Key('dashboardScaffold'),
-          body: BlocListener<DashboardBloc, DashboardState>(
-            key: Key('dashboardBlocListener'),
-            bloc: dashboardBloc,
-            listener: _listenForDashboardBlocState,
-            child: BlocBuilder<DashboardBloc, DashboardState>(
-                key: Key('dashboardBlocBuilder'),
-                bloc: dashboardBloc,
-                builder: (context, state) {
-                  return CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: <Widget>[
-                      _buildAppBar(context, state),
-                      _buildTabBar(),
-                      if (_tabIndex == 0) SliverToBoxAdapter(child: Placeholder()),
-                      if (_tabIndex == 1) _buildTableCalendar(state),
-                      if (_tabIndex == 2) _buildListView(),
-                    ],
-                  );
-                }),
+          body: BlocProvider(
+            create: (_) => dashboardBloc,
+            child: BlocListener<DashboardBloc, DashboardState>(
+              key: Key('dashboardBlocListener'),
+              listener: _listenForDashboardBlocState,
+              child: BlocBuilder<DashboardBloc, DashboardState>(
+                  cubit: dashboardBloc,
+                  key: Key('dashboardBlocBuilder'),
+                  builder: (context, state) {
+                    return CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      slivers: <Widget>[
+                        _buildAppBar(context, state),
+                        _buildTabBar(),
+                        if (_tabIndex == 0) SliverToBoxAdapter(child: Placeholder()),
+                        if (_tabIndex == 1) _buildTableCalendar(state),
+                        if (_tabIndex == 2) _buildListView(),
+                      ],
+                    );
+                  }),
+            ),
           ),
         ),
       ),
@@ -88,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   void _listenForDashboardBlocState(BuildContext context, DashboardState state) {
     if (state is DashboardDateChangeError) {
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         key: Key('workoutLookupError'),
         content: Text('Workout lookup failed. Please check your connection and try again.'),
         duration: Duration(seconds: 5),
@@ -135,7 +139,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   Widget _buildAppBarContent(DashboardState state, BuildContext context) {
     if (state is DashboardUninitialized) {
-      dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: DateTime.now()));
+      var now = DateTime.now();
+      dashboardBloc.add(CalendarDateChanged(
+          cruxUser: cruxUser, selectedDate: DateTime.utc(now.year, now.month, now.day)));
     }
     if (state is DashboardDateChangeInProgress) {
       return LoadingIndicator(
@@ -144,19 +150,34 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     } else if (state is DashboardDateChangeSuccess) {
       return Column(
         children: <Widget>[
-          Text('Current Exercise: '),
+          Text('Workout overview:'),
+          state.cruxWorkout.hangboardWorkout != null
+              ? Text('Hangboard Workout: ${state.cruxWorkout.hangboardWorkout.workoutTitle}')
+              : null,
           Text('Get Started'),
           Icon(Icons.play_arrow),
           Icon(Icons.pause),
           Text('Total Time: 1:34:56'),
+          RaisedButton(
+            child: Text(
+              'EDIT WORKOUT',
+            ),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                WorkoutFormScreen.routeName,
+                arguments: WorkoutFormScreenArguments(
+                  cruxUser: cruxUser,
+                  cruxWorkout: state.cruxWorkout,
+                ),
+              );
+            },
+          ),
         ],
         mainAxisAlignment: MainAxisAlignment.center,
       );
     } else if (state is DashboardDateChangeNotFound) {
-      if (state.selectedDate
-          .subtract(Duration(hours: 12))
-          .difference(DateTime.now().subtract(Duration(days: 1)))
-          .isNegative) {
+      if (state.selectedDate.difference(DateTime.now().subtract(Duration(days: 1))).isNegative) {
         return Column(
           key: Key('noWorkoutFoundAppBar'),
           mainAxisSize: MainAxisSize.min,
@@ -185,7 +206,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     WorkoutFormScreen.routeName,
                     arguments: WorkoutFormScreenArguments(
                       cruxUser: cruxUser,
-                      cruxWorkout: CruxWorkout((b) => b..workoutDate = state.selectedDate),
+                      cruxWorkout: state.cruxWorkout,
                     ),
                   );
                 },
@@ -268,8 +289,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           outsideWeekendStyle: const TextStyle(),
         ),
         calendarController: _calendarController,
-        onDaySelected: (dateTime, events) {
-          dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: dateTime));
+        onDaySelected: (dateTime, events, _) {
+          var selectedDate = DateTime.utc(dateTime.year, dateTime.month, dateTime.day);
+          dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: selectedDate));
         },
       ),
     );

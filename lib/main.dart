@@ -7,15 +7,16 @@ import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dart';
 import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
+import 'package:crux/frontend/screen/form/workout/bloc/workout_form_screen_bloc.dart';
 import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
-import 'package:crux/frontend/simple_bloc_delegate.dart';
+import 'package:crux/frontend/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
   /// Needed to add this since there's an await in main() - update: not anymore but I'm leaving it JIC
   WidgetsFlutterBinding.ensureInitialized();
 
-  BlocSupervisor.delegate = SimpleBlocDelegate();
+  Bloc.observer = SimpleBlocObserver();
 
   runApp(Crux());
 }
@@ -54,15 +55,15 @@ class Crux extends StatelessWidget {
         return MaterialPageRoute(
           builder: (context) {
             return WorkoutFormScreen(
+              workoutFormScreenBloc: injector.get<WorkoutFormBloc>(),
               cruxUser: args.cruxUser,
               cruxWorkout: args.cruxWorkout,
-//              dashboardBloc: injector.get<DashboardBloc>(),
             );
           },
           settings: settings,
         );
       case HangboardFormScreen.routeName:
-        final WorkoutFormScreenArguments args = settings.arguments;
+        final HangboardFormScreenArguments args = settings.arguments;
         return MaterialPageRoute(
           builder: (context) {
             return HangboardFormScreen(

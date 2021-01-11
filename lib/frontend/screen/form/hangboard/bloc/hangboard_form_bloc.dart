@@ -15,10 +15,7 @@ import 'hangboard_form_state.dart';
 class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   final BaseWorkoutRepository baseWorkoutRepository;
 
-  HangboardFormBloc({@required this.baseWorkoutRepository});
-
-  @override
-  get initialState => HangboardFormState.initial();
+  HangboardFormBloc({@required this.baseWorkoutRepository}) : super(HangboardFormState.initial());
 
   @override
   Stream<Transition<HangboardFormEvent, HangboardFormState>> transformEvents(eventStream, next) {
@@ -245,11 +242,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
       } else {
         var cruxWorkout = event.cruxWorkout;
         if (cruxWorkout.hangboardWorkout == null) {
-          cruxWorkout = cruxWorkout.rebuild((cw) => cw
-            ..hangboardWorkout.update((hw) => hw
-              ..workoutTitle = "Tuesday, May 26, 2020"
-              ..hangboardExercises.update((he) => he..build())
-              ..build()));
+          cruxWorkout = initializeHangboardWorkout(cruxWorkout);
         }
 
         CruxWorkout workout = cruxWorkout
@@ -266,6 +259,15 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     } catch (e) {
       yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
     }
+  }
+
+  CruxWorkout initializeHangboardWorkout(CruxWorkout cruxWorkout) {
+    cruxWorkout = cruxWorkout.rebuild((cw) => cw
+      ..hangboardWorkout.update((hw) => hw
+        ..workoutTitle = ""
+        ..hangboardExercises.update((he) => he..build())
+        ..build()));
+    return cruxWorkout;
   }
 
   Stream<HangboardFormState> _addExerciseTitleToState() async* {
