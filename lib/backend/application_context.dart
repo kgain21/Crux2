@@ -31,7 +31,10 @@ class ApplicationContext {
     /* Authentication */
 
     /* Dashboard */
-    injector.map((i) => Firestore.instance, isSingleton: true);
+    injector.map((i) {
+      Firestore.instance.settings(persistenceEnabled: true);
+      return Firestore.instance;
+    }, isSingleton: true);
     injector.map((i) => serializers, isSingleton: true);
 
     injector.map(

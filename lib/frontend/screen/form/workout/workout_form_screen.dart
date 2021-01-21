@@ -1,5 +1,6 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
+import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
 import 'package:crux/frontend/screen/form/workout/bloc/workout_form_screen_bloc.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +8,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WorkoutFormScreenArguments {
-  final CruxUser cruxUser;
+//  final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 
   WorkoutFormScreenArguments({
-    @required this.cruxUser,
+//    @required this.cruxUser,
     @required this.cruxWorkout,
   });
 }
@@ -20,12 +21,13 @@ class WorkoutFormScreen extends StatefulWidget {
   static const routeName = '/workoutForm';
 
   final WorkoutFormBloc workoutFormScreenBloc;
-  final CruxUser cruxUser;
+
+//  final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 
   const WorkoutFormScreen({
     @required this.workoutFormScreenBloc,
-    @required this.cruxUser,
+//    @required this.cruxUser,
     @required this.cruxWorkout,
   });
 
@@ -57,8 +59,8 @@ class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
           create: (_) => workoutFormBloc,
           child: BlocListener<WorkoutFormBloc, WorkoutFormState>(
             listener: (context, state) {
-              if(state is WorkoutFormUninitialized) {
-                workoutFormBloc.add(WorkoutFormInitialized());
+              if (state is WorkoutFormUninitialized) {
+                workoutFormBloc.add(WorkoutFormInitialized(cruxUser: StateContainer.of(context).cruxUser, workoutDate: widget.cruxWorkout.workoutDate));
               }
             },
             child: BlocBuilder<WorkoutFormBloc, WorkoutFormState>(
@@ -102,28 +104,20 @@ class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: state.cruxWorkout?.hangboardWorkout?.hangboardExercises
-                      ?.map((exercise) => Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '${String.fromCharCode(0x2022)} ${exercise.exerciseTitle}',
-                              textAlign: TextAlign.left,
-                            ),
+                      ?.map((exercise) => Text(
+                            '${String.fromCharCode(0x2022)} ${exercise.exerciseTitle}',
+                            textAlign: TextAlign.left,
                           ))
                       ?.toList() ??
                   [
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: Text(
-                          'No hangboard workout created for selected day. Tap to start making one!'),
-                    ),
+                    Text('No hangboard workout created for selected day. Tap to start making one!'),
                   ],
             ),
           ],
         ),
         onTap: () {
           Navigator.pushNamed(context, gridTileMap["Hangboard"],
-              arguments: HangboardFormScreenArguments(
-                  cruxUser: state.cruxUser, cruxWorkout: state.cruxWorkout));
+              arguments: HangboardFormScreenArguments(cruxWorkout: state.cruxWorkout));
         },
       ),
     );

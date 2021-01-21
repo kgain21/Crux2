@@ -1,5 +1,6 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
+import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_event.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.dart';
@@ -16,11 +17,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HangboardFormScreenArguments {
-  final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 
   HangboardFormScreenArguments({
-    @required this.cruxUser,
     @required this.cruxWorkout,
   });
 }
@@ -30,12 +29,10 @@ class HangboardFormScreen extends StatefulWidget {
 
   final HangboardFormBloc hangboardFormBloc;
   final CruxWorkout cruxWorkout;
-  final CruxUser cruxUser;
 
   HangboardFormScreen({
     @required this.hangboardFormBloc,
     @required this.cruxWorkout,
-    @required this.cruxUser,
   });
 
   @override
@@ -687,7 +684,7 @@ class _HangboardFormScreenState extends State<HangboardFormScreen> {
   void _saveTileFields(BuildContext scaffoldContext, HangboardFormState hangboardFormState) {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      hangboardFormBloc.add(ValidSave(cruxUser: widget.cruxUser, cruxWorkout: widget.cruxWorkout));
+      hangboardFormBloc.add(ValidSave(cruxUser: StateContainer.of(context).cruxUser, cruxWorkout: widget.cruxWorkout));
     } else {
       hangboardFormBloc.add(InvalidSave());
     }

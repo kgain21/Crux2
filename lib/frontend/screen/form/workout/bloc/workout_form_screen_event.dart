@@ -5,12 +5,17 @@ abstract class WorkoutFormEvent extends Equatable {
 }
 
 class WorkoutFormInitialized extends WorkoutFormEvent {
+  final CruxUser cruxUser;
+  final DateTime workoutDate;
 
-  const WorkoutFormInitialized();
+  const WorkoutFormInitialized({
+    @required this.cruxUser,
+    @required this.workoutDate,
+  });
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [cruxUser, workoutDate];
 
   @override
-  String toString() => '''WorkoutFormInitialized ''';
+  String toString() => '''WorkoutFormInitialized: { cruxUser: $cruxUser, workoutDate: $workoutDate }''';
 }

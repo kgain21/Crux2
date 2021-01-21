@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
 import 'package:crux/frontend/screen/authentication/bloc/authentication_event.dart';
 import 'package:crux/frontend/screen/authentication/bloc/authentication_state.dart';
@@ -14,8 +16,7 @@ class SignInScreen extends StatefulWidget {
   const SignInScreen({@required this.authenticationBloc});
 
   @override
-  State<StatefulWidget> createState() =>
-      _SignInScreenState(authenticationBloc);
+  State<StatefulWidget> createState() => _SignInScreenState(authenticationBloc);
 }
 
 class _SignInScreenState extends State<SignInScreen> {
@@ -24,6 +25,12 @@ class _SignInScreenState extends State<SignInScreen> {
   final AuthenticationBloc authenticationBloc;
 
   _SignInScreenState(this.authenticationBloc);
+
+
+  @override
+  void didChangeDependencies() {
+
+  }
 
   @override
   Widget build(context) {
@@ -57,13 +64,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _listenForAuthenticationState(context, state) {
     if (state is AuthenticationSuccess) {
+      StateContainer.of(context).updateCruxUser(state.cruxUser);
+
       Navigator.pushNamed(
         context,
         DashboardScreen.routeName,
-        arguments: DashboardScreenArguments(state.cruxUser),
       );
-    }
-    else if (state is AuthenticationFailure) {
+    } else if (state is AuthenticationFailure) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         key: Key('failureSnackBar'),
         content: Text(
@@ -71,8 +78,7 @@ class _SignInScreenState extends State<SignInScreen> {
         duration: Duration(seconds: 5),
         backgroundColor: Theme.of(context).errorColor,
       ));
-    }
-    else if (state is AuthenticationError) {
+    } else if (state is AuthenticationError) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         key: Key('errorSnackBar'),
         content:

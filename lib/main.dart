@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/application_context.dart';
+import 'package:crux/backend/repository/preferences.dart';
 import 'package:crux/backend/util/injector/injector.dart';
+import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
 import 'package:crux/frontend/screen/authentication/sign_in_screen.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
@@ -11,40 +13,37 @@ import 'package:crux/frontend/screen/form/workout/bloc/workout_form_screen_bloc.
 import 'package:crux/frontend/screen/form/workout/workout_form_screen.dart';
 import 'package:crux/frontend/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
-  /// Needed to add this since there's an await in main() - update: not anymore but I'm leaving it JIC
   WidgetsFlutterBinding.ensureInitialized();
-
+  Preferences.sharedPreferences = await SharedPreferences.getInstance();
   Bloc.observer = SimpleBlocObserver();
 
-  runApp(Crux());
+  runApp(StateContainer(
+    child: Crux(),
+  ));
 }
 
 class Crux extends StatelessWidget {
   /// Static and globally available for testing widget properties
   static final ThemeData themeData = ThemeData(
-    primaryColor: Color(0xFFcfd8dc),
-    primaryColorLight: Color(0xFFffffff),
-    accentColor: Color(0xFF42b983),
-    errorColor: Color(0xFFFF6666),
-    snackBarTheme: SnackBarThemeData(),
-    fontFamily: 'Metropolis',
-    iconTheme: IconThemeData(
-      color: Colors.black38
-    )
-  );
+      primaryColor: Color(0xFFcfd8dc),
+      primaryColorLight: Color(0xFFffffff),
+      accentColor: Color(0xFF42b983),
+      errorColor: Color(0xFFFF6666),
+      snackBarTheme: SnackBarThemeData(),
+      fontFamily: 'Metropolis',
+      iconTheme: IconThemeData(color: Colors.black38));
 
   static final Injector injector = ApplicationContext().initialize(Injector.injector);
 
   static Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case DashboardScreen.routeName:
-        final DashboardScreenArguments args = settings.arguments;
         return MaterialPageRoute(
           builder: (context) {
             return DashboardScreen(
-              cruxUser: args.cruxUser,
               dashboardBloc: injector.get<DashboardBloc>(),
             );
           },
@@ -56,7 +55,6 @@ class Crux extends StatelessWidget {
           builder: (context) {
             return WorkoutFormScreen(
               workoutFormScreenBloc: injector.get<WorkoutFormBloc>(),
-              cruxUser: args.cruxUser,
               cruxWorkout: args.cruxWorkout,
             );
           },
@@ -68,7 +66,6 @@ class Crux extends StatelessWidget {
           builder: (context) {
             return HangboardFormScreen(
               hangboardFormBloc: injector.get<HangboardFormBloc>(),
-              cruxUser: args.cruxUser,
               cruxWorkout: args.cruxWorkout,
             );
           },

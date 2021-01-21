@@ -124,7 +124,8 @@ Future<void> main() async {
   group('create workout associated to date tests', () {});
 
   group('updateWorkoutByDate tests', () {
-    test('given valid date with corresponding workout, should update workout and return true',
+    test(
+        'given valid date with corresponding workout, should update workout and return updated workout',
         () async {
       var workoutResource = const Resource('test/resource/workout/test_workout.json');
       var testWorkout = await workoutResource.readAsString();
@@ -135,13 +136,11 @@ Future<void> main() async {
       when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
-      when(collectionReferenceMock.document('$testDate'))
-          .thenReturn(documentReferenceMock);
+      when(collectionReferenceMock.document('$testDate')).thenReturn(documentReferenceMock);
 
       when(serializersMock.serializeWith(any, cruxWorkout)).thenReturn(testWorkoutJson);
 
-      when(documentReferenceMock.setData(testWorkoutJson))
-          .thenAnswer((_) => Future.value(null));
+      when(documentReferenceMock.setData(testWorkoutJson)).thenAnswer((_) => Future.value(null));
 
       CruxWorkout updatedWorkout =
           await firestoreWorkoutRepository.updateWorkout(testUser, cruxWorkout);
@@ -166,6 +165,4 @@ Future<void> main() async {
   });
 
   group('delete workout tests', () {});
-
-  group('find historic workout by date', () {});
 }

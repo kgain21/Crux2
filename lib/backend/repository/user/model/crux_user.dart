@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 @immutable
 class CruxUser extends Equatable {
@@ -7,7 +8,11 @@ class CruxUser extends Equatable {
   final String displayName;
   final String email;
 
-  const CruxUser({@required this.uid, @required this.displayName, @required this.email});
+  const CruxUser({
+    this.uid,
+    this.displayName,
+    this.email,
+  });
 
   @override
   List<Object> get props => [uid, displayName, email];

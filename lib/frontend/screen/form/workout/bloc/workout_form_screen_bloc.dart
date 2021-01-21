@@ -14,7 +14,8 @@ part 'workout_form_screen_state.dart';
 class WorkoutFormBloc extends Bloc<WorkoutFormEvent, WorkoutFormState> {
   BaseWorkoutRepository workoutRepository;
 
-  WorkoutFormBloc() : super(WorkoutFormInitializationInProgress());
+  WorkoutFormBloc({@required this.workoutRepository})
+      : super(WorkoutFormInitializationInProgress());
 
   @override
   Stream<WorkoutFormState> mapEventToState(WorkoutFormEvent event) {
@@ -26,7 +27,7 @@ class WorkoutFormBloc extends Bloc<WorkoutFormEvent, WorkoutFormState> {
   }
 
   Stream<WorkoutFormState> _mapWorkoutFormInitializedToState(WorkoutFormInitialized event) async* {
-    workoutRepository.
+    workoutRepository.findWorkoutByDate(event.workoutDate, event.cruxUser);
     yield WorkoutFormInitializationSuccess();
   }
 }

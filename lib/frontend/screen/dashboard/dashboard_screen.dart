@@ -1,4 +1,5 @@
 import 'package:crux/backend/repository/user/model/crux_user.dart';
+import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
@@ -13,21 +14,18 @@ import 'package:table_calendar/table_calendar.dart';
 class DashboardScreen extends StatefulWidget {
   static const routeName = '/dashboard';
 
-  final CruxUser cruxUser;
   final DashboardBloc dashboardBloc;
 
   const DashboardScreen({
-    @required this.cruxUser,
     @required this.dashboardBloc,
   });
 
   @override
-  _DashboardScreenState createState() => _DashboardScreenState(dashboardBloc, cruxUser);
+  _DashboardScreenState createState() => _DashboardScreenState(dashboardBloc);
 }
 
 class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
   final DashboardBloc dashboardBloc;
-  final CruxUser cruxUser;
 
   TabController _tabController;
   ScrollController _scrollController;
@@ -35,7 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   int _tabIndex = 1;
 
-  _DashboardScreenState(this.dashboardBloc, this.cruxUser);
+  _DashboardScreenState(this.dashboardBloc);
 
   @override
   void initState() {
@@ -141,7 +139,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     if (state is DashboardUninitialized) {
       var now = DateTime.now();
       dashboardBloc.add(CalendarDateChanged(
-          cruxUser: cruxUser, selectedDate: DateTime.utc(now.year, now.month, now.day)));
+          cruxUser: StateContainer.of(context).cruxUser,
+          selectedDate: DateTime.utc(now.year, now.month, now.day)));
     }
     if (state is DashboardDateChangeInProgress) {
       return LoadingIndicator(
@@ -167,7 +166,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 context,
                 WorkoutFormScreen.routeName,
                 arguments: WorkoutFormScreenArguments(
-                  cruxUser: cruxUser,
                   cruxWorkout: state.cruxWorkout,
                 ),
               );
@@ -205,7 +203,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     context,
                     WorkoutFormScreen.routeName,
                     arguments: WorkoutFormScreenArguments(
-                      cruxUser: cruxUser,
                       cruxWorkout: state.cruxWorkout,
                     ),
                   );
@@ -291,7 +288,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         calendarController: _calendarController,
         onDaySelected: (dateTime, events, _) {
           var selectedDate = DateTime.utc(dateTime.year, dateTime.month, dateTime.day);
-          dashboardBloc.add(CalendarDateChanged(cruxUser: cruxUser, selectedDate: selectedDate));
+          dashboardBloc
+              .add(CalendarDateChanged(cruxUser: StateContainer.of(context).cruxUser, selectedDate: selectedDate));
         },
       ),
     );
@@ -321,10 +319,4 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
     return false;
   }
-}
-
-class DashboardScreenArguments {
-  final CruxUser cruxUser;
-
-  DashboardScreenArguments(this.cruxUser);
 }

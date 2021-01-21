@@ -15,7 +15,7 @@ class FirestoreWorkoutRepository implements BaseWorkoutRepository {
   FirestoreWorkoutRepository({@required this.firestore, @required this.serializers});
 
   @override
-  CruxWorkout createWorkout(DateTime dateTime) {
+  CruxWorkout createWorkout(CruxUser cruxUser, DateTime dateTime) {
     // TODO: implement createWorkout
     throw UnimplementedError();
   }
