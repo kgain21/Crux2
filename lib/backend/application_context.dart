@@ -7,7 +7,10 @@ import 'package:crux/backend/util/injector/injector.dart';
 import 'package:crux/frontend/screen/authentication/bloc/authentication_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dart';
-import 'package:crux/frontend/screen/form/workout/bloc/workout_form_screen_bloc.dart';
+import 'package:crux/frontend/screen/form/workout/bloc/workout_form_bloc.dart';
+import 'package:crux/frontend/screen/workout/hangboard/bloc/exercise/hangboard_exercise_bloc.dart';
+import 'package:crux/frontend/screen/workout/hangboard/bloc/workout/hangboard_workout_bloc.dart';
+import 'package:crux/frontend/screen/workout/timer/bloc/timer_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -35,6 +38,7 @@ class ApplicationContext {
       Firestore.instance.settings(persistenceEnabled: true);
       return Firestore.instance;
     }, isSingleton: true);
+
     injector.map((i) => serializers, isSingleton: true);
 
     injector.map(
@@ -48,13 +52,23 @@ class ApplicationContext {
     /* Dashboard */
 
     /* Workout Form */
-    injector.map((i) => WorkoutFormBloc(), isSingleton: true);
+    injector.map(
+        (i) => WorkoutFormBloc(workoutRepository: injector.get<FirestoreWorkoutRepository>()),
+        isSingleton: true);
     /* Workout Form */
 
     /* Hangboard Form*/
     injector.map((i) =>
         HangboardFormBloc(baseWorkoutRepository: injector.get<FirestoreWorkoutRepository>()));
     /* Hangboard Form*/
+
+    /* Hangboard Workout */
+    injector.map((injector) => HangboardWorkoutBloc());
+
+    injector.map((injector) => HangboardExerciseBloc());
+
+    injector.map((injector) => TimerBloc());
+    /* Hangboard Workout */
     return injector;
   }
 }

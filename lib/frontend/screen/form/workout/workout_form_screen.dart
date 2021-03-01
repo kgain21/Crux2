@@ -1,18 +1,19 @@
-import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/form/hangboard/hangboard_form_screen.dart';
-import 'package:crux/frontend/screen/form/workout/bloc/workout_form_screen_bloc.dart';
+import 'package:crux/frontend/screen/form/workout/bloc/workout_form_bloc.dart';
+import 'package:crux/frontend/screen/form/workout/bloc/workout_form_event.dart';
+import 'package:crux/frontend/screen/form/workout/bloc/workout_form_state.dart';
+import 'package:crux/frontend/screen/workout/hangboard/hangboard_workout_screen.dart';
+import 'package:crux/frontend/util_widget/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WorkoutFormScreenArguments {
-//  final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 
   WorkoutFormScreenArguments({
-//    @required this.cruxUser,
     @required this.cruxWorkout,
   });
 }
@@ -20,20 +21,17 @@ class WorkoutFormScreenArguments {
 class WorkoutFormScreen extends StatefulWidget {
   static const routeName = '/workoutForm';
 
-  final WorkoutFormBloc workoutFormScreenBloc;
+  final WorkoutFormBloc workoutFormBloc;
 
-//  final CruxUser cruxUser;
   final CruxWorkout cruxWorkout;
 
   const WorkoutFormScreen({
-    @required this.workoutFormScreenBloc,
-//    @required this.cruxUser,
+    @required this.workoutFormBloc,
     @required this.cruxWorkout,
   });
 
   @override
-  State<StatefulWidget> createState() =>
-      _WorkoutFormScreenState(workoutFormBloc: workoutFormScreenBloc);
+  State<StatefulWidget> createState() => _WorkoutFormScreenState(workoutFormBloc: workoutFormBloc);
 }
 
 class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
@@ -44,40 +42,70 @@ class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
   static const Map<String, String> gridTileMap = {
     'Stretching': WorkoutFormScreen.routeName,
     'Campus Board': WorkoutFormScreen.routeName,
-    'Hangboard': HangboardFormScreen.routeName,
+    'Hangboard Workout': HangboardWorkoutScreen.routeName,
+    'Hangboard Form': HangboardFormScreen.routeName,
     'Climbing': WorkoutFormScreen.routeName,
     'Core': WorkoutFormScreen.routeName,
     'Strength': WorkoutFormScreen.routeName
   };
 
   @override
+  void dispose() {
+    workoutFormBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        key: Key('workoutFormScaffold'),
-        body: BlocProvider(
-          create: (_) => workoutFormBloc,
-          child: BlocListener<WorkoutFormBloc, WorkoutFormState>(
-            listener: (context, state) {
-              if (state is WorkoutFormUninitialized) {
-                workoutFormBloc.add(WorkoutFormInitialized(cruxUser: StateContainer.of(context).cruxUser, workoutDate: widget.cruxWorkout.workoutDate));
-              }
-            },
-            child: BlocBuilder<WorkoutFormBloc, WorkoutFormState>(
-              cubit: workoutFormBloc,
-              builder: (context, state) => CustomScrollView(
-                slivers: <Widget>[
-                  _buildAppBar(context),
-                  SliverPadding(
-                    padding: EdgeInsets.all(8.0),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate(
-                        [hangboardWorkoutListTile(context, state)],
-                      ),
-                    ),
-                  )
-                ],
-              ),
+    return WillPopScope(
+      onWillPop: () {
+        //todo: can I wrap this in a blocking future so that it happens no matter what?
+        workoutFormBloc.add(WorkoutFormClosed());
+        return Future.value((workoutFormBloc.state is WorkoutFormUninitialized));
+        //todo: ^ tthis is not working - bloc gets disposed but state remains what it was initialized to.
+        //todo: Worried that DI of bloc instance might be wrong approach - need a new instance every time we
+        //todo: open the screen? I'd like to avoid that somehow if possible - uninitialize state when leaving
+      },
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(),
+          key: Key('workoutFormScaffold'),
+          body: BlocProvider(
+            create: (_) => workoutFormBloc
+              ..add(WorkoutFormInitialized(
+                  cruxUser: StateContainer.of(context).cruxUser,
+                  workoutDate: widget.cruxWorkout.workoutDate)),
+            child: BlocListener<WorkoutFormBloc, WorkoutFormState>(
+              listener: (context, state) {
+                if (state is WorkoutFormUninitialized) {
+                  workoutFormBloc.add(WorkoutFormInitialized(
+                      cruxUser: StateContainer.of(context).cruxUser,
+                      workoutDate: widget.cruxWorkout.workoutDate));
+                }
+                //todo: error snackbar?
+              },
+              child: BlocBuilder<WorkoutFormBloc, WorkoutFormState>(
+                  cubit: workoutFormBloc,
+                  builder: (context, state) {
+                    if (state is WorkoutFormUninitialized ||
+                        state is WorkoutFormInitializationInProgress) {
+                      return LoadingIndicator(color: Theme.of(context).accentColor);
+                    } else {
+                      return CustomScrollView(
+                        slivers: <Widget>[
+//                  _buildAppBar(context),
+                          SliverPadding(
+                            padding: EdgeInsets.all(8.0),
+                            sliver: SliverList(
+                              delegate: SliverChildListDelegate(
+                                [hangboardWorkoutListTile(context, state)],
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    }
+                  }),
             ),
           ),
         ),
@@ -90,37 +118,66 @@ class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
       tileColor: Theme.of(context).accentColor,
       key: Key('hangboardWorkoutTile'),
       title: GridTileBar(
-        title: Text('Hangboard Workout'),
+        title: Text(
+          'Hangboard Workout',
+          style: TextStyle(fontSize: Theme.of(context).textTheme.headline6.fontSize),
+        ),
         subtitle: Text('${state.cruxWorkout?.hangboardWorkout?.workoutTitle ?? ''}'),
       ),
-      subtitle: GestureDetector(
-        child: Row(
-          //todo: fucking around with this layout - can't seem to get bullets centered w/ row & col.
-          //todo: also need to turn this into a bloc to stream state - added new exercise and it did not
-          //todo: show up after navigating back. Think a bloc would solve this but double check to make sure.
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: state.cruxWorkout?.hangboardWorkout?.hangboardExercises
-                      ?.map((exercise) => Text(
-                            '${String.fromCharCode(0x2022)} ${exercise.exerciseTitle}',
-                            textAlign: TextAlign.left,
-                          ))
-                      ?.toList() ??
-                  [
-                    Text('No hangboard workout created for selected day. Tap to start making one!'),
-                  ],
-            ),
-          ],
-        ),
-        onTap: () {
-          Navigator.pushNamed(context, gridTileMap["Hangboard"],
-              arguments: HangboardFormScreenArguments(cruxWorkout: state.cruxWorkout));
-        },
+      subtitle: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: mapWorkoutContent(state) ?? noWorkoutFoundContent(context, state),
       ),
     );
+  }
+
+  List<Widget> mapWorkoutContent(WorkoutFormState state) {
+    List<Widget> widgets = state.cruxWorkout?.hangboardWorkout?.hangboardExercises
+        // ignore: unnecessary_cast
+        ?.map((exercise) => Row(
+              children: [
+                Text(
+                  '${String.fromCharCode(0x2022)} ${exercise.exerciseTitle}',
+//                  textAlign: TextAlign.left,
+                ),
+              ],
+            ) as Widget)
+        ?.toList();
+
+    widgets?.add(
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, gridTileMap["Hangboard"],
+                arguments: HangboardWorkoutScreenArguments(
+                  hangboardWorkout: state.cruxWorkout.hangboardWorkout,
+                ));
+          },
+          child: Text('START WORKOUT'),
+        ),
+      ),
+    );
+
+    return widgets;
+  }
+
+  List<Widget> noWorkoutFoundContent(BuildContext context, WorkoutFormState state) {
+    return [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20.0),
+        child: Text('No hangboard workout created yet.'),
+      ),
+      RaisedButton(
+        onPressed: () {
+          Navigator.pushNamed(context, HangboardFormScreen.routeName,
+              arguments: HangboardFormScreenArguments(
+                cruxWorkout: state.cruxWorkout,
+              ));
+        },
+        child: Text('GET STARTED'),
+      ),
+    ];
   }
 
   SliverAppBar _buildAppBar(BuildContext context) {

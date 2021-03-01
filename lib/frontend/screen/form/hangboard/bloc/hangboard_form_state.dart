@@ -1,8 +1,8 @@
 import 'package:crux/backend/repository/workout/model/hangboard_exercise.dart';
-import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hang_protocol.dart';
-import 'package:crux/model/hold.dart';
-import 'package:crux/model/unit.dart';
+import 'package:crux/model/hangboard/finger_configuration.dart';
+import 'package:crux/model/hangboard/hang_protocol.dart';
+import 'package:crux/model/hangboard/hold.dart';
+import 'package:crux/model/hangboard/unit.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';

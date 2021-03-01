@@ -1,4 +1,5 @@
 import 'package:crux/backend/repository/workout/base_workout_repository.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
@@ -30,7 +31,7 @@ void main() {
     test('close does not emit new states', () {
       expectLater(
         dashboardBloc,
-        emitsInOrder([DashboardUninitialized(), emitsDone]),
+        emitsInOrder([emitsDone]),
       );
       dashboardBloc.close();
     });
@@ -48,7 +49,6 @@ void main() {
         expectLater(
             dashboardBloc,
             emitsInOrder([
-              DashboardUninitialized(),
               DashboardDateChangeInProgress(),
               DashboardDateChangeSuccess(selectedDate: selectedDate, cruxWorkout: testWorkout),
             ]));
@@ -64,7 +64,6 @@ void main() {
         expectLater(
             dashboardBloc,
             emitsInOrder([
-              DashboardUninitialized(),
               DashboardDateChangeInProgress(),
               DashboardDateChangeError(selectedDate: selectedDate),
             ]));
@@ -78,12 +77,14 @@ void main() {
       test(
           'emits [uninitialized, dateChangeInProgress, dateChangeNotFound] given valid cruxUser'
           ' and selectedDate when no workout found in db', () {
+        var notFoundCruxWorkout = CruxWorkout((b) => b..workoutDate = selectedDate);
+
         expectLater(
             dashboardBloc,
             emitsInOrder([
-              DashboardUninitialized(),
               DashboardDateChangeInProgress(),
-              DashboardDateChangeNotFound(selectedDate: selectedDate),
+              DashboardDateChangeNotFound(
+                  selectedDate: selectedDate, cruxWorkout: notFoundCruxWorkout),
             ]));
 
         when(baseWorkoutRepositoryMock.findWorkoutByDate(selectedDate, testUser))

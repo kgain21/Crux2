@@ -1,7 +1,7 @@
-import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hang_protocol.dart';
-import 'package:crux/model/hold.dart';
-import 'package:crux/model/unit.dart';
+import 'package:crux/model/hangboard/finger_configuration.dart';
+import 'package:crux/model/hangboard/hang_protocol.dart';
+import 'package:crux/model/hangboard/hold.dart';
+import 'package:crux/model/hangboard/unit.dart';
 import 'package:crux/util/string_format_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 

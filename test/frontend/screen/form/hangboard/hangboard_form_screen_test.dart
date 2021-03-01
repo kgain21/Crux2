@@ -27,7 +27,6 @@ void main() {
     subject = buildTestableWidget(
         HangboardFormScreen(
             hangboardFormBloc: hangboardFormBlocMock,
-            cruxUser: cruxUser,
             cruxWorkout: CruxWorkout((cw) => (cw..workoutDate = DateTime.now()).build())),
         navigatorObserverMock: navigatorObserverMock);
   });
@@ -78,4 +77,6 @@ void main() {
       expect(findDepthTile, findsNothing);
     });
   });
+
+  //todo: left off here - no save button tests :( save isn't working rn so make a test. Also test different fields and buttons
 }

@@ -2,10 +2,10 @@
 // https://dart.dev/guides/language/effective-dart/design#avoid-defining-a-class-that-contains-only-static-members
 // TODO: Refactor at some point
 
-import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hang_protocol.dart';
-import 'package:crux/model/hold.dart';
-import 'package:crux/model/unit.dart';
+import 'package:crux/model/hangboard/finger_configuration.dart';
+import 'package:crux/model/hangboard/hang_protocol.dart';
+import 'package:crux/model/hangboard/hold.dart';
+import 'package:crux/model/hangboard/unit.dart';
 import 'package:flutter/foundation.dart';
 
 class StringFormatUtil {

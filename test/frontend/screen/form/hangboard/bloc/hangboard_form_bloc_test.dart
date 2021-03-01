@@ -1,10 +1,10 @@
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_event.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.dart';
-import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hang_protocol.dart';
-import 'package:crux/model/hold.dart';
-import 'package:crux/model/unit.dart';
+import 'package:crux/model/hangboard/finger_configuration.dart';
+import 'package:crux/model/hangboard/hang_protocol.dart';
+import 'package:crux/model/hangboard/hold.dart';
+import 'package:crux/model/hangboard/unit.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';

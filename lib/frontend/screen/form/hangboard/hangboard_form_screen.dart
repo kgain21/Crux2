@@ -1,13 +1,12 @@
-import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_bloc.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_event.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.dart';
-import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hang_protocol.dart';
-import 'package:crux/model/hold.dart';
-import 'package:crux/model/unit.dart';
+import 'package:crux/model/hangboard/finger_configuration.dart';
+import 'package:crux/model/hangboard/hang_protocol.dart';
+import 'package:crux/model/hangboard/hold.dart';
+import 'package:crux/model/hangboard/unit.dart';
 import 'package:crux/util/null_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

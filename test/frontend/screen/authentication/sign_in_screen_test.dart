@@ -52,7 +52,6 @@ void main() {
 
     testWidgets('Test Sign In Screen basic structure with AuthenticationUninitialized state',
         (WidgetTester tester) async {
-//      whenListen(authenticationBlocMock, Stream.value(AuthenticationUninitialized()));
 
       await tester.pumpWidget(subject);
 
@@ -92,7 +91,6 @@ void main() {
         final Route pushedRoute =
             verify(navigatorObserverMock.didPush(captureAny, any)).captured[1];
         expect(pushedRoute.settings.name, DashboardScreen.routeName);
-        expect(pushedRoute.settings.arguments, isA<DashboardScreenArguments>());
       },
     );
 

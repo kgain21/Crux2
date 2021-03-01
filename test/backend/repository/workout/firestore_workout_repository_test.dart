@@ -46,10 +46,10 @@ Future<void> main() async {
 
   group('findWorkoutByDate tests', () {
     test('given valid date with corresponding workout, should return workout', () async {
-      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+      when(firestoreMock.collection('/users/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
-      when(collectionReferenceMock.document('${testDate.toIso8601String()}'))
+      when(collectionReferenceMock.document('${testDate.toUtc()}'))
           .thenReturn(documentReferenceMock);
 
       when(documentReferenceMock.get())
@@ -71,10 +71,10 @@ Future<void> main() async {
     });
 
     test('given no document found, should return null', () async {
-      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+      when(firestoreMock.collection('/users/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
-      when(collectionReferenceMock.document('${testDate.toIso8601String()}'))
+      when(collectionReferenceMock.document('${testDate.toUtc()}'))
           .thenReturn(documentReferenceMock);
 
       when(documentReferenceMock.get())
@@ -89,10 +89,10 @@ Future<void> main() async {
 
     test('given an error occurs on document get, should throw CruxWorkoutRepositoryException',
         () async {
-      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+      when(firestoreMock.collection('/users/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
-      when(collectionReferenceMock.document('${testDate.toIso8601String()}'))
+      when(collectionReferenceMock.document('${testDate.toUtc()}'))
           .thenReturn(documentReferenceMock);
 
       when(documentReferenceMock.get()).thenAnswer((_) => Future<DocumentSnapshot>.error(Error()));
@@ -103,10 +103,10 @@ Future<void> main() async {
 
     test('given an error occurs on deserialization, should throw CruxWorkoutRepositoryException',
         () async {
-      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+      when(firestoreMock.collection('/users/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
-      when(collectionReferenceMock.document('${testDate.toIso8601String()}'))
+      when(collectionReferenceMock.document('${testDate.toUtc()}'))
           .thenReturn(documentReferenceMock);
 
       when(documentReferenceMock.get())
@@ -133,7 +133,7 @@ Future<void> main() async {
 
       CruxWorkout cruxWorkout = TestModelFactory.getTypicalCruxWorkout();
 
-      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+      when(firestoreMock.collection('/users/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
       when(collectionReferenceMock.document('$testDate')).thenReturn(documentReferenceMock);
@@ -151,10 +151,10 @@ Future<void> main() async {
         () async {
       CruxWorkout cruxWorkout = TestModelFactory.getTypicalCruxWorkout();
 
-      when(firestoreMock.collection('/user/${testUser.uid}/workouts'))
+      when(firestoreMock.collection('/users/${testUser.uid}/workouts'))
           .thenReturn(collectionReferenceMock);
 
-      when(collectionReferenceMock.document('${testDate.toIso8601String()}'))
+      when(collectionReferenceMock.document('${testDate.toUtc()}'))
           .thenReturn(documentReferenceMock);
 
       when(serializersMock.serializeWith(any, cruxWorkout)).thenThrow(Exception("Unit Test"));

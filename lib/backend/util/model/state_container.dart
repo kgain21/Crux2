@@ -28,11 +28,15 @@ class StateContainer extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => StateContainerState();
+  State<StatefulWidget> createState() => StateContainerState(cruxUser: cruxUser);
 }
 
 class StateContainerState extends State<StateContainer> {
   CruxUser cruxUser;
+
+  StateContainerState({
+    this.cruxUser,
+  });
 
   void updateCruxUser(CruxUser newCruxUser) {
     if (cruxUser != newCruxUser) {

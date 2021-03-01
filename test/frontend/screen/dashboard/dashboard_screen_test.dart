@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:crux/backend/repository/user/model/crux_user.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
+import 'package:crux/backend/util/model/state_container.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_bloc.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_event.dart';
 import 'package:crux/frontend/screen/dashboard/bloc/dashboard_state.dart';
@@ -13,6 +14,7 @@ import 'package:mockito/mockito.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:test/test.dart' as dartTest;
 
+import '../../../test_util/test_model_factory.dart';
 import '../../../test_util/widget_test_utils.dart';
 
 class ModalRouteMock extends Mock implements ModalRoute {}
@@ -33,11 +35,12 @@ void main() {
     dashboardBlockMock = DashboardBlocMock();
 
     subject = buildTestableWidget(
-        DashboardScreen(
-          cruxUser: cruxUser,
-          dashboardBloc: dashboardBlockMock,
-        ),
-        navigatorObserverMock: navigatorObserverMock);
+      DashboardScreen(
+        dashboardBloc: dashboardBlockMock,
+      ),
+      navigatorObserverMock: navigatorObserverMock,
+      cruxUser: cruxUser,
+    );
   });
 
   dartTest.tearDown(() => dashboardBlockMock.close());
@@ -46,6 +49,8 @@ void main() {
     final findScaffold = find.byKey(Key('dashboardScaffold'));
 
     testWidgets('test Dashboard screen builds correctly', (WidgetTester tester) async {
+      var today = DateTime.now();
+
       when(dashboardBlockMock.state).thenReturn(dashboardUninitialized);
 
       whenListen(
@@ -54,9 +59,15 @@ void main() {
           dashboardUninitialized,
         ]),
       );
+
       await tester.pumpWidget(subject);
 
       dartTest.expect(findScaffold, findsOneWidget);
+      var result = verify(dashboardBlockMock.add(captureThat(isA<CalendarDateChanged>())));
+      result.called(1);
+
+      expect((result.captured.first as CalendarDateChanged).cruxUser, cruxUser);
+      expect((result.captured.first as CalendarDateChanged).selectedDate.day, today.day);
     });
   });
 
@@ -89,7 +100,7 @@ void main() {
 
       // Capture the call to the mock here and assert on it
       var result = verify(dashboardBlockMock.add(captureThat(isA<CalendarDateChanged>())));
-      result.called(1);
+      result.called(2);
 
       expect((result.captured.first as CalendarDateChanged).cruxUser, cruxUser);
       expect((result.captured.first as CalendarDateChanged).selectedDate.day, selectedDate.day);
@@ -116,6 +127,7 @@ void main() {
       await tester.pumpWidget(subject);
 
       expect(find.byType(DashboardScreen), findsOneWidget);
+      //TODO: success interactions need to be built out more - tap edit button, tap start workout button, etc.
     });
 
     testWidgets(
@@ -123,12 +135,15 @@ void main() {
         'noWorkoutFoundAppBar', (WidgetTester tester) async {
       when(dashboardBlockMock.state).thenReturn(dashboardUninitialized);
 
+      var twoDaysAgo = selectedDate.subtract(Duration(days: 2));
       whenListen(
         dashboardBlockMock,
         Stream.fromIterable([
           DashboardUninitialized(),
           DashboardDateChangeInProgress(),
-          DashboardDateChangeNotFound(selectedDate: selectedDate.subtract(Duration(days: 2))),
+          DashboardDateChangeNotFound(
+              selectedDate: twoDaysAgo,
+              cruxWorkout: TestModelFactory.getEmptyCruxWorkout(workoutDate: twoDaysAgo)),
         ]),
       );
 
@@ -153,7 +168,9 @@ void main() {
         Stream.fromIterable([
           DashboardUninitialized(),
           DashboardDateChangeInProgress(),
-          DashboardDateChangeNotFound(selectedDate: futureSelectedDate),
+          DashboardDateChangeNotFound(
+              selectedDate: futureSelectedDate,
+              cruxWorkout: TestModelFactory.getEmptyCruxWorkout(workoutDate: futureSelectedDate)),
         ]),
       );
 
@@ -166,7 +183,6 @@ void main() {
       expect(newWorkoutButton, findsOneWidget);
 
       await tester.tap(newWorkoutButton);
-      await tester.pumpAndSettle();
 
       final Route pushedRoute = verify(navigatorObserverMock.didPush(captureAny, any))
           .captured
@@ -176,10 +192,7 @@ void main() {
       expect(pushedRoute.settings.arguments, isA<WorkoutFormScreenArguments>());
 
       var workoutFormScreenArguments = pushedRoute.settings.arguments as WorkoutFormScreenArguments;
-      expect(workoutFormScreenArguments.cruxUser, cruxUser);
       expect(workoutFormScreenArguments.cruxWorkout, dartTest.isA<CruxWorkout>());
-
-      expect(find.byType(WorkoutFormScreen), findsOneWidget);
     });
 
     testWidgets(

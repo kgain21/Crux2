@@ -9,21 +9,17 @@ import 'package:crux/backend/repository/workout/model/hangboard_workout.dart';
 import 'package:crux/backend/repository/workout/model/strength_workout.dart';
 import 'package:crux/backend/repository/workout/model/stretching_workout.dart';
 import 'package:crux/frontend/screen/form/hangboard/bloc/hangboard_form_state.dart';
-import 'package:crux/model/finger_configuration.dart';
-import 'package:crux/model/hang_protocol.dart';
-import 'package:crux/model/hold.dart';
-import 'package:crux/model/unit.dart';
+import 'package:crux/model/hangboard/finger_configuration.dart';
+import 'package:crux/model/hangboard/hang_protocol.dart';
+import 'package:crux/model/hangboard/hold.dart';
+import 'package:crux/model/hangboard/unit.dart';
 
 class TestModelFactory {
   static CruxWorkout getTypicalCruxWorkout() {
     return CruxWorkout((cw) {
       return cw
         ..workoutDate = DateTime.utc(2020, 5, 26, 12, 0, 0)
-        ..hangboardWorkout = (HangboardWorkoutBuilder()
-          ..workoutTitle = "Tuesday, May 26, 2020"
-          ..hangboardExercises =
-              (ListBuilder<HangboardExercise>([getTypicalHangboardExercise()])..build())
-          ..build())
+        ..hangboardWorkout = (getTypicalHangboardWorkout().toBuilder()..build())
         ..climbingWorkout = (ClimbingWorkoutBuilder()..build())
         ..stretchingWorkout = (StretchingWorkoutBuilder()..build())
         ..strengthWorkout = (StrengthWorkoutBuilder()..build())
@@ -33,11 +29,19 @@ class TestModelFactory {
     });
   }
 
+  static HangboardWorkout getTypicalHangboardWorkout() {
+    return HangboardWorkout((hw) => hw
+      ..workoutTitle = "Tuesday, May 26, 2020"
+      ..hangboardExercises =
+          (ListBuilder<HangboardExercise>([getTypicalHangboardExercise()])..build())
+      ..build());
+  }
+
   static HangboardExercise getTypicalHangboardExercise() {
     return HangboardExercise((he) => he
+      ..exerciseTitle = "Two-Handed 12mm I/M/R/P Half Crimp Repeaters"
       ..breakDuration = 180
       ..depthUnit = DepthUnit.MILLIMETERS.abbreviation
-      ..exerciseTitle = "Two-Handed 12mm I/M/R/P Half Crimp Repeaters"
       ..fingerConfiguration = FingerConfiguration.INDEX_MIDDLE_RING_PINKIE.name
       ..hangsPerSet = 6
       ..depth = 12
@@ -54,6 +58,10 @@ class TestModelFactory {
 
   static CruxUser getTypicalCruxUser() {
     return CruxUser(uid: '12345', displayName: 'Kyle Gain', email: 'abc123@gmail.com');
+  }
+
+  static CruxWorkout getEmptyCruxWorkout({DateTime workoutDate}) {
+    return CruxWorkout((b) => b..workoutDate = workoutDate ?? DateTime.utc(2020, 5, 26, 12, 0, 0));
   }
 
   static HangboardFormState getTypicalOneHandedHangboardWorkoutFormState() {
