@@ -38,10 +38,13 @@ class WorkoutFormInitializationSuccess extends WorkoutFormState {
 }
 
 class WorkoutFormInitializationNotFound extends WorkoutFormState {
-  const WorkoutFormInitializationNotFound() : super(cruxWorkout: null);
+  final CruxWorkout cruxWorkout;
+
+  const WorkoutFormInitializationNotFound({@required this.cruxWorkout})
+      : super(cruxWorkout: cruxWorkout);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [cruxWorkout];
 }
 
 class WorkoutFormInitializationError extends WorkoutFormState {

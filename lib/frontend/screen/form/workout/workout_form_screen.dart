@@ -50,6 +50,16 @@ class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
   };
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    workoutFormBloc.add(WorkoutFormInitialized(
+      cruxUser: StateContainer.of(context).cruxUser,
+      workoutDate: widget.cruxWorkout.workoutDate,
+    ));
+  }
+
+  @override
   void dispose() {
     workoutFormBloc.close();
     super.dispose();
@@ -57,56 +67,38 @@ class _WorkoutFormScreenState extends State<WorkoutFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        //todo: can I wrap this in a blocking future so that it happens no matter what?
-        workoutFormBloc.add(WorkoutFormClosed());
-        return Future.value((workoutFormBloc.state is WorkoutFormUninitialized));
-        //todo: ^ tthis is not working - bloc gets disposed but state remains what it was initialized to.
-        //todo: Worried that DI of bloc instance might be wrong approach - need a new instance every time we
-        //todo: open the screen? I'd like to avoid that somehow if possible - uninitialize state when leaving
-      },
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(),
-          key: Key('workoutFormScaffold'),
-          body: BlocProvider(
-            create: (_) => workoutFormBloc
-              ..add(WorkoutFormInitialized(
-                  cruxUser: StateContainer.of(context).cruxUser,
-                  workoutDate: widget.cruxWorkout.workoutDate)),
-            child: BlocListener<WorkoutFormBloc, WorkoutFormState>(
-              listener: (context, state) {
-                if (state is WorkoutFormUninitialized) {
-                  workoutFormBloc.add(WorkoutFormInitialized(
-                      cruxUser: StateContainer.of(context).cruxUser,
-                      workoutDate: widget.cruxWorkout.workoutDate));
-                }
-                //todo: error snackbar?
-              },
-              child: BlocBuilder<WorkoutFormBloc, WorkoutFormState>(
-                  cubit: workoutFormBloc,
-                  builder: (context, state) {
-                    if (state is WorkoutFormUninitialized ||
-                        state is WorkoutFormInitializationInProgress) {
-                      return LoadingIndicator(color: Theme.of(context).accentColor);
-                    } else {
-                      return CustomScrollView(
-                        slivers: <Widget>[
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        key: Key('workoutFormScaffold'),
+        body: BlocProvider(
+          create: (_) => workoutFormBloc,
+          child: BlocListener<WorkoutFormBloc, WorkoutFormState>(
+            listener: (context, state) {
+              //todo: error snackbar?
+            },
+            child: BlocBuilder<WorkoutFormBloc, WorkoutFormState>(
+                cubit: workoutFormBloc,
+                builder: (context, state) {
+                  if (state is WorkoutFormUninitialized ||
+                      state is WorkoutFormInitializationInProgress) {
+                    return LoadingIndicator(color: Theme.of(context).accentColor);
+                  } else {
+                    return CustomScrollView(
+                      slivers: <Widget>[
 //                  _buildAppBar(context),
-                          SliverPadding(
-                            padding: EdgeInsets.all(8.0),
-                            sliver: SliverList(
-                              delegate: SliverChildListDelegate(
-                                [hangboardWorkoutListTile(context, state)],
-                              ),
+                        SliverPadding(
+                          padding: EdgeInsets.all(8.0),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate(
+                              [hangboardWorkoutListTile(context, state)],
                             ),
-                          )
-                        ],
-                      );
-                    }
-                  }),
-            ),
+                          ),
+                        )
+                      ],
+                    );
+                  }
+                }),
           ),
         ),
       ),

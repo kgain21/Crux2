@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/repository/workout/base_workout_repository.dart';
 import 'package:crux/backend/repository/workout/model/crux_workout.dart';
@@ -257,6 +259,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
         }
       }
     } catch (e) {
+      log('Error occurred saving hangboardForm: ', error: e);
       yield state.update(isFailure: true, isSuccess: false, isDuplicate: false);
     }
   }
@@ -264,7 +267,7 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
   CruxWorkout initializeHangboardWorkout(CruxWorkout cruxWorkout) {
     cruxWorkout = cruxWorkout.rebuild((cw) => cw
       ..hangboardWorkout.update((hw) => hw
-        ..workoutTitle = ""
+        ..workoutTitle = "" //todo: what should this be?
         ..hangboardExercises.update((he) => he..build())
         ..build()));
     return cruxWorkout;
@@ -283,8 +286,8 @@ class HangboardFormBloc extends Bloc<HangboardFormEvent, HangboardFormState> {
     yield state.update(exerciseTitle: exerciseTitle);
   }
 
-  /// Check for duplicate exercises iterating through [hangboardExercises] and using overridden
-  /// equality operator from [HangboardExercise].
+  /// Check for duplicate exercises iterating through the existing [cruxWorkout]
+  /// [hangboardExercises], and using overridden equality operator from [HangboardExercise].
   bool _isDuplicate(HangboardExercise hangboardExercise, ValidSave event) {
     if (event.cruxWorkout.hangboardWorkout == null) {
       return false;

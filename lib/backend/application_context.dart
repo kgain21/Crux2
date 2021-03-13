@@ -22,22 +22,26 @@ class ApplicationContext {
     injector.map((i) => GoogleSignIn(), isSingleton: true);
 
     injector.map(
-        (i) => GoogleSignInAuthenticationService(
-              credentialManager: injector.get<CredentialManager>(),
-              firebaseAuth: injector.get<FirebaseAuth>(),
-              googleSignIn: injector.get<GoogleSignIn>(),
-            ),
-        isSingleton: true);
+      (i) => GoogleSignInAuthenticationService(
+        credentialManager: injector.get<CredentialManager>(),
+        firebaseAuth: injector.get<FirebaseAuth>(),
+        googleSignIn: injector.get<GoogleSignIn>(),
+      ),
+      isSingleton: true,
+    );
 
-    injector.map((i) => AuthenticationBloc(
-        authenticationService: injector.get<GoogleSignInAuthenticationService>()));
+    injector.map(
+      (i) => AuthenticationBloc(
+          authenticationService: injector.get<GoogleSignInAuthenticationService>()),
+      isSingleton: false,
+    );
     /* Authentication */
 
     /* Dashboard */
-    injector.map((i) {
-      Firestore.instance.settings(persistenceEnabled: true);
-      return Firestore.instance;
-    }, isSingleton: true);
+    injector.map(
+      (i) => Firestore.instance.settings(persistenceEnabled: true),
+      isSingleton: true,
+    );
 
     injector.map((i) => serializers, isSingleton: true);
 
@@ -46,28 +50,44 @@ class ApplicationContext {
             firestore: injector.get<Firestore>(), serializers: injector.get<Serializers>()),
         isSingleton: true);
 
-    injector.map((i) => DashboardBloc(
-          workoutRepository: injector.get<FirestoreWorkoutRepository>(),
-        ));
+    injector.map(
+      (i) => DashboardBloc(
+        workoutRepository: injector.get<FirestoreWorkoutRepository>(),
+      ),
+      isSingleton: false,
+    );
     /* Dashboard */
 
     /* Workout Form */
     injector.map(
-        (i) => WorkoutFormBloc(workoutRepository: injector.get<FirestoreWorkoutRepository>()),
-        isSingleton: true);
+      (i) => WorkoutFormBloc(workoutRepository: injector.get<FirestoreWorkoutRepository>()),
+      isSingleton: false,
+    );
     /* Workout Form */
 
     /* Hangboard Form*/
-    injector.map((i) =>
-        HangboardFormBloc(baseWorkoutRepository: injector.get<FirestoreWorkoutRepository>()));
+    injector.map(
+      (i) => HangboardFormBloc(baseWorkoutRepository: injector.get<FirestoreWorkoutRepository>()),
+      isSingleton: false,
+    );
     /* Hangboard Form*/
 
     /* Hangboard Workout */
-    injector.map((injector) => HangboardWorkoutBloc());
+    injector.map(
+      (i) => HangboardWorkoutBloc(),
+      isSingleton: false,
+    );
 
-    injector.map((injector) => HangboardExerciseBloc());
+    injector.map(
+      (i) => HangboardExerciseBloc(),
+      isSingleton: false,
+    );
 
-    injector.map((injector) => TimerBloc());
+    injector.map(
+      (i) => TimerBloc(),
+      isSingleton: false,
+    );
+
     /* Hangboard Workout */
     return injector;
   }

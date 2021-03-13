@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:crux/backend/repository/workout/base_workout_repository.dart';
+import 'package:crux/backend/repository/workout/model/crux_workout.dart';
 import 'package:crux/frontend/screen/form/workout/bloc/workout_form_event.dart';
 import 'package:crux/frontend/screen/form/workout/bloc/workout_form_state.dart';
 import 'package:flutter/widgets.dart';
@@ -10,7 +11,9 @@ import 'package:flutter/widgets.dart';
 class WorkoutFormBloc extends Bloc<WorkoutFormEvent, WorkoutFormState> {
   BaseWorkoutRepository workoutRepository;
 
-  WorkoutFormBloc({@required this.workoutRepository}) : super(WorkoutFormUninitialized());
+  WorkoutFormBloc({
+    @required this.workoutRepository,
+  }) : super(WorkoutFormUninitialized());
 
   @override
   Stream<WorkoutFormState> mapEventToState(WorkoutFormEvent event) {
@@ -27,13 +30,15 @@ class WorkoutFormBloc extends Bloc<WorkoutFormEvent, WorkoutFormState> {
     yield WorkoutFormInitializationInProgress();
 
     try {
+      var workoutDate = event.workoutDate;
       var cruxWorkout =
-          await workoutRepository.findWorkoutByDate(event.workoutDate, event.cruxUser);
+          await workoutRepository.findWorkoutByDate(workoutDate, event.cruxUser);
 
       if (cruxWorkout != null) {
         yield WorkoutFormInitializationSuccess(cruxWorkout: cruxWorkout);
       } else {
-        yield WorkoutFormInitializationNotFound();
+        var cruxWorkout = CruxWorkout((b) => b..workoutDate = workoutDate);
+        yield WorkoutFormInitializationNotFound(cruxWorkout: cruxWorkout);
       }
     } catch (error) {
       log('Error occurred retrieving cruxWorkout for WorkoutFormScreen.', error: error);
